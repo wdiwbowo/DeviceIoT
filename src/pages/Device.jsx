@@ -1,24 +1,89 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Navbar from "../components/Navbar";
+import apiService from '../services/apiservice';
 
 export default function Device() {
     const [showModal, setShowModal] = useState(false);
+    const [devices, setDevices] = useState([]);
+    const [error, setError] = useState(null);
+    const [deviceData, setDeviceData] = useState({
+        companyGuid: "",
+        deviceGuid: "",
+        mac: "",
+        name: "",
+        type: "",
+        latitude: "",
+        longitude: "",
+        sensorUnit: "",
+        status: false,
+        active: false,
+        image: ""
+    });
 
-    // Updated data array with new fields
-    const data = [
-        {
-            deviceGuid: "DEVICE-87654322-2024",
-            mac: "00:1B:44:11:3A:B7",
-            name: "Temperature Sensor",
-            type: "Sensor",
-            latitude: "37.7749",
-            longitude: "-122.4194",
-            status: true,
-            active: true,
-            image: "device-image.jpg",
-        },
-        // Add more devices here if needed
-    ];
+    useEffect(() => {
+        const fetchDevices = async () => {
+            try {
+                const response = await apiService.getAllDevices();
+                if (response.success && Array.isArray(response.data.devices)) {
+                    setDevices(response.data.devices);
+                } else {
+                    console.error('Data fetched is not an array:', response);
+                }
+            } catch (error) {
+                console.error('Error fetching devices:', error);
+            }
+        };
+    
+        fetchDevices();
+    }, []);
+
+    const handleChange = (e) => {
+        const { name, value, type, checked } = e.target;
+        setDeviceData((prevState) => ({
+            ...prevState,
+            [name]: type === "checkbox" ? checked : value,
+        }));
+    };
+
+    const handleAddDevice = async () => {
+        // Validasi input
+        const requiredFields = ['companyGuid', 'deviceGuid', 'mac', 'name', 'type', 'latitude', 'longitude', 'sensorUnit'];
+        const missingFields = requiredFields.filter(field => !deviceData[field]);
+
+        if (missingFields.length > 0) {
+            setError(`Missing fields: ${missingFields.join(', ')}`);
+            return;
+        }
+
+        try {
+            await apiService.addDevice(deviceData);
+            setShowModal(false);
+            setDeviceData({
+                companyGuid: "",
+                deviceGuid: "",
+                mac: "",
+                name: "",
+                type: "",
+                latitude: "",
+                longitude: "",
+                sensorUnit: "",
+                status: false,
+                active: false,
+                image: ""
+            });
+            // Refresh the device list
+            const response = await apiService.getAllDevices();
+            if (response.success && Array.isArray(response.data.devices)) {
+                setDevices(response.data.devices);
+            } else {
+                console.error("Data fetched is not an array:", response);
+                setError("Invalid data format from API.");
+            }
+        } catch (error) {
+            console.error("Failed to add device:", error.message);
+            setError("Failed to add device. Please try again.");
+        }
+    };
 
     return (
         <div className="bg-gray-100 dark:bg-gray-900 min-h-screen">
@@ -33,12 +98,19 @@ export default function Device() {
                         Add Device
                     </button>
                 </div>
+
+                {error && (
+                    <div className="mb-4 p-4 bg-red-100 text-red-700 rounded">
+                        <p>{error}</p>
+                    </div>
+                )}
+
                 <div className="overflow-x-auto bg-white dark:bg-gray-800 rounded-lg shadow-md">
                     <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                         <thead className="bg-gray-50 dark:bg-gray-700">
                             <tr>
                                 <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">#</th>
-                                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">Device ID</th>
+                                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">Device GUID</th>
                                 <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">MAC Address</th>
                                 <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">Name</th>
                                 <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">Type</th>
@@ -46,118 +118,194 @@ export default function Device() {
                                 <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">Longitude</th>
                                 <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">Status</th>
                                 <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">Active</th>
+                                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">Image</th>
                                 <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider"></th>
                             </tr>
                         </thead>
                         <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                            {data.map((item, index) => (
-                                <tr key={item.deviceGuid} className="hover:bg-gray-100 dark:hover:bg-gray-700">
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">{index + 1}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{item.deviceGuid}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{item.mac}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{item.name}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{item.type}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{item.latitude}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{item.longitude}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{item.status ? "Active" : "Inactive"}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{item.active ? "Yes" : "No"}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                        <button className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-600 mr-4">Edit</button>
-                                        <button className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-600">Delete</button>
+                            {devices.length === 0 ? (
+                                <tr>
+                                    <td colSpan="11" className="px-6 py-4 text-center text-gray-500 dark:text-gray-300">
+                                        No devices found
                                     </td>
                                 </tr>
-                            ))}
+                            ) : (
+                                devices.map((item, index) => (
+                                    <tr key={item.deviceGuid || index} className="hover:bg-gray-100 dark:hover:bg-gray-700">
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">{index + 1}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{item.deviceGuid}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{item.mac}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{item.name}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{item.type}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{item.latitude}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{item.longitude}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{item.status ? 'True' : 'False'}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{item.active ? 'Active' : 'Inactive'}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
+                                            {item.image && <img src={item.image} alt={item.name} className="w-16 h-16 object-cover rounded" />}
+                                        </td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                            <button className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300">Edit</button>
+                                            <button className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 ml-4">Delete</button>
+                                        </td>
+                                    </tr>
+                                ))
+                            )}
                         </tbody>
                     </table>
                 </div>
-            </div>
 
-            {showModal && (
-                <div className="fixed z-10 inset-0 overflow-y-auto">
-                    <div className="flex items-center justify-center min-h-screen px-4">
-                        <div className="fixed inset-0 transition-opacity" aria-hidden="true">
-                            <div className="absolute inset-0 bg-black opacity-50"></div>
-                        </div>
-
-                        <div className="bg-white dark:bg-gray-800 rounded-lg overflow-hidden shadow-xl transform transition-all sm:max-w-lg sm:w-full">
-                            <div className="bg-white dark:bg-gray-800 px-6 pt-5 pb-4 sm:p-6 sm:pb-4">
-                                <div className="sm:flex sm:items-start">
-                                    <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
-                                        <h3 className="text-lg leading-6 font-medium text-gray-900 dark:text-white" id="modal-title">
-                                            Add New Device
-                                        </h3>
-                                        <div className="mt-4 space-y-4">
-                                            <input
-                                                type="text"
-                                                className="w-full px-4 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                                                placeholder="Device ID"
-                                            />
-                                            <input
-                                                type="text"
-                                                className="w-full px-4 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                                                placeholder="MAC Address"
-                                            />
-                                            <input
-                                                type="text"
-                                                className="w-full px-4 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                                                placeholder="Name"
-                                            />
-                                            <input
-                                                type="text"
-                                                className="w-full px-4 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                                                placeholder="Type"
-                                            />
-                                            <input
-                                                type="text"
-                                                className="w-full px-4 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                                                placeholder="Latitude"
-                                            />
-                                            <input
-                                                type="text"
-                                                className="w-full px-4 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                                                placeholder="Longitude"
-                                            />
-                                            <input
-                                                type="text"
-                                                className="w-full px-4 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                                                placeholder="Sensor Unit"
-                                            />
-                                            <input
-                                                type="text"
-                                                className="w-full px-4 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                                                placeholder="Image URL"
-                                            />
-                                            <div className="flex items-center">
-                                                <input
-                                                    type="checkbox"
-                                                    className="mr-2"
-                                                />
-                                                <label className="text-gray-700 dark:text-gray-300">Active</label>
-                                            </div>
-                                        </div>
+                {showModal && (
+                    <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50">
+                        <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-lg w-full max-w-3xl">
+                            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">Add Device</h2>
+                            <form className="space-y-4">
+                                {/* Form Part 1 */}
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Company GUID</label>
+                                        <input
+                                            type="text"
+                                            name="companyGuid"
+                                            value={deviceData.companyGuid}
+                                            onChange={handleChange}
+                                            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 dark:bg-gray-900 dark:text-gray-100"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Device GUID</label>
+                                        <input
+                                            type="text"
+                                            name="deviceGuid"
+                                            value={deviceData.deviceGuid}
+                                            onChange={handleChange}
+                                            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 dark:bg-gray-900 dark:text-gray-100"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">MAC Address</label>
+                                        <input
+                                            type="text"
+                                            name="mac"
+                                            value={deviceData.mac}
+                                            onChange={handleChange}
+                                            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 dark:bg-gray-900 dark:text-gray-100"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Name</label>
+                                        <input
+                                            type="text"
+                                            name="name"
+                                            value={deviceData.name}
+                                            onChange={handleChange}
+                                            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 dark:bg-gray-900 dark:text-gray-100"
+                                        />
                                     </div>
                                 </div>
-                            </div>
-                            <div className="bg-gray-50 dark:bg-gray-700 px-6 py-4 sm:px-6 sm:flex sm:flex-row-reverse">
-                                <button
-                                    type="button"
-                                    className="w-full inline-flex justify-center rounded-lg border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 sm:ml-3 sm:w-auto sm:text-sm"
-                                    onClick={() => setShowModal(false)}
-                                >
-                                    Save
-                                </button>
-                                <button
-                                    type="button"
-                                    className="mt-3 w-full inline-flex justify-center rounded-lg border border-gray-300 shadow-sm px-4 py-2 bg-white dark:bg-gray-800 text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 sm:mt-0 sm:w-auto sm:text-sm"
-                                    onClick={() => setShowModal(false)}
-                                >
-                                    Cancel
-                                </button>
-                            </div>
+
+                                {/* Form Part 2 */}
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Type</label>
+                                        <input
+                                            type="text"
+                                            name="type"
+                                            value={deviceData.type}
+                                            onChange={handleChange}
+                                            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 dark:bg-gray-900 dark:text-gray-100"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Latitude</label>
+                                        <input
+                                            type="number"
+                                            name="latitude"
+                                            value={deviceData.latitude}
+                                            onChange={handleChange}
+                                            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 dark:bg-gray-900 dark:text-gray-100"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Longitude</label>
+                                        <input
+                                            type="number"
+                                            name="longitude"
+                                            value={deviceData.longitude}
+                                            onChange={handleChange}
+                                            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 dark:bg-gray-900 dark:text-gray-100"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Sensor Unit</label>
+                                        <input
+                                            type="text"
+                                            name="sensorUnit"
+                                            value={deviceData.sensorUnit}
+                                            onChange={handleChange}
+                                            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 dark:bg-gray-900 dark:text-gray-100"
+                                        />
+                                    </div>
+                                </div>
+
+                                {/* Form Part 3 */}
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="flex items-center">
+                                        <input
+                                            type="checkbox"
+                                            name="status"
+                                            checked={deviceData.status}
+                                            onChange={handleChange}
+                                            className="mr-2"
+                                        />
+                                        <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Status</label>
+                                    </div>
+                                    <div className="flex items-center">
+                                        <input
+                                            type="checkbox"
+                                            name="active"
+                                            checked={deviceData.active}
+                                            onChange={handleChange}
+                                            className="mr-2"
+                                        />
+                                        <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Active</label>
+                                    </div>
+                                </div>
+
+                                {/* Form Part 4 */}
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Image URL</label>
+                                    <input
+                                        type="text"
+                                        name="image"
+                                        value={deviceData.image}
+                                        onChange={handleChange}
+                                        className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 dark:bg-gray-900 dark:text-gray-100"
+                                    />
+                                </div>
+
+                                {/* Form Buttons */}
+                                <div className="flex justify-end space-x-4">
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowModal(false)}
+                                        className="bg-gray-500 text-white px-4 py-2 rounded-md shadow hover:bg-gray-600 dark:bg-gray-700 dark:hover:bg-gray-600"
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={handleAddDevice}
+                                        className="bg-blue-600 text-white px-4 py-2 rounded-md shadow hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
+                                    >
+                                        Add Device
+                                    </button>
+                                </div>
+                            </form>
                         </div>
                     </div>
-                </div>
-            )}
+                )}
+            </div>
         </div>
     );
 }

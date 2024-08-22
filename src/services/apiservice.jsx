@@ -39,6 +39,24 @@ const apiService = {
       throw new Error(error.response?.data?.message || 'Failed to fetch rules');
     }
   },
+
+  getAllDevices: async () => {
+    try {
+      const response = await apiClient.get('/devices/admin/get');
+      return response.data; // Adjust according to the actual API response structure
+    } catch (error) {
+      throw new Error(error.response?.data?.message || 'Failed to fetch devices');
+    }
+  },
+
+  addDevice: async (deviceData) => {
+    try {
+      const response = await apiClient.post('/devices/admin/add', deviceData);
+      return response.data;
+    } catch (error) {
+      throw new Error(error.response?.data?.message || 'Failed to add device');
+    }
+  },
 };
 
 export default apiService;
