@@ -11,6 +11,7 @@ const Rules = () => {
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
+    const [successMessage, setSuccessMessage] = useState(""); // State for success message
 
     // Fetch data from API on component mount
     useEffect(() => {
@@ -33,10 +34,12 @@ const Rules = () => {
     const handleSave = async () => {
         setLoading(true);
         setErrorMessage(""); // Reset error message before starting
+        setSuccessMessage(""); // Reset success message before starting
         try {
             const response = await apiService.addRule(guidInput, valueInput, guidOutput, valueOutput);
             console.log('Rule added successfully:', response);
             setData([...data, { guidInput, valueInput, guidOutput, valueOutput }]); // Add new rule to state
+            setSuccessMessage("Rule added successfully!"); // Set success message
             setShowModal(false); // Close modal on success
         } catch (error) {
             setErrorMessage(error.message || "Failed to add rule.");
@@ -51,7 +54,7 @@ const Rules = () => {
             <Navbar />
             <div className="container mx-auto py-8">
                 <div className="flex justify-between items-center mb-8">
-                    <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Rules Management</h1>
+                    <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Rules</h1>
                     <button
                         className="bg-blue-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
                         onClick={() => setShowModal(true)}
@@ -65,6 +68,9 @@ const Rules = () => {
 
                 {/* Show error message if there is one */}
                 {errorMessage && <p className="text-red-500">{errorMessage}</p>}
+
+                {/* Show success message if there is one */}
+                {successMessage && <p className="text-green-500">{successMessage}</p>}
 
                 {/* Display table only if not loading and no error */}
                 {!loading && !errorMessage && (
@@ -141,6 +147,9 @@ const Rules = () => {
                                             />
                                             {errorMessage && (
                                                 <div className="text-red-500 text-sm mt-4">{errorMessage}</div>
+                                            )}
+                                            {successMessage && (
+                                                <div className="text-green-500 text-sm mt-4">{successMessage}</div>
                                             )}
                                         </div>
                                     </div>
