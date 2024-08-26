@@ -31,6 +31,8 @@ apiClient.interceptors.request.use(
 );
 
 const apiService = {
+  // Existing methods
+
   login: async (email, password) => {
     try {
       console.log('Login request data:', { email, password, guidAplication: 'PROJECT-519391a1-bff6-4e8c-a854-bed3984cc0bb-2024' });
@@ -121,6 +123,17 @@ const apiService = {
     }
   },
 
+  getAllRules: async () => {
+    try {
+      const response = await apiClient.get('/rules/all');
+      console.log('Get All Rules Response:', response.data);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching rules:', error);
+      throw new Error(error.response?.data?.message || 'Failed to fetch rules');
+    }
+  },
+
   addRule: async (guidInput, valueInput, guidOutput, valueOutput) => {
     try {
       const response = await apiClient.post('/rules/add', {
@@ -137,14 +150,52 @@ const apiService = {
     }
   },
 
-  getAllRules: async () => {
+  updateRule: async (guid, newGuidInput, newValueInput, newGuidOutput, newValueOutput) => {
     try {
-      const response = await apiClient.get('/rules/all');
-      console.log('Get All Rules Response:', response.data);
+      const requestData = {
+        guidInput: newGuidInput,
+        valueInput: newValueInput,
+        guidOutput: newGuidOutput,
+        valueOutput: newValueOutput,
+      };
+
+      console.log('Request Data:', requestData);
+
+      const response = await apiClient.put(`/rules/update/${guid}`, requestData, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      console.log('Update Rule Response:', response.data);
       return response.data;
     } catch (error) {
-      console.error('Error fetching rules:', error);
-      throw new Error(error.response?.data?.message || 'Failed to fetch rules');
+      console.error('Error updating rule:', error);
+      if (error.response?.status === 401) {
+        console.error('Unauthorized access. Please log in again.');
+        throw new Error('Unauthorized access. Please log in again.');
+      }
+      throw new Error(error.response?.data?.message || 'Failed to update rule');
+    }
+  },
+
+  deleteRule: async (guid) => {
+    if (!guid) {
+      console.error('GUID is required for deleting rule.');
+      throw new Error('GUID is required.');
+    }
+
+    try {
+      const response = await apiClient.delete(`/rules/delete/${guid}`);
+      console.log('Delete Rule Response:', response.data);
+      return response.data;
+    } catch (error) {
+      console.error('Error deleting rule:', error);
+      if (error.response?.status === 401) {
+        console.error('Unauthorized access. Please log in again.');
+        throw new Error('Unauthorized access. Please log in again.');
+      }
+      throw new Error(error.response?.data?.message || 'Failed to delete rule');
     }
   },
 
@@ -175,6 +226,46 @@ const apiService = {
         throw new Error('Unauthorized access. Please log in again.');
       }
       throw new Error(error.response?.data?.message || 'Failed to add project');
+    }
+  },
+
+  updateProject: async (guid, projectData) => {
+    if (!guid) {
+      console.error('GUID is required for updating project.');
+      throw new Error('GUID is required.');
+    }
+
+    try {
+      const response = await apiClient.put(`/projects/update/${guid}`, projectData);
+      console.log('Update Project Response:', response.data);
+      return response.data;
+    } catch (error) {
+      console.error('Error updating project:', error);
+      if (error.response?.status === 401) {
+        console.error('Unauthorized access. Please log in again.');
+        throw new Error('Unauthorized access. Please log in again.');
+      }
+      throw new Error(error.response?.data?.message || 'Failed to update project');
+    }
+  },
+
+  deleteProject: async (guid) => {
+    if (!guid) {
+      console.error('GUID is required for deleting project.');
+      throw new Error('GUID is required.');
+    }
+
+    try {
+      const response = await apiClient.delete(`/projects/delete/${guid}`);
+      console.log('Delete Project Response:', response.data);
+      return response.data;
+    } catch (error) {
+      console.error('Error deleting project:', error);
+      if (error.response?.status === 401) {
+        console.error('Unauthorized access. Please log in again.');
+        throw new Error('Unauthorized access. Please log in again.');
+      }
+      throw new Error(error.response?.data?.message || 'Failed to delete project');
     }
   },
 

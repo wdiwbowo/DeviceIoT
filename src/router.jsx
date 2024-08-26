@@ -5,12 +5,13 @@ import Rules from "./pages/Rules";
 import Login from "./pages/Login";
 import Projects from "./pages/Projects";
 import DeviceType from "./pages/DeviceType";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 export const router = createBrowserRouter([
-    { path: '/', element: <App /> },
-    { path: '/device', element: <Device /> },
-    { path: '/rules', element: <Rules /> },
+    { path: '/', element: <ProtectedRoute element={<App />} /> },
+    { path: '/device', element: <ProtectedRoute element={<Device />} /> },
+    { path: '/rules', element: <ProtectedRoute element={<Rules />} /> },
+    { path: '/projects', element: <ProtectedRoute element={<Projects />} /> },
+    { path: '/deviceType', element: <ProtectedRoute element={<DeviceType />} /> },
     { path: '/login', element: <Login /> },
-    { path: '/projects', element: <Projects /> },
-    { path: '/deviceType', element: <DeviceType /> },
-])
+]);
