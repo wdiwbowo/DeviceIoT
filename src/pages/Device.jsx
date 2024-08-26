@@ -81,6 +81,7 @@ export default function Device() {
         }
     };
 
+    // Mengatur timeout untuk menghilangkan pesan setelah 2 detik
     useEffect(() => {
         if (successMessage || error) {
             const timer = setTimeout(() => {
@@ -92,6 +93,7 @@ export default function Device() {
         }
     }, [successMessage, error]);
 
+    // Pagination logic
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
     const currentItems = filteredDevices.slice(indexOfFirstItem, indexOfLastItem);
@@ -110,12 +112,11 @@ export default function Device() {
                     <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Devices</h1>
                     <button
                         onClick={() => setShowAddModal(true)}
-                        className="bg-blue-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="bg-blue-600 text-white px-4 py-2 rounded-md shadow-sm hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
                     >
                         Add Device
                     </button>
                 </div>
-
                 <div className="mb-4">
                     <input
                         type="text"
@@ -125,38 +126,32 @@ export default function Device() {
                         className="w-full px-4 py-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                     />
                 </div>
-
-                {successMessage && (
-                    <p className="text-green-500 mb-4">{successMessage}</p>
-                )}
-                {error && (
-                    <p className="text-red-500 mb-4">{error}</p>
-                )}
-
-                <div className="overflow-x-auto bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+                <div className="overflow-x-auto bg-white dark:bg-gray-800 rounded-lg shadow-md">
                     <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                         <thead className="bg-gray-50 dark:bg-gray-700">
                             <tr>
-                                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">#</th>
-                                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Device GUID</th>
-                                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">MAC Address</th>
-                                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Name</th>
-                                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Type</th>
-                                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Latitude</th>
-                                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Longitude</th>
-                                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Status</th>
-                                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Active</th>
-                                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Action</th>
+                                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">#</th>
+                                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">Device GUID</th>
+                                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">MAC Address</th>
+                                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">Name</th>
+                                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">Type</th>
+                                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">Latitude</th>
+                                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">Longitude</th>
+                                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">Status</th>
+                                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">Active</th>
+                                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">Action</th>
                             </tr>
                         </thead>
                         <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                             {currentItems.length === 0 ? (
                                 <tr>
-                                    <td colSpan="10" className="px-6 py-4 text-center text-gray-500 dark:text-gray-300">No devices found</td>
+                                    <td colSpan="11" className="px-6 py-4 text-center text-gray-500 dark:text-gray-300">
+                                        No devices found
+                                    </td>
                                 </tr>
                             ) : (
                                 currentItems.map((item, index) => (
-                                    <tr key={item.deviceGuid || index}>
+                                    <tr key={item.deviceGuid || index} className="hover:bg-gray-100 dark:hover:bg-gray-700">
                                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">{indexOfFirstItem + index + 1}</td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{item.deviceGuid}</td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{item.mac}</td>
@@ -164,15 +159,15 @@ export default function Device() {
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{item.type}</td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{item.latitude}</td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{item.longitude}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{item.status}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{item.active ? 'Yes' : 'No'}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{item.status ? 'True' : 'False'}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{item.active ? 'Active' : 'Inactive'}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                             <button
+                                                className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300"
                                                 onClick={() => {
                                                     setDeviceToEdit(item);
                                                     setShowEditModal(true);
                                                 }}
-                                                className="text-blue-600 dark:text-blue-400 hover:underline"
                                             >
                                                 Edit
                                             </button>
@@ -192,6 +187,18 @@ export default function Device() {
                         </tbody>
                     </table>
                 </div>
+
+                {error && (
+                    <div className="mb-4 p-4 bg-red-100 text-red-700 rounded">
+                        <p>{error}</p>
+                    </div>
+                )}
+
+                {successMessage && (
+                    <div className="mb-4 p-4 bg-green-100 text-green-700 rounded">
+                        <p>{successMessage}</p>
+                    </div>
+                )}
 
                 <div className="flex justify-between items-center mt-6">
                     <button
@@ -213,25 +220,28 @@ export default function Device() {
                     </button>
                 </div>
 
-            </div>
-
-            <AddDeviceModal
-                isOpen={showAddModal}
-                onClose={() => setShowAddModal(false)}
-                onSave={handleAddDevice}
-            />
-            <EditDeviceModal
-                isOpen={showEditModal}
-                onClose={() => setShowEditModal(false)}
-                device={deviceToEdit}
-                onSave={handleEditDevice}
-            />
-            <DeleteDeviceModal
+                <AddDeviceModal
+                    showModal={showAddModal}
+                    onClose={() => setShowAddModal(false)}
+                    onSave={handleAddDevice}
+                />
+                {deviceToEdit && (
+                    <EditDeviceModal
+                        showModal={showEditModal}
+                        onClose={() => setShowEditModal(false)}
+                        device={deviceToEdit}
+                        onSave={handleEditDevice}
+                    />
+                )}
+                {deviceToDelete && (
+                    <DeleteDeviceModal
                 isOpen={showDeleteModal}
                 onClose={() => setShowDeleteModal(false)}
                 device={deviceToDelete}
                 onDelete={handleDeleteDevice}
             />
+                )}
+            </div>
         </div>
     );
 }
