@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Navbar from "../components/Navbar";
-import apiService from "../services/apiservice"; // Adjust the path to apiService
+import apiService from "../services/apiservice";
+import debounce from "lodash.debounce";
 
 const Rules = () => {
     const [showModal, setShowModal] = useState(false);
@@ -9,9 +10,13 @@ const Rules = () => {
     const [guidOutput, setGuidOutput] = useState("");
     const [valueOutput, setValueOutput] = useState("");
     const [data, setData] = useState([]);
+    const [filteredData, setFilteredData] = useState([]);
     const [loading, setLoading] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
-    const [successMessage, setSuccessMessage] = useState(""); // State for success message
+    const [successMessage, setSuccessMessage] = useState("");
+    const [searchTerm, setSearchTerm] = useState("");
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 5; // Define how many items per page
 
     // Fetch data from API on component mount
     useEffect(() => {
@@ -19,7 +24,8 @@ const Rules = () => {
             setLoading(true);
             try {
                 const response = await apiService.getAllRules();
-                setData(response.data); // Set data from API to state
+                setData(response.data);
+                setFilteredData(response.data);
             } catch (error) {
                 setErrorMessage(error.message || "Failed to fetch rules data.");
                 console.error("Error fetching rules data:", error);
@@ -31,23 +37,50 @@ const Rules = () => {
         fetchData();
     }, []);
 
+    // Debounced search function
+    const handleSearch = useCallback(
+        debounce((term) => {
+            const results = data.filter((item) =>
+                item.guidInput.toLowerCase().includes(term.toLowerCase()) ||
+                item.valueInput.toLowerCase().includes(term.toLowerCase()) ||
+                item.guidOutput.toLowerCase().includes(term.toLowerCase()) ||
+                item.valueOutput.toLowerCase().includes(term.toLowerCase())
+            );
+            setFilteredData(results);
+            setCurrentPage(1); // Reset to the first page when searching
+        }, 300), // Adjust debounce delay as needed
+        [data]
+    );
+
+    // Update search term and trigger debounced search
+    useEffect(() => {
+        handleSearch(searchTerm);
+    }, [searchTerm, handleSearch]);
+
+    // Handle save rule
     const handleSave = async () => {
         setLoading(true);
-        setErrorMessage(""); // Reset error message before starting
-        setSuccessMessage(""); // Reset success message before starting
+        setErrorMessage("");
+        setSuccessMessage("");
         try {
             const response = await apiService.addRule(guidInput, valueInput, guidOutput, valueOutput);
             console.log('Rule added successfully:', response);
-            setData([...data, { guidInput, valueInput, guidOutput, valueOutput }]); // Add new rule to state
-            setSuccessMessage("Rule added successfully!"); // Set success message
-            setShowModal(false); // Close modal on success
+            const newRule = { guidInput, valueInput, guidOutput, valueOutput };
+            setData([...data, newRule]);
+            setFilteredData([...filteredData, newRule]);
+            setSuccessMessage("Rule added successfully!");
+            setShowModal(false);
         } catch (error) {
             setErrorMessage(error.message || "Failed to add rule.");
             console.error('Failed to add rule:', error);
         } finally {
-            setLoading(false); // End loading state
+            setLoading(false);
         }
     };
+
+    // Pagination calculations
+    const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+    const paginatedData = filteredData.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
     return (
         <div className="min-h-screen bg-gray-100 dark:bg-gray-900">
@@ -63,16 +96,21 @@ const Rules = () => {
                     </button>
                 </div>
 
-                {/* Show loading message while fetching data */}
+                {/* Search input */}
+                <div className="mb-4">
+                    <input
+                        type="text"
+                        className="w-full px-4 py-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                        placeholder="Search rules..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                </div>
+
                 {loading && <p>Loading...</p>}
-
-                {/* Show error message if there is one */}
                 {errorMessage && <p className="text-red-500">{errorMessage}</p>}
-
-                {/* Show success message if there is one */}
                 {successMessage && <p className="text-green-500">{successMessage}</p>}
 
-                {/* Display table only if not loading and no error */}
                 {!loading && !errorMessage && (
                     <div className="overflow-x-auto bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
                         <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
@@ -87,9 +125,9 @@ const Rules = () => {
                                 </tr>
                             </thead>
                             <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                                {data.map((item, index) => (
+                                {paginatedData.map((item, index) => (
                                     <tr key={index}>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">{index + 1}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">{(currentPage - 1) * itemsPerPage + index + 1}</td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{item.guidInput}</td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{item.valueInput}</td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{item.guidOutput}</td>
@@ -104,9 +142,29 @@ const Rules = () => {
                         </table>
                     </div>
                 )}
+
+                {/* Pagination */}
+                <div className="flex justify-between items-center mt-6">
+                    <button
+                        className="bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-gray-100 px-4 py-2 rounded-lg shadow-md disabled:opacity-50"
+                        onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                        disabled={currentPage === 1}
+                    >
+                        Previous
+                    </button>
+                    <span className="text-gray-700 dark:text-gray-300">
+                        Page {currentPage} of {totalPages}
+                    </span>
+                    <button
+                        className="bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-gray-100 px-4 py-2 rounded-lg shadow-md disabled:opacity-50"
+                        onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                        disabled={currentPage === totalPages}
+                    >
+                        Next
+                    </button>
+                </div>
             </div>
 
-            {/* Modal for adding a new rule */}
             {showModal && (
                 <div className="fixed z-10 inset-0 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
                     <div className="flex items-center justify-center min-h-screen px-4">
@@ -160,7 +218,7 @@ const Rules = () => {
                                     type="button"
                                     className={`w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 ${loading ? 'bg-gray-400' : 'bg-blue-600'} text-white text-base font-medium focus:outline-none sm:ml-3 sm:w-auto sm:text-sm`}
                                     onClick={handleSave}
-                                    disabled={loading} // Disable button while loading
+                                    disabled={loading}
                                 >
                                     {loading ? 'Saving...' : 'Save'}
                                 </button>

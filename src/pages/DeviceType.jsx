@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from "react";
 import apiService from "../services/apiservice";
 import Navbar from "../components/Navbar";
+import debounce from "lodash.debounce";
 
 const DeviceTypes = () => {
     const [deviceTypes, setDeviceTypes] = useState([]);
+    const [filteredDeviceTypes, setFilteredDeviceTypes] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
@@ -15,6 +17,7 @@ const DeviceTypes = () => {
     });
     const [formError, setFormError] = useState("");
     const [successMessage, setSuccessMessage] = useState("");
+    const [searchTerm, setSearchTerm] = useState("");
 
     useEffect(() => {
         const fetchDeviceTypes = async () => {
@@ -22,6 +25,7 @@ const DeviceTypes = () => {
                 const response = await apiService.getDeviceTypes();
                 if (Array.isArray(response.data)) {
                     setDeviceTypes(response.data);
+                    setFilteredDeviceTypes(response.data);
                 } else {
                     console.error("Unexpected data format:", response.data);
                     setError("Unexpected data format. Please try again.");
@@ -57,17 +61,10 @@ const DeviceTypes = () => {
         try {
             const response = await apiService.addDeviceType(newDeviceType);
 
-            // Log the entire response object for debugging
-            console.log("Add Device Type Response:", response);
-
-            // Ensure response data is in the expected format
             if (response.status === 200) {
-                // Log the response data
-                console.log("Response Data:", response.data);
-
-                // Check if the response data is an object with the expected fields
                 if (response.data && response.data.guid) {
                     setDeviceTypes((prevState) => [...prevState, response.data]);
+                    setFilteredDeviceTypes((prevState) => [...prevState, response.data]);
                     setNewDeviceType({ name: "", active: true });
                     setShowModal(false);
                     setSuccessMessage("Device type added successfully!");
@@ -87,11 +84,28 @@ const DeviceTypes = () => {
         }
     };
 
+    const handleSearch = debounce((term) => {
+        const lowercasedTerm = term.toLowerCase();
+        const filtered = deviceTypes.filter((type) =>
+            type.name.toLowerCase().includes(lowercasedTerm)
+        );
+        setFilteredDeviceTypes(filtered);
+        setCurrentPage(1);
+    }, 300);
+
+    useEffect(() => {
+        handleSearch(searchTerm);
+    }, [searchTerm, deviceTypes]);
+
+    const handleSearchChange = (e) => {
+        setSearchTerm(e.target.value);
+    };
+
     const indexOfLastDeviceType = currentPage * itemsPerPage;
     const indexOfFirstDeviceType = indexOfLastDeviceType - itemsPerPage;
-    const currentDeviceTypes = deviceTypes.slice(indexOfFirstDeviceType, indexOfLastDeviceType);
+    const currentDeviceTypes = filteredDeviceTypes.slice(indexOfFirstDeviceType, indexOfLastDeviceType);
 
-    const totalPages = Math.ceil(deviceTypes.length / itemsPerPage);
+    const totalPages = Math.ceil(filteredDeviceTypes.length / itemsPerPage);
 
     const handlePageChange = (pageNumber) => {
         if (pageNumber >= 1 && pageNumber <= totalPages) {
@@ -111,6 +125,16 @@ const DeviceTypes = () => {
                     >
                         Add Device Type
                     </button>
+                </div>
+
+                <div className="mb-6">
+                    <input
+                        type="text"
+                        placeholder="Search Device Types..."
+                        value={searchTerm}
+                        onChange={handleSearchChange}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm dark:bg-gray-900 dark:border-gray-700 dark:text-white"
+                    />
                 </div>
 
                 {loading ? (
@@ -140,7 +164,7 @@ const DeviceTypes = () => {
                                 <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                                     {currentDeviceTypes.length === 0 ? (
                                         <tr>
-                                            <td colSpan="4" className="px-6 py-4 text-center text-gray-500 dark:text-gray-300">
+                                            <td colSpan="5" className="px-6 py-4 text-center text-gray-500 dark:text-gray-300">
                                                 No device types found
                                             </td>
                                         </tr>
@@ -165,34 +189,25 @@ const DeviceTypes = () => {
                         </div>
 
                         {/* Pagination Controls */}
-                        <div className="flex justify-center mt-6">
-                            <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
-                                <button
-                                    onClick={() => handlePageChange(Math.max(currentPage - 1, 1))}
-                                    className="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 dark:bg-gray-800 dark:text-white dark:border-gray-700 dark:hover:bg-gray-700"
-                                >
-                                    Previous
-                                </button>
-                                {[...Array(totalPages).keys()].map((pageNumber) => (
-                                    <button
-                                        key={pageNumber + 1}
-                                        onClick={() => handlePageChange(pageNumber + 1)}
-                                        className={`relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium ${pageNumber + 1 === currentPage
-                                            ? "bg-blue-500 text-white dark:bg-blue-600 dark:text-white"
-                                            : "bg-white text-gray-700 dark:bg-gray-800 dark:text-white dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700"
-                                            }`}
-                                    >
-                                        {pageNumber + 1}
-                                    </button>
-                                ))}
-                                <button
-                                    onClick={() => handlePageChange(Math.min(currentPage + 1, totalPages))}
-                                    className="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 dark:bg-gray-800 dark:text-white dark:border-gray-700 dark:hover:bg-gray-700"
-                                >
-                                    Next
-                                </button>
-                            </nav>
-                        </div>
+                        <div className="flex justify-between items-center mt-6">
+                    <button
+                        className="bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-gray-100 px-4 py-2 rounded-lg shadow-md disabled:opacity-50"
+                        onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                        disabled={currentPage === 1}
+                    >
+                        Previous
+                    </button>
+                    <span className="text-gray-700 dark:text-gray-300">
+                        Page {currentPage} of {totalPages}
+                    </span>
+                    <button
+                        className="bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-gray-100 px-4 py-2 rounded-lg shadow-md disabled:opacity-50"
+                        onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                        disabled={currentPage === totalPages}
+                    >
+                        Next
+                    </button>
+                </div>
 
                         {/* Add Device Type Modal */}
                         {showModal && (

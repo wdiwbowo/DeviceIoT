@@ -18,9 +18,6 @@ const apiUser = axios.create({
   },
 });
 
-// Set the appToken directly to localStorage
-// localStorage.setItem('appToken', 'your-app-token-here');
-
 // Add interceptor for requests to apiClient
 apiClient.interceptors.request.use(
   (config) => {
@@ -45,7 +42,6 @@ const apiService = {
       console.log('Login response:', response.data);
       const token = response.data?.data;
       if (token) {
-        localStorage.setItem('userToken', token.userToken);
         localStorage.setItem('appToken', token.appToken);
       }
       return response.data;
@@ -58,7 +54,7 @@ const apiService = {
   getAllDevices: async () => {
     try {
       const response = await apiClient.get('/devices/admin/get');
-      console.log('Get All Devices Response:', response.data); // Log the response data
+      console.log('Get All Devices Response:', response.data);
       return response.data;
     } catch (error) {
       if (error.response?.status === 401) {
@@ -73,7 +69,7 @@ const apiService = {
   addDevice: async (deviceData) => {
     try {
       const response = await apiClient.post('/devices/admin/add', deviceData);
-      console.log('Add Device Response:', response.data); // Log the response data
+      console.log('Add Device Response:', response.data);
       return response.data;
     } catch (error) {
       console.error('Error adding device:', error);
@@ -85,6 +81,46 @@ const apiService = {
     }
   },
 
+  updateDevice: async (guid, deviceData) => {
+    if (!guid) {
+      console.error('GUID is required for updating device.');
+      throw new Error('GUID is required.');
+    }
+
+    try {
+      const response = await apiClient.put(`/devices/update/${guid}`, deviceData);
+      console.log('Update Device Response:', response.data);
+      return response.data;
+    } catch (error) {
+      console.error('Error updating device:', error);
+      if (error.response?.status === 401) {
+        console.error('Unauthorized access. Please log in again.');
+        throw new Error('Unauthorized access. Please log in again.');
+      }
+      throw new Error(error.response?.data?.message || 'Failed to update device');
+    }
+  },
+
+  deleteDevice: async (guid) => {
+    if (!guid) {
+      console.error('GUID is required for deleting device.');
+      throw new Error('GUID is required.');
+    }
+
+    try {
+      const response = await apiClient.delete(`/devices/delete/${guid}`);
+      console.log('Delete Device Response:', response.data);
+      return response.data;
+    } catch (error) {
+      console.error('Error deleting device:', error);
+      if (error.response?.status === 401) {
+        console.error('Unauthorized access. Please log in again.');
+        throw new Error('Unauthorized access. Please log in again.');
+      }
+      throw new Error(error.response?.data?.message || 'Failed to delete device');
+    }
+  },
+
   addRule: async (guidInput, valueInput, guidOutput, valueOutput) => {
     try {
       const response = await apiClient.post('/rules/add', {
@@ -93,7 +129,7 @@ const apiService = {
         guidOutput,
         valueOutput,
       });
-      console.log('Add Rule Response:', response.data); // Log the response data
+      console.log('Add Rule Response:', response.data);
       return response.data;
     } catch (error) {
       console.error('Error adding rule:', error);
@@ -104,7 +140,7 @@ const apiService = {
   getAllRules: async () => {
     try {
       const response = await apiClient.get('/rules/all');
-      console.log('Get All Rules Response:', response.data); // Log the response data
+      console.log('Get All Rules Response:', response.data);
       return response.data;
     } catch (error) {
       console.error('Error fetching rules:', error);
@@ -115,7 +151,7 @@ const apiService = {
   getAllProjects: async () => {
     try {
       const response = await apiClient.get('/projects/get');
-      console.log('Get All Projects Response:', response.data); // Log the response data
+      console.log('Get All Projects Response:', response.data);
       return response.data;
     } catch (error) {
       if (error.response?.status === 401) {
@@ -130,7 +166,7 @@ const apiService = {
   addProject: async (projectData) => {
     try {
       const response = await apiClient.post('/projects/add', projectData);
-      console.log('Add Project Response:', response.data); // Log the response data
+      console.log('Add Project Response:', response.data);
       return response.data;
     } catch (error) {
       console.error('Error adding project:', error);
@@ -145,7 +181,7 @@ const apiService = {
   getDeviceTypes: async () => {
     try {
       const response = await apiClient.get('/device-types/get');
-      console.log('Get Device Types Response:', response.data); // Log the response data
+      console.log('Get Device Types Response:', response.data);
       return response.data;
     } catch (error) {
       console.error('Error fetching device types:', error);
@@ -156,7 +192,7 @@ const apiService = {
   addDeviceType: async (deviceTypeData) => {
     try {
       const response = await apiClient.post('/device-types/add', deviceTypeData);
-      console.log('Add Device Type Response:', response.data); // Log the response data
+      console.log('Add Device Type Response:', response.data);
       return response.data;
     } catch (error) {
       console.error('Error adding device type:', error);

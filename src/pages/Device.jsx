@@ -1,156 +1,190 @@
 import React, { useState, useEffect } from "react";
 import Navbar from "../components/Navbar";
 import apiService from '../services/apiservice';
+import AddDeviceModal from '../components/device/AddDeviceModal';
+import EditDeviceModal from '../components/device/EditDeviceModal';
+import DeleteDeviceModal from '../components/device/DeleteDeviceModal';
 
 export default function Device() {
-    const [showModal, setShowModal] = useState(false);
+    const [showAddModal, setShowAddModal] = useState(false);
+    const [showEditModal, setShowEditModal] = useState(false);
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [devices, setDevices] = useState([]);
+    const [filteredDevices, setFilteredDevices] = useState([]);
     const [error, setError] = useState(null);
-    const [successMessage, setSuccessMessage] = useState(null); // State untuk pesan sukses
-    const [deviceData, setDeviceData] = useState({
-        companyGuid: "",
-        deviceGuid: "",
-        mac: "",
-        name: "",
-        type: "",
-        latitude: "",
-        longitude: "",
-        sensorUnit: "",
-        status: false,
-        active: false,
-        image: ""
-    });
+    const [successMessage, setSuccessMessage] = useState(null);
+    const [deviceToEdit, setDeviceToEdit] = useState(null);
+    const [deviceToDelete, setDeviceToDelete] = useState(null);
+    const [searchQuery, setSearchQuery] = useState("");
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 5;
 
-    useEffect(() => {
-        const fetchDevices = async () => {
-            try {
-                const response = await apiService.getAllDevices();
-                if (response.success && Array.isArray(response.data.devices)) {
-                    setDevices(response.data.devices);
-                } else {
-                    console.error('Data fetched is not an array:', response);
-                }
-            } catch (error) {
-                console.error('Error fetching devices:', error);
-            }
-        };
-
-        fetchDevices();
-    }, []);
-
-    const handleChange = (e) => {
-        const { name, value, type, checked } = e.target;
-        setDeviceData((prevState) => ({
-            ...prevState,
-            [name]: type === "checkbox" ? checked : value,
-        }));
-    };
-
-    const handleAddDevice = async () => {
-        // Validasi input
-        const requiredFields = ['companyGuid', 'deviceGuid', 'mac', 'name', 'type', 'latitude', 'longitude', 'sensorUnit'];
-        const missingFields = requiredFields.filter(field => !deviceData[field]);
-
-        if (missingFields.length > 0) {
-            setError(`Missing fields: ${missingFields.join(', ')}`);
-            return;
-        }
-
+    const fetchDevices = async () => {
         try {
-            await apiService.addDevice(deviceData);
-            setShowModal(false);
-            setDeviceData({
-                companyGuid: "",
-                deviceGuid: "",
-                mac: "",
-                name: "",
-                type: "",
-                latitude: "",
-                longitude: "",
-                sensorUnit: "",
-                status: false,
-                active: false,
-                image: ""
-            });
-            // Refresh the device list
             const response = await apiService.getAllDevices();
             if (response.success && Array.isArray(response.data.devices)) {
                 setDevices(response.data.devices);
-                setSuccessMessage("Device added successfully!"); // Set success message
+                setFilteredDevices(response.data.devices);
             } else {
-                console.error("Data fetched is not an array:", response);
-                setError("Invalid data format from API.");
+                console.error('Data fetched is not an array:', response);
             }
         } catch (error) {
-            console.error("Failed to add device:", error.message);
+            console.error('Error fetching devices:', error);
+            setError('Failed to fetch devices.');
+        }
+    };
+
+    useEffect(() => {
+        fetchDevices();
+    }, []);
+
+    useEffect(() => {
+        const filtered = devices.filter(device =>
+            device.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            device.deviceGuid.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            device.mac.toLowerCase().includes(searchQuery.toLowerCase())
+        );
+        setFilteredDevices(filtered);
+        setCurrentPage(1); // Reset to first page on new search
+    }, [searchQuery, devices]);
+
+    const handleAddDevice = async (deviceData) => {
+        try {
+            await apiService.addDevice(deviceData);
+            setShowAddModal(false);
+            setSuccessMessage("Device added successfully!");
+            fetchDevices(); // Refresh devices list
+        } catch (error) {
             setError("Failed to add device. Please try again.");
         }
     };
 
+    const handleEditDevice = async (guid, updatedDeviceData) => {
+        try {
+            await apiService.updateDevice(guid, updatedDeviceData);
+            setShowEditModal(false);
+            setSuccessMessage("Device updated successfully!");
+            fetchDevices(); // Refresh devices list
+        } catch (error) {
+            setError("Failed to update device. Please try again.");
+        }
+    };
+
+    const handleDeleteDevice = async () => {
+        try {
+            await apiService.deleteDevice(deviceToDelete.guid);
+            setShowDeleteModal(false);
+            setSuccessMessage("Device deleted successfully!");
+            fetchDevices(); // Refresh devices list
+        } catch (error) {
+            setError("Failed to delete device. Please try again.");
+        }
+    };
+
+    useEffect(() => {
+        if (successMessage || error) {
+            const timer = setTimeout(() => {
+                setSuccessMessage(null);
+                setError(null);
+            }, 2000); // 2000 ms = 2 detik
+
+            return () => clearTimeout(timer);
+        }
+    }, [successMessage, error]);
+
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    const currentItems = filteredDevices.slice(indexOfFirstItem, indexOfLastItem);
+
+    const totalPages = Math.ceil(filteredDevices.length / itemsPerPage);
+
+    const handleSearchChange = (e) => {
+        setSearchQuery(e.target.value);
+    };
+
     return (
-        <div className="bg-gray-100 dark:bg-gray-900 min-h-screen">
+        <div className="min-h-screen bg-gray-100 dark:bg-gray-900">
             <Navbar />
-            <div className="container mx-auto p-6">
+            <div className="container mx-auto py-8">
                 <div className="flex justify-between items-center mb-8">
-                    <h1 className="text-3xl font-bold text-gray-800 dark:text-white">Device</h1>
+                    <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Devices</h1>
                     <button
-                        className="bg-blue-600 text-white px-6 py-3 rounded-lg shadow hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
-                        onClick={() => setShowModal(true)}
+                        onClick={() => setShowAddModal(true)}
+                        className="bg-blue-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     >
                         Add Device
                     </button>
                 </div>
 
-                {error && (
-                    <div className="mb-4 p-4 bg-red-100 text-red-700 rounded">
-                        <p>{error}</p>
-                    </div>
-                )}
+                <div className="mb-4">
+                    <input
+                        type="text"
+                        placeholder="Search devices..."
+                        value={searchQuery}
+                        onChange={handleSearchChange}
+                        className="w-full px-4 py-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                    />
+                </div>
 
                 {successMessage && (
-                    <div className="mb-4 p-4 bg-green-100 text-green-700 rounded">
-                        <p>{successMessage}</p>
-                    </div>
+                    <p className="text-green-500 mb-4">{successMessage}</p>
+                )}
+                {error && (
+                    <p className="text-red-500 mb-4">{error}</p>
                 )}
 
-                <div className="overflow-x-auto bg-white dark:bg-gray-800 rounded-lg shadow-md">
+                <div className="overflow-x-auto bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
                     <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                         <thead className="bg-gray-50 dark:bg-gray-700">
                             <tr>
-                                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">#</th>
-                                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">Device GUID</th>
-                                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">MAC Address</th>
-                                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">Name</th>
-                                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">Type</th>
-                                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">Latitude</th>
-                                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">Longitude</th>
-                                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">Status</th>
-                                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">Active</th>
-                                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">Action</th>
+                                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">#</th>
+                                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Device GUID</th>
+                                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">MAC Address</th>
+                                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Name</th>
+                                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Type</th>
+                                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Latitude</th>
+                                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Longitude</th>
+                                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Status</th>
+                                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Active</th>
+                                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Action</th>
                             </tr>
                         </thead>
                         <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                            {devices.length === 0 ? (
+                            {currentItems.length === 0 ? (
                                 <tr>
-                                    <td colSpan="11" className="px-6 py-4 text-center text-gray-500 dark:text-gray-300">
-                                        No devices found
-                                    </td>
+                                    <td colSpan="10" className="px-6 py-4 text-center text-gray-500 dark:text-gray-300">No devices found</td>
                                 </tr>
                             ) : (
-                                devices.map((item, index) => (
-                                    <tr key={item.deviceGuid || index} className="hover:bg-gray-100 dark:hover:bg-gray-700">
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">{index + 1}</td>
+                                currentItems.map((item, index) => (
+                                    <tr key={item.deviceGuid || index}>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">{indexOfFirstItem + index + 1}</td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{item.deviceGuid}</td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{item.mac}</td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{item.name}</td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{item.type}</td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{item.latitude}</td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{item.longitude}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{item.status ? 'True' : 'False'}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{item.active ? 'Active' : 'Inactive'}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                            <button className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300">Edit</button>
-                                            <button className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 ml-4">Delete</button>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{item.status}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{item.active ? 'Yes' : 'No'}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                            <button
+                                                onClick={() => {
+                                                    setDeviceToEdit(item);
+                                                    setShowEditModal(true);
+                                                }}
+                                                className="text-blue-600 dark:text-blue-400 hover:underline"
+                                            >
+                                                Edit
+                                            </button>
+                                            <button
+                                                onClick={() => {
+                                                    setDeviceToDelete(item);
+                                                    setShowDeleteModal(true);
+                                                }}
+                                                className="text-red-600 dark:text-red-400 hover:underline ml-4"
+                                            >
+                                                Delete
+                                            </button>
                                         </td>
                                     </tr>
                                 ))
@@ -159,150 +193,45 @@ export default function Device() {
                     </table>
                 </div>
 
-                {showModal && (
-                    <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50">
-                        <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-lg w-full max-w-3xl">
-                            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">Add Device</h2>
-                            <form className="space-y-4">
-                                {/* Form Part 1 */}
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Company GUID</label>
-                                        <input
-                                            type="text"
-                                            name="companyGuid"
-                                            value={deviceData.companyGuid}
-                                            onChange={handleChange}
-                                            className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Device GUID</label>
-                                        <input
-                                            type="text"
-                                            name="deviceGuid"
-                                            value={deviceData.deviceGuid}
-                                            onChange={handleChange}
-                                            className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">MAC Address</label>
-                                        <input
-                                            type="text"
-                                            name="mac"
-                                            value={deviceData.mac}
-                                            onChange={handleChange}
-                                            className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Name</label>
-                                        <input
-                                            type="text"
-                                            name="name"
-                                            value={deviceData.name}
-                                            onChange={handleChange}
-                                            className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Type</label>
-                                        <input
-                                            type="text"
-                                            name="type"
-                                            value={deviceData.type}
-                                            onChange={handleChange}
-                                            className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Latitude</label>
-                                        <input
-                                            type="text"
-                                            name="latitude"
-                                            value={deviceData.latitude}
-                                            onChange={handleChange}
-                                            className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Longitude</label>
-                                        <input
-                                            type="text"
-                                            name="longitude"
-                                            value={deviceData.longitude}
-                                            onChange={handleChange}
-                                            className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Sensor Unit</label>
-                                        <input
-                                            type="text"
-                                            name="sensorUnit"
-                                            value={deviceData.sensorUnit}
-                                            onChange={handleChange}
-                                            className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                                        />
-                                    </div>
-                                </div>
+                <div className="flex justify-between items-center mt-6">
+                    <button
+                        className="bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-gray-100 px-4 py-2 rounded-lg shadow-md disabled:opacity-50"
+                        onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                        disabled={currentPage === 1}
+                    >
+                        Previous
+                    </button>
+                    <span className="text-gray-700 dark:text-gray-300">
+                        Page {currentPage} of {totalPages}
+                    </span>
+                    <button
+                        className="bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-gray-100 px-4 py-2 rounded-lg shadow-md disabled:opacity-50"
+                        onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                        disabled={currentPage === totalPages}
+                    >
+                        Next
+                    </button>
+                </div>
 
-                                {/* Form Part 2 */}
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div className="flex items-center">
-                                        <input
-                                            type="checkbox"
-                                            name="status"
-                                            checked={deviceData.status}
-                                            onChange={handleChange}
-                                            className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                                        />
-                                        <label className="ml-2 block text-sm font-medium text-gray-700 dark:text-gray-300">Status</label>
-                                    </div>
-                                    <div className="flex items-center">
-                                        <input
-                                            type="checkbox"
-                                            name="active"
-                                            checked={deviceData.active}
-                                            onChange={handleChange}
-                                            className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                                        />
-                                        <label className="ml-2 block text-sm font-medium text-gray-700 dark:text-gray-300">Active</label>
-                                    </div>
-                                    <div className="col-span-2">
-                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Image URL</label>
-                                        <input
-                                            type="text"
-                                            name="image"
-                                            value={deviceData.image}
-                                            onChange={handleChange}
-                                            className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                                        />
-                                    </div>
-                                </div>
-
-                                <div className="flex justify-end mt-4">
-                                    <button
-                                        type="button"
-                                        className="bg-blue-600 text-white px-4 py-2 rounded-md shadow-sm hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
-                                        onClick={handleAddDevice}
-                                    >
-                                        Add Device
-                                    </button>
-                                    <button
-                                        type="button"
-                                        className="ml-4 bg-gray-500 text-white px-4 py-2 rounded-md shadow-sm hover:bg-gray-600 dark:bg-gray-600 dark:hover:bg-gray-700"
-                                        onClick={() => setShowModal(false)}
-                                    >
-                                        Cancel
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                )}
             </div>
+
+            <AddDeviceModal
+                isOpen={showAddModal}
+                onClose={() => setShowAddModal(false)}
+                onSave={handleAddDevice}
+            />
+            <EditDeviceModal
+                isOpen={showEditModal}
+                onClose={() => setShowEditModal(false)}
+                device={deviceToEdit}
+                onSave={handleEditDevice}
+            />
+            <DeleteDeviceModal
+                isOpen={showDeleteModal}
+                onClose={() => setShowDeleteModal(false)}
+                device={deviceToDelete}
+                onDelete={handleDeleteDevice}
+            />
         </div>
     );
 }

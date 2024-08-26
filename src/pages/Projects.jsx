@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Navbar from "../components/Navbar";
 import apiService from "../services/apiservice";
+import debounce from "lodash.debounce";
 
 const Projects = () => {
   const [projects, setProjects] = useState([]);
@@ -16,15 +17,16 @@ const Projects = () => {
   const [formError, setFormError] = useState("");
   const [editingProject, setEditingProject] = useState(null);
   const [successMessage, setSuccessMessage] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filteredProjects, setFilteredProjects] = useState([]);
 
   useEffect(() => {
     const fetchProjects = async () => {
       try {
         const response = await apiService.getAllProjects();
-        console.log("Full response:", response);
-
         if (Array.isArray(response.data)) {
           setProjects(response.data);
+          setFilteredProjects(response.data); // Initialize filteredProjects
         } else {
           console.error("Data fetched is not an array:", response.data);
         }
@@ -38,6 +40,25 @@ const Projects = () => {
 
     fetchProjects();
   }, []);
+
+  // Debounced search function
+  const handleSearch = useCallback(
+    debounce((term) => {
+      const lowercasedTerm = term.toLowerCase();
+      const results = projects.filter((project) =>
+        project.name.toLowerCase().includes(lowercasedTerm) ||
+        project.guid.toLowerCase().includes(lowercasedTerm)
+      );
+      setFilteredProjects(results);
+      setCurrentPage(1); // Reset to first page on new search
+    }, 300), // Adjust debounce delay as needed
+    [projects]
+  );
+
+  // Update search term and trigger debounced search
+  useEffect(() => {
+    handleSearch(searchTerm);
+  }, [searchTerm, handleSearch]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -59,6 +80,7 @@ const Projects = () => {
     try {
       const response = await apiService.addProject(newProject);
       setProjects([...projects, response]); // Assuming response contains the full project object
+      setFilteredProjects([...filteredProjects, response]); // Update filteredProjects
       setNewProject({ name: "" }); // Remove icon from state
       setShowModal(false);
       setSuccessMessage("Project added successfully, please reload!");
@@ -82,6 +104,7 @@ const Projects = () => {
       try {
         await apiService.deleteProject(guid); // Ensure you have this API method
         setProjects(projects.filter(project => project.guid !== guid));
+        setFilteredProjects(filteredProjects.filter(project => project.guid !== guid)); // Update filteredProjects
         setSuccessMessage("Project deleted successfully!");
       } catch (error) {
         console.error('Failed to delete project:', error);
@@ -94,9 +117,9 @@ const Projects = () => {
 
   const indexOfLastProject = currentPage * itemsPerPage;
   const indexOfFirstProject = indexOfLastProject - itemsPerPage;
-  const currentProjects = projects.slice(indexOfFirstProject, indexOfLastProject);
+  const currentProjects = filteredProjects.slice(indexOfFirstProject, indexOfLastProject);
 
-  const totalPages = Math.ceil(projects.length / itemsPerPage);
+  const totalPages = Math.ceil(filteredProjects.length / itemsPerPage);
 
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
@@ -114,6 +137,16 @@ const Projects = () => {
           >
             Add Project
           </button>
+        </div>
+
+        <div className="mb-4">
+          <input
+            type="text"
+            className="w-full px-4 py-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+            placeholder="Search projects..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
         </div>
 
         {loading ? (
@@ -176,34 +209,25 @@ const Projects = () => {
             </div>
 
             {/* Pagination Controls */}
-            <div className="flex justify-center mt-6">
-              <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
-                <button
-                  onClick={() => handlePageChange(currentPage > 1 ? currentPage - 1 : 1)}
-                  className="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 dark:bg-gray-800 dark:text-white dark:border-gray-700 dark:hover:bg-gray-700"
-                >
-                  Previous
-                </button>
-                {[...Array(totalPages).keys()].map(pageNumber => (
-                  <button
-                    key={pageNumber + 1}
-                    onClick={() => handlePageChange(pageNumber + 1)}
-                    className={`relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium ${pageNumber + 1 === currentPage
-                        ? "bg-blue-500 text-white dark:bg-blue-600 dark:text-white"
-                        : "bg-white text-gray-700 dark:bg-gray-800 dark:text-white dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700"
-                      }`}
-                  >
-                    {pageNumber + 1}
-                  </button>
-                ))}
-                <button
-                  onClick={() => handlePageChange(currentPage < totalPages ? currentPage + 1 : totalPages)}
-                  className="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 dark:bg-gray-800 dark:text-white dark:border-gray-700 dark:hover:bg-gray-700"
-                >
-                  Next
-                </button>
-              </nav>
-            </div>
+            <div className="flex justify-between items-center mt-6">
+                    <button
+                        className="bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-gray-100 px-4 py-2 rounded-lg shadow-md disabled:opacity-50"
+                        onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                        disabled={currentPage === 1}
+                    >
+                        Previous
+                    </button>
+                    <span className="text-gray-700 dark:text-gray-300">
+                        Page {currentPage} of {totalPages}
+                    </span>
+                    <button
+                        className="bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-gray-100 px-4 py-2 rounded-lg shadow-md disabled:opacity-50"
+                        onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                        disabled={currentPage === totalPages}
+                    >
+                        Next
+                    </button>
+                </div>
 
             {/* Add/Edit Project Modal */}
             {showModal && (
