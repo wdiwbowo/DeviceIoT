@@ -13,8 +13,9 @@ const Login = () => {
     setError(null);
 
     try {
-      const { appToken } = await apiService.login(username, password);
-      console.log('App Token:', appToken);
+      const response = await apiService.login(username, password);
+      // console.log(response.data)
+      // console.log('App Token:', appToken);
       navigate('/device');
     } catch (error) {
       setError(error.message);

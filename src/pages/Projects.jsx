@@ -11,7 +11,7 @@ const Projects = () => {
   const [showModal, setShowModal] = useState(false);
   const [newProject, setNewProject] = useState({
     name: "",
-    icon: ""
+    icon: "" // Remove this field if not needed
   });
   const [formError, setFormError] = useState("");
   const [editingProject, setEditingProject] = useState(null);
@@ -48,18 +48,18 @@ const Projects = () => {
   };
 
   const handleAddProject = async () => {
-    if (newProject.name === "" || newProject.icon === "") {
-      setFormError("Name and icon are required.");
+    if (newProject.name === "") {
+      setFormError("Name is required.");
       return;
     }
-  
+
     setFormError("");
     setLoading(true);
-    
+
     try {
       const response = await apiService.addProject(newProject);
       setProjects([...projects, response]); // Assuming response contains the full project object
-      setNewProject({ name: "", icon: "" });
+      setNewProject({ name: "" }); // Remove icon from state
       setShowModal(false);
       setSuccessMessage("Project added successfully, please reload!");
     } catch (error) {
@@ -78,7 +78,7 @@ const Projects = () => {
   const handleDelete = async (guid) => {
     if (window.confirm("Are you sure you want to delete this project?")) {
       setLoading(true);
-      
+
       try {
         await apiService.deleteProject(guid); // Ensure you have this API method
         setProjects(projects.filter(project => project.guid !== guid));
@@ -135,8 +135,8 @@ const Projects = () => {
                   <tr>
                     <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">#</th>
                     <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">Name</th>
-                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">Icon</th>
                     <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">GUID</th>
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">Action</th>
                   </tr>
                 </thead>
                 <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
@@ -153,9 +153,6 @@ const Projects = () => {
                           {indexOfFirstProject + index + 1}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{project.name}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
-                          <img src={project.icon} alt={project.name} className="w-6 h-6" />
-                        </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{project.guid}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
                           <button
@@ -191,11 +188,10 @@ const Projects = () => {
                   <button
                     key={pageNumber + 1}
                     onClick={() => handlePageChange(pageNumber + 1)}
-                    className={`relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium ${
-                      pageNumber + 1 === currentPage
+                    className={`relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium ${pageNumber + 1 === currentPage
                         ? "bg-blue-500 text-white dark:bg-blue-600 dark:text-white"
                         : "bg-white text-gray-700 dark:bg-gray-800 dark:text-white dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700"
-                    }`}
+                      }`}
                   >
                     {pageNumber + 1}
                   </button>
@@ -225,16 +221,7 @@ const Projects = () => {
                       className="mt-1 block w-full border-gray-300 rounded-md shadow-sm dark:bg-gray-900 dark:border-gray-700 dark:text-white"
                     />
                   </div>
-                  <div className="mb-4">
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Icon URL</label>
-                    <input
-                      type="text"
-                      name="icon"
-                      value={newProject.icon}
-                      onChange={handleInputChange}
-                      className="mt-1 block w-full border-gray-300 rounded-md shadow-sm dark:bg-gray-900 dark:border-gray-700 dark:text-white"
-                    />
-                  </div>
+                  {/* Removed Icon Field */}
                   <div className="flex justify-end">
                     <button
                       onClick={handleAddProject}
