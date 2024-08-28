@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import apiService from '../../services/apiservice';
 
 export default function AddDeviceModal({ showModal, onClose, onSave }) {
     const [deviceData, setDeviceData] = useState({
@@ -14,6 +15,10 @@ export default function AddDeviceModal({ showModal, onClose, onSave }) {
         active: false,
         image: ""
     });
+
+    const [deviceTypes, setDeviceTypes] = useState([]);
+    const [error, setError] = useState(null);
+    const [loading, setLoading] = useState(true);
 
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
@@ -39,6 +44,22 @@ export default function AddDeviceModal({ showModal, onClose, onSave }) {
             image: ""
         });
     };
+
+    useEffect(() => {
+        const fetchDeviceTypes = async () => {
+            try {
+                const response = await apiService.getDeviceTypes();
+                setDeviceTypes(response.data);
+                setLoading(false);
+            } catch (err) {
+                console.error("Error fetching device types:", err); // Log detailed error
+                setError('Failed to fetch device types.');
+                setLoading(false);
+            }
+        };
+
+        fetchDeviceTypes();
+    }, []);
 
     if (!showModal) return null;
 
@@ -98,10 +119,11 @@ export default function AddDeviceModal({ showModal, onClose, onSave }) {
                                 className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                             >
                                 <option value="">Select Type</option>
-                                <option value="sensor">Sensor</option>
-                                <option value="actuator">Actuator</option>
-                                <option value="controller">Controller</option>
-                                {/* Tambahkan opsi lain sesuai kebutuhan */}
+                                {deviceTypes.map((deviceType) => (
+                                    <option key={deviceType.guid} value={deviceType.name}>
+                                        {deviceType.name}
+                                    </option>
+                                ))}
                             </select>
                         </div>
                         <div>
@@ -169,6 +191,7 @@ export default function AddDeviceModal({ showModal, onClose, onSave }) {
                             />
                         </div>
                     </div>
+                    {error && <div className="text-red-500 text-sm mt-2">{error}</div>}
                     <div className="flex justify-end mt-4">
                         <button
                             type="button"

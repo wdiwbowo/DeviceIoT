@@ -1,12 +1,32 @@
 import React, { useState, useEffect } from 'react';
+import apiService from '../../services/apiservice';
 
 function EditDeviceModal({ showModal, onClose, device, onSave }) {
     const [deviceData, setDeviceData] = useState(device);
     const [saveMessage, setSaveMessage] = useState("");
+    const [deviceTypes, setDeviceTypes] = useState([]); // Add state for device types
+    const [error, setError] = useState(''); // Add state for errors
+    const [loading, setLoading] = useState(true); // Add state for loading
 
     useEffect(() => {
         setDeviceData(device);
     }, [device]);
+
+    useEffect(() => {
+        const fetchDeviceTypes = async () => {
+            try {
+                const response = await apiService.getDeviceTypes();
+                setDeviceTypes(response.data); // Update with correct field from response
+                setLoading(false);
+            } catch (err) {
+                console.error("Error fetching device types:", err); // Log detailed error
+                setError('Failed to fetch device types.');
+                setLoading(false);
+            }
+        };
+
+        fetchDeviceTypes();
+    }, []);
 
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
@@ -20,7 +40,7 @@ function EditDeviceModal({ showModal, onClose, device, onSave }) {
         console.log('Device data on save:', deviceData); // Debugging
 
         // Simple validation
-        if (!deviceData.deviceGuid) {
+        if (!deviceData.guid) {
             alert("GUID diperlukan untuk pembaruan perangkat.");
             return;
         }
@@ -43,9 +63,6 @@ function EditDeviceModal({ showModal, onClose, device, onSave }) {
 
     if (!showModal) return null;
 
-    // Define the options for device type
-    const deviceTypes = ["Sensor", "Actuator", "Controller"];
-
     return (
         <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50">
             <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-lg w-full max-w-3xl">
@@ -53,6 +70,11 @@ function EditDeviceModal({ showModal, onClose, device, onSave }) {
                 {saveMessage && (
                     <div className="bg-green-100 text-green-700 p-2 mb-4 rounded-md">
                         {saveMessage}
+                    </div>
+                )}
+                {error && (
+                    <div className="bg-red-100 text-red-700 p-2 mb-4 rounded-md">
+                        {error}
                     </div>
                 )}
                 <form className="space-y-4">
@@ -98,8 +120,11 @@ function EditDeviceModal({ showModal, onClose, device, onSave }) {
                                 onChange={handleChange}
                                 className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                             >
-                                {deviceTypes.map((type) => (
-                                    <option key={type} value={type}>{type}</option>
+                                <option value="">Select Type</option>
+                                {deviceTypes.map((deviceType) => (
+                                    <option key={`${deviceType.id}-${deviceType.name}`} value={deviceType.name}>
+                                        {deviceType.name}
+                                    </option>
                                 ))}
                             </select>
                         </div>
