@@ -20,7 +20,7 @@ function EditDeviceModal({ showModal, onClose, device, onSave }) {
         console.log('Device data on save:', deviceData); // Debugging
 
         // Simple validation
-        if (!deviceData.guid) {
+        if (!deviceData.deviceGuid) {
             alert("GUID diperlukan untuk pembaruan perangkat.");
             return;
         }
@@ -30,7 +30,7 @@ function EditDeviceModal({ showModal, onClose, device, onSave }) {
         }
 
         try {
-            await onSave(deviceData.guid, deviceData); // Use guid for updating
+            await onSave(deviceData.guid, deviceData); // Use deviceGuid for updating
             setSaveMessage("Perangkat berhasil disimpan!");
             setTimeout(() => {
                 setSaveMessage("");
@@ -42,6 +42,9 @@ function EditDeviceModal({ showModal, onClose, device, onSave }) {
     };
 
     if (!showModal) return null;
+
+    // Define the options for device type
+    const deviceTypes = ["Sensor", "Actuator", "Controller"];
 
     return (
         <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50">
@@ -58,21 +61,11 @@ function EditDeviceModal({ showModal, onClose, device, onSave }) {
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">GUID</label>
                             <input
                                 type="text"
-                                name="guid"
-                                value={deviceData.guid}
+                                name="deviceGuid"
+                                value={deviceData.deviceGuid}
                                 onChange={handleChange}
                                 className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                                 readOnly
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Company GUID</label>
-                            <input
-                                type="text"
-                                name="companyGuid"
-                                value={deviceData.companyGuid}
-                                onChange={handleChange}
-                                className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                             />
                         </div>
                         <div>
@@ -99,13 +92,16 @@ function EditDeviceModal({ showModal, onClose, device, onSave }) {
                         </div>
                         <div>
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Type</label>
-                            <input
-                                type="text"
+                            <select
                                 name="type"
                                 value={deviceData.type}
                                 onChange={handleChange}
                                 className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                            />
+                            >
+                                {deviceTypes.map((type) => (
+                                    <option key={type} value={type}>{type}</option>
+                                ))}
+                            </select>
                         </div>
                         <div>
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Latitude</label>
@@ -137,6 +133,16 @@ function EditDeviceModal({ showModal, onClose, device, onSave }) {
                                 className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                             />
                         </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Image URL</label>
+                            <input
+                                type="text"
+                                name="image"
+                                value={deviceData.image}
+                                onChange={handleChange}
+                                className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                            />
+                        </div>
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                         <div className="flex items-center">
@@ -158,16 +164,6 @@ function EditDeviceModal({ showModal, onClose, device, onSave }) {
                                 className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                             />
                             <label className="ml-2 block text-sm font-medium text-gray-700 dark:text-gray-300">Active</label>
-                        </div>
-                        <div className="col-span-2">
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Image URL</label>
-                            <input
-                                type="text"
-                                name="image"
-                                value={deviceData.image}
-                                onChange={handleChange}
-                                className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                            />
                         </div>
                     </div>
                     <div className="flex justify-end mt-4">

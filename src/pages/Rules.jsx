@@ -5,6 +5,7 @@ import debounce from "lodash.debounce";
 import AddModal from "../components/Rules/AddModal";
 import EditModal from "../components/Rules/EditModal";
 import DeleteModal from "../components/Rules/DeleteModal";
+import { FaPlus, FaEdit, FaTrash } from 'react-icons/fa';
 
 const Rules = () => {
     const [showAddModal, setShowAddModal] = useState(false);
@@ -85,37 +86,37 @@ const Rules = () => {
     };
 
     // Handle edit rule
-   // Handle edit rule
-const handleEdit = async () => {
-    if (!selectedRule) return;
+    // Handle edit rule
+    const handleEdit = async () => {
+        if (!selectedRule) return;
 
-    setLoading(true);
-    setErrorMessage("");
-    setSuccessMessage("");
+        setLoading(true);
+        setErrorMessage("");
+        setSuccessMessage("");
 
-    try {
-        // Kirim request untuk memperbarui aturan
-        const response = await apiService.updateRule(selectedRule.guid, guidInput, valueInput, guidOutput, valueOutput);
-        console.log('Rule updated successfully:', response);
+        try {
+            // Kirim request untuk memperbarui aturan
+            const response = await apiService.updateRule(selectedRule.guid, guidInput, valueInput, guidOutput, valueOutput);
+            console.log('Rule updated successfully:', response);
 
-        // Perbarui data di state
-        const updatedData = data.map((rule) =>
-            rule.guid === selectedRule.guid
-                ? { ...rule, guidInput, valueInput, guidOutput, valueOutput }
-                : rule
-        );
+            // Perbarui data di state
+            const updatedData = data.map((rule) =>
+                rule.guid === selectedRule.guid
+                    ? { ...rule, guidInput, valueInput, guidOutput, valueOutput }
+                    : rule
+            );
 
-        setData(updatedData);
-        setFilteredData(updatedData);
-        setSuccessMessage("Rule updated successfully!");
-        setShowEditModal(false);
-    } catch (error) {
-        setErrorMessage(error.message || "Failed to update rule.");
-        console.error('Failed to update rule:', error);
-    } finally {
-        setLoading(false);
-    }
-};
+            setData(updatedData);
+            setFilteredData(updatedData);
+            setSuccessMessage("Rule updated successfully!");
+            setShowEditModal(false);
+        } catch (error) {
+            setErrorMessage(error.message || "Failed to update rule.");
+            console.error('Failed to update rule:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     // Handle delete rule
     const handleDelete = async () => {
@@ -150,7 +151,6 @@ const handleEdit = async () => {
                 <div className="flex justify-between items-center mb-8">
                     <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Rules</h1>
                     <button
-                        className="bg-blue-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
                         onClick={() => {
                             setGuidInput("");
                             setValueInput("");
@@ -158,8 +158,9 @@ const handleEdit = async () => {
                             setValueOutput("");
                             setShowAddModal(true);
                         }}
+                        className="flex items-center bg-blue-600 text-white px-4 py-2 rounded-md shadow-sm hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
                     >
-                        Add Rule
+                        <FaPlus className="mr-2" />Add Rule
                     </button>
                 </div>
 
@@ -180,7 +181,7 @@ const handleEdit = async () => {
 
                 {!loading && !errorMessage && (
                     <div className="overflow-x-auto bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
-                          <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                        <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                             <thead className="bg-gray-50 dark:bg-gray-700">
                                 <tr>
                                     <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">#</th>
@@ -200,56 +201,59 @@ const handleEdit = async () => {
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{item.guidOutput}</td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{item.valueOutput}</td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                            <button
-                                                className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 mr-4"
-                                                onClick={() => {
-                                                    setSelectedRule(item);
-                                                    setGuidInput(item.guidInput);
-                                                    setValueInput(item.valueInput);
-                                                    setGuidOutput(item.guidOutput);
-                                                    setValueOutput(item.valueOutput);
-                                                    setShowEditModal(true);
-                                                }}
-                                            >
-                                                Edit
-                                            </button>
-                                            <button
-                                                className="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300"
-                                                onClick={() => {
-                                                    setSelectedRule(item);
-                                                    setShowDeleteModal(true);
-                                                }}
-                                            >
-                                                Delete
-                                            </button>
+                                            <div className="flex space-x-2">
+                                                <button
+                                                    onClick={() => {
+                                                        setSelectedRule(item);
+                                                        setGuidInput(item.guidInput);
+                                                        setValueInput(item.valueInput);
+                                                        setGuidOutput(item.guidOutput);
+                                                        setValueOutput(item.valueOutput);
+                                                        setShowEditModal(true);
+                                                    }}
+                                                    className="flex items-center bg-blue-600 text-white px-3 py-2 rounded-md shadow-sm hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
+                                                >
+                                                    <FaEdit className="mr-2" /> Edit
+                                                </button>
+                                                <button
+                                                    onClick={() => {
+                                                        setSelectedRule(item);
+                                                        setShowDeleteModal(true);
+                                                    }}
+                                                    className="flex items-center bg-red-600 text-white px-3 py-2 rounded-md shadow-sm hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600"
+                                                >
+                                                    <FaTrash className="mr-2" /> Delete
+                                                </button>
+                                            </div>
                                         </td>
+
                                     </tr>
                                 ))}
                             </tbody>
                         </table>
 
-                        {/* Pagination */}
-                        <div className="mt-4 flex justify-between">
-                            <button
-                                className="bg-blue-600 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                disabled={currentPage === 1}
-                                onClick={() => setCurrentPage(currentPage - 1)}
-                            >
-                                Previous
-                            </button>
-                            <span className="self-center text-gray-700 dark:text-gray-300">
-                                Page {currentPage} of {totalPages}
-                            </span>
-                            <button
-                                className="bg-blue-600 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                disabled={currentPage === totalPages}
-                                onClick={() => setCurrentPage(currentPage + 1)}
-                            >
-                                Next
-                            </button>
-                        </div>
                     </div>
                 )}
+                {/* Pagination */}
+                <div className="flex justify-between items-center mt-6">
+                    <button
+                        className="bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-gray-100 px-4 py-2 rounded-lg shadow-md disabled:opacity-50"
+                        onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                        disabled={currentPage === 1}
+                    >
+                        Previous
+                    </button>
+                    <span className="text-gray-700 dark:text-gray-300">
+                        Page {currentPage} of {totalPages}
+                    </span>
+                    <button
+                        className="bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-gray-100 px-4 py-2 rounded-lg shadow-md disabled:opacity-50"
+                        onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                        disabled={currentPage === totalPages}
+                    >
+                        Next
+                    </button>
+                </div>
 
                 {/* Add Modal */}
                 <AddModal

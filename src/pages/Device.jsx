@@ -4,6 +4,7 @@ import apiService from '../services/apiservice';
 import AddDeviceModal from '../components/device/AddDeviceModal';
 import EditDeviceModal from '../components/device/EditDeviceModal';
 import DeleteDeviceModal from '../components/device/DeleteDeviceModal';
+import { FaPlus, FaEdit, FaTrash } from 'react-icons/fa'; // Import the icons
 
 export default function Device() {
     const [showAddModal, setShowAddModal] = useState(false);
@@ -112,9 +113,9 @@ export default function Device() {
                     <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Devices</h1>
                     <button
                         onClick={() => setShowAddModal(true)}
-                        className="bg-blue-600 text-white px-4 py-2 rounded-md shadow-sm hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
+                        className="flex items-center bg-blue-600 text-white px-4 py-2 rounded-md shadow-sm hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
                     >
-                        Add Device
+                        <FaPlus className="mr-2" /> Add Device
                     </button>
                 </div>
                 <div className="mb-4">
@@ -162,25 +163,28 @@ export default function Device() {
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{item.status ? 'True' : 'False'}</td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{item.active ? 'Active' : 'Inactive'}</td>
                                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                            <button
-                                                className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300"
-                                                onClick={() => {
-                                                    setDeviceToEdit(item);
-                                                    setShowEditModal(true);
-                                                }}
-                                            >
-                                                Edit
-                                            </button>
-                                            <button
-                                                onClick={() => {
-                                                    setDeviceToDelete(item);
-                                                    setShowDeleteModal(true);
-                                                }}
-                                                className="text-red-600 dark:text-red-400 hover:underline ml-4"
-                                            >
-                                                Delete
-                                            </button>
+                                            <div className="flex space-x-2">
+                                                <button
+                                                    onClick={() => {
+                                                        setDeviceToEdit(item);
+                                                        setShowEditModal(true);
+                                                    }}
+                                                    className="flex items-center bg-blue-600 text-white px-3 py-2 rounded-md shadow-sm hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
+                                                >
+                                                    <FaEdit className="mr-2" /> Edit
+                                                </button>
+                                                <button
+                                                    onClick={() => {
+                                                        setDeviceToDelete(item);
+                                                        setShowDeleteModal(true);
+                                                    }}
+                                                    className="flex items-center bg-red-600 text-white px-3 py-2 rounded-md shadow-sm hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600"
+                                                >
+                                                    <FaTrash className="mr-2" /> Delete
+                                                </button>
+                                            </div>
                                         </td>
+
                                     </tr>
                                 ))
                             )}
@@ -235,11 +239,11 @@ export default function Device() {
                 )}
                 {deviceToDelete && (
                     <DeleteDeviceModal
-                isOpen={showDeleteModal}
-                onClose={() => setShowDeleteModal(false)}
-                device={deviceToDelete}
-                onDelete={handleDeleteDevice}
-            />
+                        isOpen={showDeleteModal}
+                        onClose={() => setShowDeleteModal(false)}
+                        device={deviceToDelete}
+                        onDelete={handleDeleteDevice}
+                    />
                 )}
             </div>
         </div>

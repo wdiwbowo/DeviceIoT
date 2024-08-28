@@ -290,6 +290,46 @@ const apiService = {
       throw new Error(error.response?.data?.message || 'Failed to add device type');
     }
   },
+
+  updateDeviceType: async (guid, deviceTypeData) => {
+    if (!guid) {
+      console.error('GUID is required for updating device type.');
+      throw new Error('GUID is required.');
+    }
+
+    try {
+      const response = await apiClient.put(`/device-types/update/${guid}`, deviceTypeData);
+      console.log('Update Device Type Response:', response.data);
+      return response.data;
+    } catch (error) {
+      console.error('Error updating device type:', error);
+      if (error.response?.status === 401) {
+        console.error('Unauthorized access. Please log in again.');
+        throw new Error('Unauthorized access. Please log in again.');
+      }
+      throw new Error(error.response?.data?.message || 'Failed to update device type');
+    }
+  },
+
+  deleteDeviceType: async (guid) => {
+    if (!guid) {
+      console.error('GUID is required for deleting device type.');
+      throw new Error('GUID is required.');
+    }
+
+    try {
+      const response = await apiClient.delete(`/device-types/delete/${guid}`);
+      console.log('Delete Device Type Response:', response.data);
+      return response.data;
+    } catch (error) {
+      console.error('Error deleting device type:', error);
+      if (error.response?.status === 401) {
+        console.error('Unauthorized access. Please log in again.');
+        throw new Error('Unauthorized access. Please log in again.');
+      }
+      throw new Error(error.response?.data?.message || 'Failed to delete device type');
+    }
+  },
 };
 
 export default apiService;
