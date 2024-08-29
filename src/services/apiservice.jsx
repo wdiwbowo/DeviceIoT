@@ -330,6 +330,17 @@ const apiService = {
       throw new Error(error.response?.data?.message || 'Failed to delete device type');
     }
   },
+
+  getAllCompanies: async () => {
+    try {
+        const response = await apiUser.get('/companies');
+        console.log('Get All Companies Response:', response.data); // Log the response data
+        return response.data?.data || []; // Access and return the companies array, default to empty array
+    } catch (error) {
+        console.error('Error fetching companies:', error);
+        throw new Error(error.response?.data?.message || 'Failed to fetch companies');
+    }
+},
 };
 
 export default apiService;

@@ -5,6 +5,7 @@ import Rules from "./pages/Rules";
 import Login from "./pages/Login";
 import Projects from "./pages/Projects";
 import DeviceType from "./pages/DeviceType";
+import Company from "./pages/Company";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 export const router = createBrowserRouter([
@@ -13,5 +14,6 @@ export const router = createBrowserRouter([
     { path: '/rules', element: <ProtectedRoute element={<Rules />} /> },
     { path: '/projects', element: <ProtectedRoute element={<Projects />} /> },
     { path: '/deviceType', element: <ProtectedRoute element={<DeviceType />} /> },
+    { path: '/company', element: <ProtectedRoute element={<Company />} /> },
     { path: '/login', element: <Login /> },
 ]);
