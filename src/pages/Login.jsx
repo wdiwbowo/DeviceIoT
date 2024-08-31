@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import {jwtDecode} from 'jwt-decode'; // Corrected import statement
 import apiService from '../services/apiservice';
 
 const Login = () => {
@@ -11,16 +12,34 @@ const Login = () => {
   const handleLogin = async (event) => {
     event.preventDefault();
     setError(null);
-
+  
     try {
       const response = await apiService.login(username, password);
-      // console.log(response.data)
-      // console.log('App Token:', appToken);
-      navigate('/');
+      const userToken = localStorage.getItem('userToken');
+      console.log('Retrieved userToken:', userToken);
+  
+      if (userToken) {
+        const decodedToken = jwtDecode(userToken);
+        console.log('Decoded Token:', decodedToken);
+  
+        const userRole = decodedToken.role; // Adjust according to the correct field
+        console.log('User Role:', userRole);
+  
+        // Redirect based on user role
+        if (userRole === 'superAdmin') {
+          navigate('/'); // Redirect to the Devices page for superadmins
+        } else if (userRole === 'admin') {
+          navigate('/'); // Redirect to the Admin page for admins
+         } else {
+          setError('Peran pengguna tidak dikenal.');
+        }
+      } else {
+        setError('Token pengguna tidak tersedia.');
+      }
     } catch (error) {
-      setError(error.message);
+      setError('Error logging in: ' + error.message);
     }
-  };
+  };  
 
   return (
     <div className="flex items-center justify-center h-screen bg-gray-100">

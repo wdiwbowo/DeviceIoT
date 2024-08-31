@@ -1,8 +1,18 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import {jwtDecode} from 'jwt-decode'; // Pastikan jwtDecode sudah di-import
 
 export default function Navbar() {
   const navigate = useNavigate();
+  const [userRole, setUserRole] = useState('');
+
+  useEffect(() => {
+    const userToken = localStorage.getItem('appToken');
+    if (userToken) {
+      const decodedToken = jwtDecode(userToken);
+      setUserRole(decodedToken.role); // Sesuaikan dengan field role di dalam token
+    }
+  }, []);
 
   const handleLogout = () => {
     localStorage.removeItem('appToken');
@@ -63,52 +73,84 @@ export default function Navbar() {
             </div>
             <div className="hidden sm:ml-6 sm:block">
               <div className="flex space-x-4">
-                {/* Navigation links */}
-                <a
-                  href="/"
-                  className="rounded-md bg-gray-900 px-3 py-2 text-sm font-medium text-white"
-                  aria-current="page"
-                >
-                  Dashboard
-                </a>
-                <a
-                  href="/device"
-                  className="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
-                >
-                  Device
-                </a>
-                <a
-                  href="/rules"
-                  className="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
-                >
-                  Rules
-                </a>
-                <a
-                  href="/projects"
-                  className="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
-                >
-                  Projects
-                </a>
-                <a
-                  href="/devicetype"
-                  className="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
-                >
-                  Device Type
-                </a>
-                <a
-                  href="/company"
-                  className="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
-                >
-                  Company
-                </a>
-                 <div className="flex items-center">
-              <button
-                onClick={handleLogout}
-                className="ml- rounded-md px-3 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700"
-              >
-                Logout
-              </button>
-            </div>
+                {/* Conditionally render links based on userRole */}
+                {userRole === 'superAdmin' && (
+                  <>
+                    <a
+                      href="/"
+                      className="rounded-md bg-gray-900 px-3 py-2 text-sm font-medium text-white"
+                      aria-current="page"
+                    >
+                      Dashboard
+                    </a>
+                    <a
+                      href="/device"
+                      className="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
+                    >
+                      Device
+                    </a>
+                    <a
+                      href="/rules"
+                      className="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
+                    >
+                      Rules
+                    </a>
+                    <a
+                      href="/projects"
+                      className="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
+                    >
+                      Projects
+                    </a>
+                    <a
+                      href="/devicetype"
+                      className="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
+                    >
+                      Device Type
+                    </a>
+                    <a
+                      href="/company"
+                      className="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
+                    >
+                      Company
+                    </a>
+                  </>
+                )}
+                {userRole === 'admin' && (
+                  <>
+                    <a
+                      href="/deviceadmin"
+                      className="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
+                    >
+                      Device
+                    </a>
+                    <a
+                      href="/pengguna"
+                      className="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
+                    >
+                      Pengguna
+                    </a>
+                    <a
+                      href="/laporan-petugas"
+                      className="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
+                    >
+                      Laporan Petugas
+                    </a>
+                    <a
+                      href="/manajemen-konflik"
+                      className="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
+                    >
+                      Manajemen Konflik
+                    </a>
+                  </>
+                )}
+                <div className="flex items-center">
+                  <button
+                    onClick={handleLogout}
+                    className="ml-2 rounded-md px-3 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700"
+                  >
+                    Logout
+                  </button>
+                </div>
               </div>
             </div>
           </div>

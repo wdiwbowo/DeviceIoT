@@ -8,6 +8,9 @@ import DeviceType from "./pages/DeviceType";
 import Company from "./pages/Company";
 import ProtectedRoute from "./components/ProtectedRoute";
 
+//Admin
+import DeviceAdmin from "./pages/DeviceAdmin";
+
 export const router = createBrowserRouter([
     { path: '/', element: <ProtectedRoute element={<App />} /> },
     { path: '/device', element: <ProtectedRoute element={<Device />} /> },
@@ -16,4 +19,7 @@ export const router = createBrowserRouter([
     { path: '/deviceType', element: <ProtectedRoute element={<DeviceType />} /> },
     { path: '/company', element: <ProtectedRoute element={<Company />} /> },
     { path: '/login', element: <Login /> },
+
+//Admin
+{ path: '/deviceAdmin', element: <ProtectedRoute element={<DeviceAdmin />} /> },
 ]);

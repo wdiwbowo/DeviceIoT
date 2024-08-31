@@ -35,16 +35,18 @@ const apiService = {
 
   login: async (email, password) => {
     try {
-      console.log('Login request data:', { email, password, guidAplication: 'PROJECT-519391a1-bff6-4e8c-a854-bed3984cc0bb-2024' });
+      console.log('Login request data:', { email, password });
       const response = await apiUser.post('/users/login', {
         email,
         password,
         guidAplication: 'PROJECT-519391a1-bff6-4e8c-a854-bed3984cc0bb-2024',
       });
       console.log('Login response:', response.data);
-      const token = response.data?.data;
+
+      const token = response.data?.data; // Adjust based on actual API response
       if (token) {
-        localStorage.setItem('appToken', token.appToken);
+        localStorage.setItem('appToken', token.appToken); // Ensure field names are correct
+        localStorage.setItem('userToken', token.userToken); // Ensure field names are correct
       }
       return response.data;
     } catch (error) {
@@ -53,6 +55,18 @@ const apiService = {
     }
   },
 
+  getAllCompanies: async () => {
+    try {
+      const response = await apiUser.get('/companies');
+      console.log('Get All Companies Response:', response.data); // Log the response data
+      return response.data?.data || []; // Access and return the companies array, default to empty array
+    } catch (error) {
+      console.error('Error fetching companies:', error);
+      throw new Error(error.response?.data?.message || 'Failed to fetch companies');
+    }
+  },
+
+  //Super Admin
   getAllDevices: async () => {
     try {
       const response = await apiClient.get('/devices/admin/get');
@@ -331,16 +345,76 @@ const apiService = {
     }
   },
 
-  getAllCompanies: async () => {
+  //Admin
+  getAllDevicesCompany: async () => {
     try {
-        const response = await apiUser.get('/companies');
-        console.log('Get All Companies Response:', response.data); // Log the response data
-        return response.data?.data || []; // Access and return the companies array, default to empty array
+      const response = await apiClient.get('/devices/company/get');
+      console.log('Get All Devices Response:', response.data);
+      return response.data;
     } catch (error) {
-        console.error('Error fetching companies:', error);
-        throw new Error(error.response?.data?.message || 'Failed to fetch companies');
+      if (error.response?.status === 401) {
+        console.error('Unauthorized access. Please log in again.');
+      } else {
+        console.error('Error fetching devices:', error);
+      }
+      throw error;
     }
-},
+  },
+
+  addDevice: async (deviceData) => {
+    try {
+      const response = await apiClient.post('/devices/add', deviceData);
+      console.log('Add Device Response:', response.data);
+      return response.data;
+    } catch (error) {
+      console.error('Error adding device:', error);
+      if (error.response?.status === 401) {
+        console.error('Unauthorized access. Please log in again.');
+        throw new Error('Unauthorized access. Please log in again.');
+      }
+      throw new Error(error.response?.data?.message || 'Failed to add device');
+    }
+  },
+
+  updateDeviceCompany: async (guid, deviceData) => {
+    if (!guid) {
+      console.error('GUID is required for updating device.');
+      throw new Error('GUID is required.');
+    }
+
+    try {
+      const response = await apiClient.put(`/devices/update/${guid}`, deviceData);
+      console.log('Update Device Response:', response.data);
+      return response.data;
+    } catch (error) {
+      console.error('Error updating device:', error);
+      if (error.response?.status === 401) {
+        console.error('Unauthorized access. Please log in again.');
+        throw new Error('Unauthorized access. Please log in again.');
+      }
+      throw new Error(error.response?.data?.message || 'Failed to update device');
+    }
+  },
+
+  deleteDeviceCompany: async (guid) => {
+    if (!guid) {
+      console.error('GUID is required for deleting device.');
+      throw new Error('GUID is required.');
+    }
+
+    try {
+      const response = await apiClient.delete(`/devices/delete/${guid}`);
+      console.log('Delete Device Response:', response.data);
+      return response.data;
+    } catch (error) {
+      console.error('Error deleting device:', error);
+      if (error.response?.status === 401) {
+        console.error('Unauthorized access. Please log in again.');
+        throw new Error('Unauthorized access. Please log in again.');
+      }
+      throw new Error(error.response?.data?.message || 'Failed to delete device');
+    }
+  },
 };
 
 export default apiService;
