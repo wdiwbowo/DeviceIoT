@@ -1,8 +1,10 @@
 import axios from 'axios';
+import { jwtDecode } from 'jwt-decode';
 
 // Base URLs for the API
 const apiUrl = 'https://device-iot.pptik.id/api/v1';
-const api = 'https://api-sso.lskk.co.id/v1/';
+const api = 'https://api-sso.lskk.co.id/v1';
+const apiLocal = 'https://api-iot-log.lskk.co.id/v1';
 
 // Create Axios instances
 const apiClient = axios.create({
@@ -17,6 +19,20 @@ const apiUser = axios.create({
     'Content-Type': 'application/json',
   },
 });
+const apiAdmin = axios.create({
+  baseURL: apiLocal,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+const apiAdminFile = axios.create({
+  baseURL: apiLocal,
+  headers: {
+    // 'Content-Type': 'application/json',
+    'Content-Type': 'multipart/form-data',
+
+  },
+});
 
 // Add interceptor for requests to apiClient
 apiClient.interceptors.request.use(
@@ -29,6 +45,30 @@ apiClient.interceptors.request.use(
   },
   (error) => Promise.reject(error)
 );
+
+// Add interceptor for requests to apiUser
+apiUser.interceptors.request.use(
+  (config) => {
+    const userToken = localStorage.getItem('userToken');
+    if (userToken) {
+      config.headers.Authorization = `Bearer ${userToken}`;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
+apiAdmin.interceptors.request.use(
+  (config) => {
+    const appToken = localStorage.getItem('appToken');
+    if (appToken) {
+      config.headers.Authorization = `Bearer ${appToken}`;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
 
 const apiService = {
   // Existing methods
@@ -415,6 +455,78 @@ const apiService = {
       throw new Error(error.response?.data?.message || 'Failed to delete device');
     }
   },
+
+  getAllUser: async () => {
+    try {
+      const response = await apiUser.get('/users/by-module');
+      console.log('Get All Users Response:', response.data);
+      return response.data;
+    } catch (error) {
+      if (error.response?.status === 401) {
+        console.error('Unauthorized access. Please log in again.');
+        throw new Error('Unauthorized access. Please log in again.');
+      } else {
+        console.error('Error fetching users:', error);
+      }
+      throw new Error(error.response?.data?.message || 'Failed to fetch users');
+    }
+  },
+
+  addUser: async (userData) => {
+    try {
+      const response = await apiUser.post('/users/adduser', userData); // kirim userData tanpa config tambahan
+      return response.data; // pastikan untuk mengembalikan response data
+    } catch (error) {
+      console.error('Error adding user:', error);
+      throw error; // pastikan untuk melempar error agar bisa ditangani di luar
+    }
+  },
+
+  getAllReportsByCompany: async (queryParams) => {
+    try {
+      const response = await apiAdmin.get('/reports/company', { 
+        params: {
+          companyGuid: queryParams.companyGuid, // GUID perusahaan
+          type: queryParams.type,               // Tipe report
+        }
+      });
+      console.log('Get All Reports by Company Response:', response.data);
+      return response.data;
+    } catch (error) {
+      if (error.response?.status === 401) {
+        console.error('Unauthorized access. Please log in again.');
+      } else {
+        console.error('Error fetching reports:', error);
+      }
+      throw error;
+    }
+  },
+
+  addReport: async (formData, token) => {
+    try {
+        const response = await apiAdminFile.post('/reports/create', formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+                'Authorization': `Bearer ${token}`
+            }
+        });
+        return response.data;
+    } catch (error) {
+        throw new Error(error.response?.data?.message || "Failed to add report");
+    }
+},
+  
+  decodeTokenUser: async () => {
+    const userToken = localStorage.getItem('userToken');
+    const decodedToken = jwtDecode(userToken);
+    return decodedToken;
+  },
+
+  decodeTokenApp: async () => {
+    const appToken = localStorage.getItem('appToken');
+    const decodedToken = jwtDecode(appToken);
+    return decodedToken;
+  },
 };
 
-export default apiService;
+export default apiService; 

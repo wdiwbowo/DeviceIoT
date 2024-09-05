@@ -47,7 +47,7 @@ export default function App() {
     } catch (error) {
       setError('Error logging in: ' + error.message);
     }
-  };
+  }; 
 
   return (
     <div className='bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 flex items-center justify-center min-h-screen'>

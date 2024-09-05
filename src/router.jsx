@@ -10,6 +10,9 @@ import ProtectedRoute from "./components/ProtectedRoute";
 
 //Admin
 import DeviceAdmin from "./pages/DeviceAdmin";
+import Pengguna from "./pages/Pengguna";
+import LaporanPetugas from "./pages/LaporanPetugas";
+import ManajemanKonflik from "./pages/ManajemanKonflik";
 
 export const router = createBrowserRouter([
     { path: '/', element: <ProtectedRoute element={<App />} /> },
@@ -22,4 +25,7 @@ export const router = createBrowserRouter([
 
 //Admin
 { path: '/deviceAdmin', element: <ProtectedRoute element={<DeviceAdmin />} /> },
+{ path: '/pengguna', element: <ProtectedRoute element={<Pengguna />} /> },
+{ path: '/laporanPetugas', element: <ProtectedRoute element={<LaporanPetugas />} /> },
+{ path: '/manajemanKonflik', element: <ProtectedRoute element={<ManajemanKonflik />} /> },
 ]);

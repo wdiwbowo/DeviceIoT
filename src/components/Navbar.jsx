@@ -15,8 +15,16 @@ export default function Navbar() {
   }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem('appToken');
-    navigate('/login');
+    if (window.confirm('Apakah Anda yakin ingin logout?')) {
+      localStorage.removeItem('appToken');
+      if (!localStorage.getItem('appToken')) {
+        alert('Logout berhasil.');
+        navigate('/login');
+        window.location.reload();
+      } else {
+        console.error('Token gagal dihapus.');
+      }
+    }
   };
 
   return (
@@ -130,16 +138,16 @@ export default function Navbar() {
                       Pengguna
                     </a>
                     <a
-                      href="/laporan-petugas"
+                      href="/laporanPetugas"
                       className="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
                     >
                       Laporan Petugas
                     </a>
                     <a
-                      href="/manajemen-konflik"
+                      href="/manajemanKonflik"
                       className="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
                     >
-                      Manajemen Konflik
+                      Hasil Kamera
                     </a>
                   </>
                 )}
