@@ -17,7 +17,7 @@ const ProjectsTable = () => {
     const fetchReports = async () => {
       try {
         const response = await apiService.getAllReportsByCompany(queryParams);
-        console.log('Raw API Response:', response);
+        // console.log('Raw API Response:', response);
 
         // Access the correct data structure
         const reportsData = response.data.data || [];

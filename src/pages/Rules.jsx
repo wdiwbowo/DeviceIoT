@@ -71,7 +71,7 @@ const Rules = () => {
         setSuccessMessage("");
         try {
             const response = await apiService.addRule(guidInput, valueInput, guidOutput, valueOutput);
-            console.log('Rule added successfully:', response);
+            // console.log('Rule added successfully:', response);
             const newRule = { guidInput, valueInput, guidOutput, valueOutput };
             setData((prevData) => [...prevData, newRule]);
             setFilteredData((prevData) => [...prevData, newRule]);
@@ -97,7 +97,7 @@ const Rules = () => {
         try {
             // Kirim request untuk memperbarui aturan
             const response = await apiService.updateRule(selectedRule.guid, guidInput, valueInput, guidOutput, valueOutput);
-            console.log('Rule updated successfully:', response);
+            // console.log('Rule updated successfully:', response);
 
             // Perbarui data di state
             const updatedData = data.map((rule) =>
@@ -126,7 +126,7 @@ const Rules = () => {
         setSuccessMessage("");
         try {
             const response = await apiService.deleteRule(selectedRule.guid);
-            console.log('Rule deleted successfully:', response);
+            // console.log('Rule deleted successfully:', response);
             const updatedData = data.filter((rule) => rule.guid !== selectedRule.guid);
             setData(updatedData);
             setFilteredData(updatedData);

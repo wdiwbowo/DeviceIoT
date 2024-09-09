@@ -37,7 +37,7 @@ function EditDeviceModal({ showModal, onClose, device, onSave }) {
     };
 
     const handleSave = async () => {
-        console.log('Device data on save:', deviceData); // Debugging
+        // console.log('Device data on save:', deviceData); // Debugging
 
         // Simple validation
         if (!deviceData.guid) {

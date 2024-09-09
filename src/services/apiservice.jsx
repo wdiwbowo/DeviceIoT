@@ -75,13 +75,13 @@ const apiService = {
 
   login: async (email, password) => {
     try {
-      console.log('Login request data:', { email, password });
+      // console.log('Login request data:', { email, password });
       const response = await apiUser.post('/users/login', {
         email,
         password,
         guidAplication: 'PROJECT-519391a1-bff6-4e8c-a854-bed3984cc0bb-2024',
       });
-      console.log('Login response:', response.data);
+      // console.log('Login response:', response.data);
 
       const token = response.data?.data; // Adjust based on actual API response
       if (token) {
@@ -98,7 +98,7 @@ const apiService = {
   getAllCompanies: async () => {
     try {
       const response = await apiUser.get('/companies');
-      console.log('Get All Companies Response:', response.data); // Log the response data
+      // console.log('Get All Companies Response:', response.data); // Log the response data
       return response.data?.data || []; // Access and return the companies array, default to empty array
     } catch (error) {
       console.error('Error fetching companies:', error);
@@ -110,7 +110,7 @@ const apiService = {
   getAllDevices: async () => {
     try {
       const response = await apiClient.get('/devices/admin/get');
-      console.log('Get All Devices Response:', response.data);
+      // console.log('Get All Devices Response:', response.data);
       return response.data;
     } catch (error) {
       if (error.response?.status === 401) {
@@ -125,7 +125,7 @@ const apiService = {
   addDevice: async (deviceData) => {
     try {
       const response = await apiClient.post('/devices/admin/add', deviceData);
-      console.log('Add Device Response:', response.data);
+      // console.log('Add Device Response:', response.data);
       return response.data;
     } catch (error) {
       console.error('Error adding device:', error);
@@ -145,7 +145,7 @@ const apiService = {
 
     try {
       const response = await apiClient.put(`/devices/update/${guid}`, deviceData);
-      console.log('Update Device Response:', response.data);
+      // console.log('Update Device Response:', response.data);
       return response.data;
     } catch (error) {
       console.error('Error updating device:', error);
@@ -165,7 +165,7 @@ const apiService = {
 
     try {
       const response = await apiClient.delete(`/devices/delete/${guid}`);
-      console.log('Delete Device Response:', response.data);
+      // console.log('Delete Device Response:', response.data);
       return response.data;
     } catch (error) {
       console.error('Error deleting device:', error);
@@ -180,7 +180,7 @@ const apiService = {
   getAllRules: async () => {
     try {
       const response = await apiClient.get('/rules/all');
-      console.log('Get All Rules Response:', response.data);
+      // console.log('Get All Rules Response:', response.data);
       return response.data;
     } catch (error) {
       console.error('Error fetching rules:', error);
@@ -196,7 +196,7 @@ const apiService = {
         guidOutput,
         valueOutput,
       });
-      console.log('Add Rule Response:', response.data);
+      // console.log('Add Rule Response:', response.data);
       return response.data;
     } catch (error) {
       console.error('Error adding rule:', error);
@@ -213,7 +213,7 @@ const apiService = {
         valueOutput: newValueOutput,
       };
 
-      console.log('Request Data:', requestData);
+      // console.log('Request Data:', requestData);
 
       const response = await apiClient.put(`/rules/update/${guid}`, requestData, {
         headers: {
@@ -221,7 +221,7 @@ const apiService = {
         },
       });
 
-      console.log('Update Rule Response:', response.data);
+      // console.log('Update Rule Response:', response.data);
       return response.data;
     } catch (error) {
       console.error('Error updating rule:', error);
@@ -241,7 +241,7 @@ const apiService = {
 
     try {
       const response = await apiClient.delete(`/rules/delete/${guid}`);
-      console.log('Delete Rule Response:', response.data);
+      // console.log('Delete Rule Response:', response.data);
       return response.data;
     } catch (error) {
       console.error('Error deleting rule:', error);
@@ -256,7 +256,7 @@ const apiService = {
   getAllProjects: async () => {
     try {
       const response = await apiClient.get('/projects/get');
-      console.log('Get All Projects Response:', response.data);
+      // console.log('Get All Projects Response:', response.data);
       return response.data;
     } catch (error) {
       if (error.response?.status === 401) {
@@ -271,7 +271,7 @@ const apiService = {
   addProject: async (projectData) => {
     try {
       const response = await apiClient.post('/projects/add', projectData);
-      console.log('Add Project Response:', response.data);
+      // console.log('Add Project Response:', response.data);
       return response.data;
     } catch (error) {
       console.error('Error adding project:', error);
@@ -291,7 +291,7 @@ const apiService = {
 
     try {
       const response = await apiClient.put(`/projects/update/${guid}`, projectData);
-      console.log('Update Project Response:', response.data);
+      // console.log('Update Project Response:', response.data);
       return response.data;
     } catch (error) {
       console.error('Error updating project:', error);
@@ -311,7 +311,7 @@ const apiService = {
 
     try {
       const response = await apiClient.delete(`/projects/delete/${guid}`);
-      console.log('Delete Project Response:', response.data);
+      // console.log('Delete Project Response:', response.data);
       return response.data;
     } catch (error) {
       console.error('Error deleting project:', error);
@@ -326,7 +326,7 @@ const apiService = {
   getDeviceTypes: async () => {
     try {
       const response = await apiClient.get('/device-types/get');
-      console.log('Get Device Types Response:', response.data);
+      // console.log('Get Device Types Response:', response.data);
       return response.data;
     } catch (error) {
       console.error('Error fetching device types:', error);
@@ -337,7 +337,7 @@ const apiService = {
   addDeviceType: async (deviceTypeData) => {
     try {
       const response = await apiClient.post('/device-types/add', deviceTypeData);
-      console.log('Add Device Type Response:', response.data);
+      // console.log('Add Device Type Response:', response.data);
       return response.data;
     } catch (error) {
       console.error('Error adding device type:', error);
@@ -353,7 +353,7 @@ const apiService = {
 
     try {
       const response = await apiClient.put(`/device-types/update/${guid}`, deviceTypeData);
-      console.log('Update Device Type Response:', response.data);
+      // console.log('Update Device Type Response:', response.data);
       return response.data;
     } catch (error) {
       console.error('Error updating device type:', error);
@@ -373,7 +373,7 @@ const apiService = {
 
     try {
       const response = await apiClient.delete(`/device-types/delete/${guid}`);
-      console.log('Delete Device Type Response:', response.data);
+      // console.log('Delete Device Type Response:', response.data);
       return response.data;
     } catch (error) {
       console.error('Error deleting device type:', error);
@@ -389,7 +389,7 @@ const apiService = {
   getAllDevicesCompany: async () => {
     try {
       const response = await apiClient.get('/devices/company/get');
-      console.log('Get All Devices Response:', response.data);
+      // console.log('Get All Devices Response:', response.data);
       return response.data;
     } catch (error) {
       if (error.response?.status === 401) {
@@ -404,7 +404,7 @@ const apiService = {
   addDevice: async (deviceData) => {
     try {
       const response = await apiClient.post('/devices/add', deviceData);
-      console.log('Add Device Response:', response.data);
+      // console.log('Add Device Response:', response.data);
       return response.data;
     } catch (error) {
       console.error('Error adding device:', error);
@@ -424,7 +424,7 @@ const apiService = {
 
     try {
       const response = await apiClient.put(`/devices/update/${guid}`, deviceData);
-      console.log('Update Device Response:', response.data);
+      // console.log('Update Device Response:', response.data);
       return response.data;
     } catch (error) {
       console.error('Error updating device:', error);
@@ -444,7 +444,7 @@ const apiService = {
 
     try {
       const response = await apiClient.delete(`/devices/delete/${guid}`);
-      console.log('Delete Device Response:', response.data);
+      // console.log('Delete Device Response:', response.data);
       return response.data;
     } catch (error) {
       console.error('Error deleting device:', error);
@@ -459,7 +459,7 @@ const apiService = {
   getAllUser: async () => {
     try {
       const response = await apiUser.get('/users/by-module');
-      console.log('Get All Users Response:', response.data);
+      // console.log('Get All Users Response:', response.data);
       return response.data;
     } catch (error) {
       if (error.response?.status === 401) {
@@ -490,7 +490,7 @@ const apiService = {
           type: queryParams.type,               // Tipe report
         }
       });
-      console.log('Get All Reports by Company Response:', response.data);
+      // console.log('Get All Reports by Company Response:', response.data);
       return response.data;
     } catch (error) {
       if (error.response?.status === 401) {

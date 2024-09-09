@@ -25,13 +25,13 @@ const AddUserModal = ({ isOpen, onClose, onAddUser }) => {
             companyGuid : data.companyGuid,
             guidAplication: "PROJECT-519391a1-bff6-4e8c-a854-bed3984cc0bb-2024",
         };
-        console.log(newUser)
+        // console.log(newUser)
     
         try {
             const response = await apiService.addUser(newUser);
             if (response.success) {
                 onAddUser(response);
-                console.log(response)
+                // console.log(response)
                 onClose();
             } else {
                 console.error('Failed to add user:', response.message);
