@@ -15,13 +15,13 @@ import LaporanPetugas from "./pages/LaporanPetugas";
 import ManajemanKonflik from "./pages/ManajemanKonflik";
 
 export const router = createBrowserRouter([
-    { path: '/', element: <ProtectedRoute element={<App />} /> },
+    // { path: '/', element: <ProtectedRoute element={<App />} /> },
     { path: '/device', element: <ProtectedRoute element={<Device />} /> },
     { path: '/rules', element: <ProtectedRoute element={<Rules />} /> },
     { path: '/projects', element: <ProtectedRoute element={<Projects />} /> },
     { path: '/deviceType', element: <ProtectedRoute element={<DeviceType />} /> },
     { path: '/company', element: <ProtectedRoute element={<Company />} /> },
-    { path: '/login', element: <Login /> },
+    { path: '/login', element: </> },
 
 //Admin
 { path: '/deviceAdmin', element: <ProtectedRoute element={<DeviceAdmin />} /> },
