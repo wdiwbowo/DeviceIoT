@@ -22,7 +22,7 @@ export const router = createBrowserRouter([
     { path: '/projects', element: <ProtectedRoute element={<Projects />} /> },
     { path: '/deviceType', element: <ProtectedRoute element={<DeviceType />} /> },
     { path: '/company', element: <ProtectedRoute element={<Company />} /> },
-    { path: '/', element: <Login /> }, 
+    { path: '/', element: <Login /> },
 
     // Admin
     { path: '/deviceAdmin', element: <ProtectedRoute element={<DeviceAdmin />} /> },
