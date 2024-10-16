@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { jwtDecode } from 'jwt-decode'; // Ensure jwtDecode is imported
-import Swal from 'sweetalert2'; // Import SweetAlert2
+import { jwtDecode } from 'jwt-decode';
+import { HomeIcon, DevicePhoneMobileIcon, DocumentTextIcon, UsersIcon, ArchiveIcon, CogIcon } from '@heroicons/react/24/outline'; // Import the icons you want
 
 export default function Navbar() {
   const navigate = useNavigate();
@@ -11,31 +11,19 @@ export default function Navbar() {
     const userToken = localStorage.getItem('appToken');
     if (userToken) {
       const decodedToken = jwtDecode(userToken);
-      setUserRole(decodedToken.role); // Adjust based on the role field in the token
+      setUserRole(decodedToken.role);
     }
   }, []);
 
   const handleLogout = () => {
-    Swal.fire({
-      title: 'Konfirmasi',
-      text: 'Apakah Anda yakin ingin logout?',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonText: 'Ya, logout',
-      cancelButtonText: 'Batal'
-    }).then((result) => {
-      if (result.isConfirmed) {
-        localStorage.removeItem('appToken');
-        if (!localStorage.getItem('appToken')) {
-          Swal.fire('Berhasil!', 'Logout berhasil.', 'success').then(() => {
-            navigate('/login');
-            window.location.reload();
-          });
-        } else {
-          Swal.fire('Gagal!', 'Token gagal dihapus.', 'error');
-        }
+    if (window.confirm('Apakah Anda yakin ingin logout?')) {
+      localStorage.removeItem('appToken');
+      if (!localStorage.getItem('appToken')) {
+        alert('Logout berhasil.');
+        navigate('/login');
+        window.location.reload();
       }
-    });
+    }
   };
 
   return (
@@ -91,32 +79,37 @@ export default function Navbar() {
                   <>
                     <a
                       href="/device"
-                      className="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
+                      className="flex items-center rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
                     >
+                      <DevicePhoneMobileIcon className="h-5 w-5 mr-1" />
                       Device
                     </a>
                     <a
                       href="/rules"
-                      className="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
+                      className="flex items-center rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
                     >
+                      <DocumentTextIcon className="h-5 w-5 mr-1" />
                       Rules
                     </a>
                     <a
                       href="/projects"
-                      className="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
+                      className="flex items-center rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
                     >
+                      <ArchiveIcon className="h-5 w-5 mr-1" />
                       Projects
                     </a>
                     <a
                       href="/devicetype"
-                      className="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
+                      className="flex items-center rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
                     >
+                      <CogIcon className="h-5 w-5 mr-1" />
                       Device Type
                     </a>
                     <a
                       href="/company"
-                      className="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
+                      className="flex items-center rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
                     >
+                      <UsersIcon className="h-5 w-5 mr-1" />
                       Company
                     </a>
                   </>
@@ -125,26 +118,30 @@ export default function Navbar() {
                   <>
                     <a
                       href="/deviceadmin"
-                      className="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
+                      className="flex items-center rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
                     >
+                      <DevicePhoneMobileIcon className="h-5 w-5 mr-1" />
                       Device
                     </a>
                     <a
                       href="/pengguna"
-                      className="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
+                      className="flex items-center rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
                     >
+                      <UsersIcon className="h-5 w-5 mr-1" />
                       Pengguna
                     </a>
                     <a
                       href="/laporanPetugas"
-                      className="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
+                      className="flex items-center rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
                     >
+                      <DocumentTextIcon className="h-5 w-5 mr-1" />
                       Laporan Petugas
                     </a>
                     <a
                       href="/manajemanKonflik"
-                      className="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
+                      className="flex items-center rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
                     >
+                      <DocumentTextIcon className="h-5 w-5 mr-1" />
                       Hasil Kamera
                     </a>
                   </>
