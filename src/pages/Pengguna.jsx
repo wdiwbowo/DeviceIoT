@@ -3,6 +3,7 @@ import Navbar from "../components/Navbar";
 import apiService from '../services/apiservice';
 import { FaPlus, FaEdit, FaTrash } from 'react-icons/fa';
 import AddUserModal from "../components/pengguna/AddUserModal";
+import Swal from 'sweetalert2'; // Import SweetAlert2
 
 export default function Pengguna() {
     const [penggunas, setPenggunas] = useState([]);
@@ -11,7 +12,7 @@ export default function Pengguna() {
     const [successMessage, setSuccessMessage] = useState(null);
     const [searchQuery, setSearchQuery] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
-    const [isModalOpen, setModalOpen] = useState(false); // Modal state
+    const [isModalOpen, setModalOpen] = useState(false);
     const itemsPerPage = 5;
 
     const fetchPenggunas = async () => {
@@ -21,11 +22,10 @@ export default function Pengguna() {
                 setPenggunas(response.data.users);
                 setFilteredPenggunas(response.data.users);
             } else {
-                console.error('Data fetched is not an array:', response);
+                Swal.fire('Error', 'Data fetched is not an array', 'error'); // Show error alert
             }
         } catch (error) {
-            console.error('Error fetching penggunas:', error);
-            setError('Failed to fetch pengguna.');
+            Swal.fire('Error', 'Failed to fetch pengguna.', 'error'); // Show error alert
         }
     };
 
@@ -41,17 +41,6 @@ export default function Pengguna() {
         setFilteredPenggunas(filtered);
         setCurrentPage(1); // Reset to first page on new search
     }, [searchQuery, penggunas]);
-
-    useEffect(() => {
-        if (successMessage || error) {
-            const timer = setTimeout(() => {
-                setSuccessMessage(null);
-                setError(null);
-            }, 2000);
-
-            return () => clearTimeout(timer);
-        }
-    }, [successMessage, error]);
 
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
@@ -70,23 +59,16 @@ export default function Pengguna() {
                 if (response.success) {
                     setPenggunas([...penggunas, response.data.user]);
                     setFilteredPenggunas([...penggunas, response.data.user]);
-                    setSuccessMessage('User berhasil ditambahkan!');
+                    Swal.fire('Success', 'User berhasil ditambahkan!', 'success'); // Show success alert
                     setModalOpen(false);
-    
-                    // Refresh the page after 2 seconds
-                    setTimeout(() => {
-                        window.location.reload();
-                    }, 2000);
                 } else {
-                    setError('Failed to add user.');
+                    Swal.fire('Error', 'Failed to add user.', 'error'); // Show error alert
                 }
             } catch (error) {
-                console.error('Error adding user:', error);
-                setError('Failed to add user.');
+                Swal.fire('Error', 'Failed to add user.', 'error'); // Show error alert
             }
         }
     };
-    
 
     return (
         <div className="min-h-screen bg-gray-100 dark:bg-gray-900">
