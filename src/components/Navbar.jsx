@@ -1,16 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { jwtDecode } from 'jwt-decode'; 
-import {
-  DevicePhoneIcon,
-  DocumentTextIcon,
-  BriefcaseIcon,
-  CogIcon,
-  BuildingOfficeIcon,
-  UsersIcon,
-  DocumentReportIcon,
-  XIcon
-} from '@heroicons/react/24/outline'; // Import ikon dari Heroicons
+import {jwtDecode} from 'jwt-decode'; // Pastikan jwtDecode sudah di-import
 
 export default function Navbar() {
   const navigate = useNavigate();
@@ -20,7 +10,7 @@ export default function Navbar() {
     const userToken = localStorage.getItem('appToken');
     if (userToken) {
       const decodedToken = jwtDecode(userToken);
-      setUserRole(decodedToken.role);
+      setUserRole(decodedToken.role); // Sesuaikan dengan field role di dalam token
     }
   }, []);
 
@@ -82,7 +72,8 @@ export default function Navbar() {
             </button>
           </div>
           <div className="flex flex-1 items-center justify-between sm:items-stretch sm:justify-start">
-            <div className="flex flex-shrink-0 items-center"></div>
+            <div className="flex flex-shrink-0 items-center">
+            </div>
             <div className="hidden sm:ml-6 sm:block">
               <div className="flex space-x-4">
                 {/* Conditionally render links based on userRole */}
@@ -90,37 +81,32 @@ export default function Navbar() {
                   <>
                     <a
                       href="/device"
-                      className="flex items-center rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
+                      className="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
                     >
-                      <DevicePhoneIcon className="h-5 w-5 mr-1" />
                       Device
                     </a>
                     <a
                       href="/rules"
-                      className="flex items-center rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
+                      className="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
                     >
-                      <DocumentTextIcon className="h-5 w-5 mr-1" />
                       Rules
                     </a>
                     <a
                       href="/projects"
-                      className="flex items-center rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
+                      className="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
                     >
-                      <BriefcaseIcon className="h-5 w-5 mr-1" />
                       Projects
                     </a>
                     <a
                       href="/devicetype"
-                      className="flex items-center rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
+                      className="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
                     >
-                      <CogIcon className="h-5 w-5 mr-1" />
                       Device Type
                     </a>
                     <a
                       href="/company"
-                      className="flex items-center rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
+                      className="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
                     >
-                      <BuildingOfficeIcon className="h-5 w-5 mr-1" />
                       Company
                     </a>
                   </>
@@ -129,30 +115,26 @@ export default function Navbar() {
                   <>
                     <a
                       href="/deviceadmin"
-                      className="flex items-center rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
+                      className="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
                     >
-                      <DevicePhoneIcon className="h-5 w-5 mr-1" />
                       Device
                     </a>
                     <a
                       href="/pengguna"
-                      className="flex items-center rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
+                      className="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
                     >
-                      <UsersIcon className="h-5 w-5 mr-1" />
                       Pengguna
                     </a>
                     <a
                       href="/laporanPetugas"
-                      className="flex items-center rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
+                      className="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
                     >
-                      <DocumentReportIcon className="h-5 w-5 mr-1" />
                       Laporan Petugas
                     </a>
                     <a
                       href="/manajemanKonflik"
-                      className="flex items-center rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
+                      className="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
                     >
-                      <XIcon className="h-5 w-5 mr-1" />
                       Hasil Kamera
                     </a>
                   </>
