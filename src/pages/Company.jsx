@@ -3,6 +3,7 @@ import Navbar from "../components/Navbar";
 import apiService from '../services/apiservice';
 import AddCompanyModal from '../components/company/AddCompanyModal';
 import { FaPlus } from 'react-icons/fa';
+import Swal from 'sweetalert2'; // Import SweetAlert2
 
 export default function Companies() {
     const [showAddModal, setShowAddModal] = useState(false);
@@ -21,11 +22,11 @@ export default function Companies() {
                 setCompanies(data);
                 setFilteredCompanies(data);
             } else {
-                console.error('Data fetched is not an array:', data);
+                Swal.fire('Error', 'Unexpected data format.', 'error'); // SweetAlert for unexpected data
                 setError('Unexpected data format.');
             }
         } catch (error) {
-            console.error('Error fetching companies:', error);
+            Swal.fire('Error', 'Failed to fetch companies.', 'error'); // SweetAlert for fetch error
             setError('Failed to fetch companies.');
         }
     };
@@ -55,11 +56,12 @@ export default function Companies() {
 
     const handleAddCompany = async (newCompany) => {
         try {
-            // Call the API to add the company
             await apiService.addCompany(newCompany);
             setSuccessMessage('Company added successfully.');
+            Swal.fire('Success', 'Company added successfully.', 'success'); // SweetAlert for success
             fetchCompanies(); // Refresh the list
         } catch (error) {
+            Swal.fire('Error', 'Failed to add company.', 'error'); // SweetAlert for add error
             setError('Failed to add company.');
         }
     };
