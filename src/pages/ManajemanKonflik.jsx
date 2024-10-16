@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import Navbar from "../components/Navbar";
 import { FaPlus } from 'react-icons/fa';
 import apiService from "../services/apiservice"; // Adjust the import based on your file structure
-import Swal from 'sweetalert2';
 
 const ProjectsTable = () => {
   const [reports, setReports] = useState([]);
@@ -18,26 +17,12 @@ const ProjectsTable = () => {
     const fetchReports = async () => {
       try {
         const response = await apiService.getAllReportsByCompany(queryParams);
+        // console.log('Raw API Response:', response);
 
-        // Ganti console.log dengan SweetAlert
-        Swal.fire({
-          icon: 'info',
-          title: 'Raw API Response',
-          text: JSON.stringify(response, null, 2),
-          confirmButtonText: 'Ok'
-        });
-
-        // Akses struktur data yang benar
+        // Access the correct data structure
         const reportsData = response.data.data || [];
         setReports(reportsData);
       } catch (err) {
-        // Ganti dengan notifikasi SweetAlert
-        Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text: 'Error fetching reports',
-          confirmButtonText: 'Ok'
-        });
         setError('Error fetching reports');
       } finally {
         setLoading(false);
@@ -97,6 +82,8 @@ const ProjectsTable = () => {
                 </tr>
               )}
             </tbody>
+
+
           </table>
         </div>
       </div>
