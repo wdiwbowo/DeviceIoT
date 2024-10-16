@@ -3,6 +3,7 @@ import Navbar from "../components/Navbar";
 import { FaPlus } from "react-icons/fa";
 import AddLaporanModal from "../components/laporanpetugas/AddLaporanModal";
 import apiService from "../services/apiservice";
+import Swal from "sweetalert2"; // Import SweetAlert2
 
 const ProjectsTable = () => {
   const [reports, setReports] = useState([]);
@@ -26,6 +27,11 @@ const ProjectsTable = () => {
         setReports(reportsData);
       } catch (err) {
         setError("Error fetching reports");
+        Swal.fire({
+          icon: 'error',
+          title: 'Oops...',
+          text: 'Error fetching reports!',
+        });
       } finally {
         setLoading(false);
       }
@@ -37,6 +43,11 @@ const ProjectsTable = () => {
   const handleAddReport = (newReport) => {
     setReports((prevReports) => [newReport, ...prevReports]);
     setSuccessMessage("Laporan berhasil ditambahkan!"); // Set success message
+    Swal.fire({
+      icon: 'success',
+      title: 'Success!',
+      text: 'Laporan berhasil ditambahkan!',
+    });
     setTimeout(() => {
       setSuccessMessage(""); // Clear success message after 2 seconds
     }, 2000);
