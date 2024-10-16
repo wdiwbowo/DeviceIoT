@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@heroicons/react": "^2.1.5",
     "axios": "^1.7.4",
     "jsonwebtoken": "^9.0.2",
     "jwt-decode": "^4.0.0",
