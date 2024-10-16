@@ -5,6 +5,7 @@ import AddDeviceModal from '../components/device/AddDeviceModal';
 import EditDeviceModal from '../components/device/EditDeviceModal';
 import DeleteDeviceModal from '../components/device/DeleteDeviceModal';
 import { FaPlus, FaEdit, FaTrash } from 'react-icons/fa'; // Import the icons
+import Swal from 'sweetalert2'; // Import SweetAlert2
 
 export default function Device() {
     const [showAddModal, setShowAddModal] = useState(false);
@@ -27,11 +28,10 @@ export default function Device() {
                 setDevices(response.data.devices);
                 setFilteredDevices(response.data.devices);
             } else {
-                console.error('Data fetched is not an array:', response);
+                Swal.fire('Error', 'Data fetched is not an array', 'error');
             }
         } catch (error) {
-            console.error('Error fetching devices:', error);
-            setError('Failed to fetch devices.');
+            Swal.fire('Error', 'Failed to fetch devices.', 'error');
         }
     };
 
@@ -53,10 +53,10 @@ export default function Device() {
         try {
             await apiService.addDevice(deviceData);
             setShowAddModal(false);
-            setSuccessMessage("Device added successfully!");
+            Swal.fire('Success', 'Device added successfully!', 'success');
             fetchDevices(); // Refresh devices list
         } catch (error) {
-            setError("Failed to add device. Please try again.");
+            Swal.fire('Error', 'Failed to add device. Please try again.', 'error');
         }
     };
 
@@ -64,10 +64,10 @@ export default function Device() {
         try {
             await apiService.updateDevice(guid, updatedDeviceData);
             setShowEditModal(false);
-            setSuccessMessage("Device updated successfully!");
+            Swal.fire('Success', 'Device updated successfully!', 'success');
             fetchDevices(); // Refresh devices list
         } catch (error) {
-            setError("Failed to update device. Please try again.");
+            Swal.fire('Error', 'Failed to update device. Please try again.', 'error');
         }
     };
 
@@ -75,10 +75,10 @@ export default function Device() {
         try {
             await apiService.deleteDevice(deviceToDelete.guid);
             setShowDeleteModal(false);
-            setSuccessMessage("Device deleted successfully!");
+            Swal.fire('Success', 'Device deleted successfully!', 'success');
             fetchDevices(); // Refresh devices list
         } catch (error) {
-            setError("Failed to delete device. Please try again.");
+            Swal.fire('Error', 'Failed to delete device. Please try again.', 'error');
         }
     };
 
@@ -161,54 +161,39 @@ export default function Device() {
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{item.latitude}</td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{item.longitude}</td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{item.status ? 'True' : 'False'}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{item.active ? 'Active' : 'Inactive'}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                            <div className="flex space-x-2">
-                                                <button
-                                                    onClick={() => {
-                                                        setDeviceToEdit(item);
-                                                        setShowEditModal(true);
-                                                    }}
-                                                    className="flex items-center bg-blue-600 text-white px-3 py-2 rounded-md shadow-sm hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
-                                                >
-                                                    <FaEdit className="mr-2" /> Edit
-                                                </button>
-                                                <button
-                                                    onClick={() => {
-                                                        setDeviceToDelete(item);
-                                                        setShowDeleteModal(true);
-                                                    }}
-                                                    className="flex items-center bg-red-600 text-white px-3 py-2 rounded-md shadow-sm hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600"
-                                                >
-                                                    <FaTrash className="mr-2" /> Delete
-                                                </button>
-                                            </div>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{item.active ? 'True' : 'False'}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                            <button
+                                                onClick={() => {
+                                                    setDeviceToEdit(item);
+                                                    setShowEditModal(true);
+                                                }}
+                                                className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 mr-4"
+                                            >
+                                                <FaEdit />
+                                            </button>
+                                            <button
+                                                onClick={() => {
+                                                    setDeviceToDelete(item);
+                                                    setShowDeleteModal(true);
+                                                }}
+                                                className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300"
+                                            >
+                                                <FaTrash />
+                                            </button>
                                         </td>
-
                                     </tr>
                                 ))
                             )}
                         </tbody>
                     </table>
                 </div>
-
-                {error && (
-                    <div className="mb-4 p-4 bg-red-100 text-red-700 rounded">
-                        <p>{error}</p>
-                    </div>
-                )}
-
-                {successMessage && (
-                    <div className="mb-4 p-4 bg-green-100 text-green-700 rounded">
-                        <p>{successMessage}</p>
-                    </div>
-                )}
-
-                <div className="flex justify-between items-center mt-6">
+                {/* Pagination */}
+                <div className="flex justify-between items-center mt-4">
                     <button
-                        className="bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-gray-100 px-4 py-2 rounded-lg shadow-md disabled:opacity-50"
                         onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
                         disabled={currentPage === 1}
+                        className="px-4 py-2 bg-gray-300 rounded-md disabled:opacity-50 dark:bg-gray-700"
                     >
                         Previous
                     </button>
@@ -216,36 +201,32 @@ export default function Device() {
                         Page {currentPage} of {totalPages}
                     </span>
                     <button
-                        className="bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-gray-100 px-4 py-2 rounded-lg shadow-md disabled:opacity-50"
                         onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
                         disabled={currentPage === totalPages}
+                        className="px-4 py-2 bg-gray-300 rounded-md disabled:opacity-50 dark:bg-gray-700"
                     >
                         Next
                     </button>
                 </div>
-
-                <AddDeviceModal
-                    showModal={showAddModal}
-                    onClose={() => setShowAddModal(false)}
-                    onSave={handleAddDevice}
-                />
-                {deviceToEdit && (
-                    <EditDeviceModal
-                        showModal={showEditModal}
-                        onClose={() => setShowEditModal(false)}
-                        device={deviceToEdit}
-                        onSave={handleEditDevice}
-                    />
-                )}
-                {deviceToDelete && (
-                    <DeleteDeviceModal
-                        isOpen={showDeleteModal}
-                        onClose={() => setShowDeleteModal(false)}
-                        device={deviceToDelete}
-                        onDelete={handleDeleteDevice}
-                    />
-                )}
             </div>
+
+            <AddDeviceModal
+                show={showAddModal}
+                onClose={() => setShowAddModal(false)}
+                onAddDevice={handleAddDevice}
+            />
+            <EditDeviceModal
+                show={showEditModal}
+                onClose={() => setShowEditModal(false)}
+                device={deviceToEdit}
+                onEditDevice={handleEditDevice}
+            />
+            <DeleteDeviceModal
+                show={showDeleteModal}
+                onClose={() => setShowDeleteModal(false)}
+                onDeleteDevice={handleDeleteDevice}
+                device={deviceToDelete}
+            />
         </div>
     );
 }
