@@ -197,27 +197,27 @@ export default function Device() {
                 </div>
             </div>
 
-            {/* Add Device Modal */}
             <AddDeviceModal
-                show={showAddModal}
-                onClose={() => setShowAddModal(false)}
-                onAddDevice={handleAddDevice}
-            />
-
-            {/* Edit Device Modal */}
-            <EditDeviceModal
-                show={showEditModal}
-                onClose={() => setShowEditModal(false)}
-                device={deviceToEdit}
-                onEditDevice={handleEditDevice}
-            />
-
-            {/* Delete Device Modal */}
-            <DeleteDeviceModal
-                show={showDeleteModal}
-                onClose={() => setShowDeleteModal(false)}
-                device={deviceToDelete}
-                onDeleteDevice={handleDeleteDevice}
+                    showModal={showAddModal}
+                    onClose={() => setShowAddModal(false)}
+                    onSave={handleAddDevice}
+                />
+                {deviceToEdit && (
+                    <EditDeviceModal
+                        showModal={showEditModal}
+                        onClose={() => setShowEditModal(false)}
+                        device={deviceToEdit}
+                        onSave={handleEditDevice}
+                    />
+                )}
+                  {deviceToDelete && (
+                    <DeleteDeviceModal
+                        isOpen={showDeleteModal}
+                        onClose={() => setShowDeleteModal(false)}
+                        device={deviceToDelete}
+                        onDelete={handleDeleteDevice}
+                    />
+                )}
             />
         </div>
     );
