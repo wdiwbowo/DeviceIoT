@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import Swal from 'sweetalert2';
 import apiService from '../services/apiservice';
 import Navbar from '../components/Navbar';
 import AddDeviceTypeModal from '../components/devicetype/AddDeviceTypeModal';
@@ -12,7 +13,6 @@ const DeviceTypes = () => {
     const [filteredDeviceTypes, setFilteredDeviceTypes] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [successMessage, setSuccessMessage] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 5;
 
@@ -32,6 +32,11 @@ const DeviceTypes = () => {
             } catch (err) {
                 setError('Failed to fetch device types.');
                 setLoading(false);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Failed to fetch device types.',
+                });
             }
         };
 
@@ -44,10 +49,19 @@ const DeviceTypes = () => {
             const response = await apiService.getDeviceTypes();
             setDeviceTypes(response.data);
             setFilteredDeviceTypes(response.data);
-            setSuccessMessage('Device type added successfully.');
+            Swal.fire({
+                icon: 'success',
+                title: 'Success',
+                text: 'Device type added successfully.',
+            });
             setShowAddModal(false);  // Close modal after success
         } catch (err) {
             setError('Failed to add device type.');
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Failed to add device type.',
+            });
         }
     };
 
@@ -57,10 +71,19 @@ const DeviceTypes = () => {
             const response = await apiService.getDeviceTypes();
             setDeviceTypes(response.data);
             setFilteredDeviceTypes(response.data);
-            setSuccessMessage('Device type updated successfully.');
+            Swal.fire({
+                icon: 'success',
+                title: 'Success',
+                text: 'Device type updated successfully.',
+            });
             setShowEditModal(false);  // Close modal after success
         } catch (err) {
             setError('Failed to update device type.');
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Failed to update device type.',
+            });
         }
     };
 
@@ -70,10 +93,19 @@ const DeviceTypes = () => {
             const response = await apiService.getDeviceTypes();
             setDeviceTypes(response.data);
             setFilteredDeviceTypes(response.data);
-            setSuccessMessage('Device type deleted successfully.');
+            Swal.fire({
+                icon: 'success',
+                title: 'Success',
+                text: 'Device type deleted successfully.',
+            });
             setShowDeleteModal(false);  // Close modal after success
         } catch (err) {
             setError('Failed to delete device type.');
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Failed to delete device type.',
+            });
         }
     };
 
@@ -125,7 +157,6 @@ const DeviceTypes = () => {
                 </div>
                 {loading && <p>Loading...</p>}
                 {error && <p className="text-red-500">{error}</p>}
-                {successMessage && <p className="text-green-500">{successMessage}</p>}
                 <div className="overflow-x-auto bg-white dark:bg-gray-800 rounded-lg shadow-md mt-4">
                     <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                         <thead className="bg-gray-50 dark:bg-gray-700">
@@ -179,47 +210,49 @@ const DeviceTypes = () => {
                         </tbody>
                     </table>
                 </div>
-                <div className="flex justify-between items-center mt-6">
-                    <button
-                        className="bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-gray-100 px-4 py-2 rounded-lg shadow-md disabled:opacity-50"
-                        onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-                        disabled={currentPage === 1}
-                    >
-                        Previous
-                    </button>
-                    <span className="text-gray-700 dark:text-gray-300">
-                        Page {currentPage} of {totalPages}
-                    </span>
-                    <button
-                        className="bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-gray-100 px-4 py-2 rounded-lg shadow-md disabled:opacity-50"
-                        onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-                        disabled={currentPage === totalPages}
-                    >
-                        Next
-                    </button>
+
+                {/* Pagination */}
+                <div className="flex justify-between items-center mt-4">
+                    <div>
+                        <button
+                            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                            disabled={currentPage === 1}
+                            className="mr-2 px-4 py-2 bg-gray-300 rounded-md hover:bg-gray-400 dark:bg-gray-700 dark:hover:bg-gray-600"
+                        >
+                            Previous
+                        </button>
+                        <button
+                            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                            disabled={currentPage === totalPages}
+                            className="px-4 py-2 bg-gray-300 rounded-md hover:bg-gray-400 dark:bg-gray-700 dark:hover:bg-gray-600"
+                        >
+                            Next
+                        </button>
+                    </div>
+                    <div>
+                        <span className="text-gray-700 dark:text-gray-300">
+                            Page {currentPage} of {totalPages}
+                        </span>
+                    </div>
                 </div>
-                <AddDeviceTypeModal
-                    show={showAddModal}
-                    onClose={() => setShowAddModal(false)}
-                    onAdd={handleAddDeviceType}
-                />
-                {currentDeviceType && (
-                    <EditDeviceTypeModal
-                        show={showEditModal}
-                        onClose={() => setShowEditModal(false)}
-                        deviceType={currentDeviceType}
-                        onUpdate={handleUpdateDeviceType}
-                    />
-                )}
-                {currentDeviceType && (
-                    <DeleteDeviceTypeModal
-                        show={showDeleteModal}
-                        onClose={() => setShowDeleteModal(false)}
-                        deviceType={currentDeviceType}
-                        onDelete={handleDeleteDeviceType}
-                    />
-                )}
             </div>
+
+            {/* Modals */}
+            {showAddModal && <AddDeviceTypeModal onClose={() => setShowAddModal(false)} onAdd={handleAddDeviceType} />}
+            {showEditModal && (
+                <EditDeviceTypeModal
+                    onClose={() => setShowEditModal(false)}
+                    deviceType={currentDeviceType}
+                    onUpdate={handleUpdateDeviceType}
+                />
+            )}
+            {showDeleteModal && (
+                <DeleteDeviceTypeModal
+                    onClose={() => setShowDeleteModal(false)}
+                    deviceType={currentDeviceType}
+                    onDelete={handleDeleteDeviceType}
+                />
+            )}
         </div>
     );
 };
