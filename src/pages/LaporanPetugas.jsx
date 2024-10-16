@@ -67,9 +67,6 @@ const ProjectsTable = () => {
     setCurrentPage((prevPage) => Math.max(prevPage - 1, 1));
   };
 
-  if (loading) return <p>Loading...</p>;
-  if (error) return <p>{error}</p>;
-
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900">
       <Navbar />
