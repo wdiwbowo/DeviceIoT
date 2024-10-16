@@ -49,9 +49,9 @@ const Login = () => {
 
         // Redirect based on user role
         if (userRole === 'superAdmin') {
-          navigate('/'); // Redirect to the Devices page for superadmins
+          navigate('/Device'); // Redirect to the Devices page for superadmins
         } else if (userRole === 'admin') {
-          navigate('/'); // Redirect to the Admin page for admins
+          navigate('/DeviceAdmin'); // Redirect to the Admin page for admins
         } else {
           setError('Peran pengguna tidak dikenal.');
         }
