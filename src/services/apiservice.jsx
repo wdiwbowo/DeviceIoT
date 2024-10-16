@@ -125,7 +125,7 @@ const apiService = {
   addDevice: async (deviceData) => {
     try {
       const response = await apiClient.post('/devices/admin/add', deviceData);
-      // console.log('Add Device Response:', response.data);
+      console.log('Add Device Response:', response.data);
       return response.data;
     } catch (error) {
       console.error('Error adding device:', error);
