@@ -218,7 +218,6 @@ export default function Device() {
                         onDelete={handleDeleteDevice}
                     />
                 )}
-            />
         </div>
     );
 }
