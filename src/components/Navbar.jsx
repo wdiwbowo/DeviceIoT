@@ -19,7 +19,7 @@ export default function Navbar() {
       localStorage.removeItem('appToken');
       if (!localStorage.getItem('appToken')) {
         alert('Logout berhasil.');
-        navigate('/login');
+        navigate('/');
         window.location.reload();
       } else {
         console.error('Token gagal dihapus.');
