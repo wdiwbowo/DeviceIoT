@@ -75,7 +75,7 @@ const apiService = {
 
   login: async (email, password) => {
     try {
-      // console.log('Login request data:', { email, password });
+      console.log('Login request data:', { email, password });
       const response = await apiUser.post('/users/login', {
         email,
         password,
