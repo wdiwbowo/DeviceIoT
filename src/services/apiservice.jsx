@@ -81,7 +81,7 @@ const apiService = {
         password,
         guidAplication: 'PROJECT-519391a1-bff6-4e8c-a854-bed3984cc0bb-2024',
       });
-      // console.log('Login response:', response.data);
+      console.log('Login response:', response.data);
 
       const token = response.data?.data; // Adjust based on actual API response
       if (token) {
