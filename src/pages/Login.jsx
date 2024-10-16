@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {jwtDecode} from 'jwt-decode'; // Corrected import statement
+import { jwtDecode } from 'jwt-decode'; // Corrected import statement
 import apiService from '../services/apiservice';
+import Swal from 'sweetalert2';
 
 const Login = () => {
   const [username, setUsername] = useState('');
@@ -16,27 +17,55 @@ const Login = () => {
     try {
       const response = await apiService.login(username, password);
       const userToken = localStorage.getItem('userToken');
-      // console.log('Retrieved userToken:', userToken);
-  
+
+      // Ganti console.log dengan SweetAlert untuk menunjukkan token
+      Swal.fire({
+        icon: 'info',
+        title: 'Retrieved Token',
+        text: userToken ? userToken : 'Token pengguna tidak tersedia.',
+        confirmButtonText: 'Ok'
+      });
+
       if (userToken) {
         const decodedToken = jwtDecode(userToken);
-        // console.log('Decoded Token:', decodedToken);
-  
+
+        // Ganti console.log dengan SweetAlert untuk menunjukkan decoded token
+        Swal.fire({
+          icon: 'info',
+          title: 'Decoded Token',
+          text: JSON.stringify(decodedToken, null, 2),
+          confirmButtonText: 'Ok'
+        });
+
         const userRole = decodedToken.role; // Adjust according to the correct field
-        // console.log('User Role:', userRole);
-  
+
+        // Ganti console.log dengan SweetAlert untuk menunjukkan role pengguna
+        Swal.fire({
+          icon: 'info',
+          title: 'User Role',
+          text: userRole ? userRole : 'Peran pengguna tidak tersedia.',
+          confirmButtonText: 'Ok'
+        });
+
         // Redirect based on user role
         if (userRole === 'superAdmin') {
           navigate('/'); // Redirect to the Devices page for superadmins
         } else if (userRole === 'admin') {
           navigate('/'); // Redirect to the Admin page for admins
-         } else {
+        } else {
           setError('Peran pengguna tidak dikenal.');
         }
       } else {
         setError('Token pengguna tidak tersedia.');
       }
     } catch (error) {
+      // Ganti dengan notifikasi SweetAlert
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Error logging in: ' + error.message,
+        confirmButtonText: 'Ok'
+      });
       setError('Error logging in: ' + error.message);
     }
   };  
