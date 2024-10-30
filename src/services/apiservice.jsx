@@ -3,7 +3,7 @@ import Swal from 'sweetalert2';
 import { jwtDecode } from 'jwt-decode';
 
 // Base URLs for the API
-const apiUrl = 'https://device-iot.pptik.id/api/v1';
+const apiUrl = 'https://api-iot-device.lskk.co.id/v1';
 const api = 'https://api-sso.lskk.co.id/v1';
 const apiLocal = 'https://api-iot-log.lskk.co.id/v1';
 
