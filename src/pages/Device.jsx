@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Navbar from "../components/Navbar";
 import apiService from '../services/apiservice';
-import AddDeviceModal from "../components/device/AddDeviceModal";
+import AddDeviceModal from '../components/device/AddDeviceModal';
 import EditDeviceModal from '../components/device/EditDeviceModal';
 import DeleteDeviceModal from '../components/device/DeleteDeviceModal';
 import { FaPlus, FaEdit, FaTrash } from 'react-icons/fa'; // Import the icons
@@ -13,6 +13,8 @@ export default function Device() {
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [devices, setDevices] = useState([]);
     const [filteredDevices, setFilteredDevices] = useState([]);
+    const [error, setError] = useState(null);
+    const [successMessage, setSuccessMessage] = useState(null);
     const [deviceToEdit, setDeviceToEdit] = useState(null);
     const [deviceToDelete, setDeviceToDelete] = useState(null);
     const [searchQuery, setSearchQuery] = useState("");
@@ -21,7 +23,7 @@ export default function Device() {
 
     const fetchDevices = async () => {
         try {
-            const response = await apiService.getAllDevicesCompany();
+            const response = await apiService.getAllDevices();
             if (response.success && Array.isArray(response.data.devices)) {
                 setDevices(response.data.devices);
                 setFilteredDevices(response.data.devices);
@@ -71,7 +73,7 @@ export default function Device() {
 
     const handleDeleteDevice = async () => {
         try {
-            await apiService.deleteDeviceCompany(deviceToDelete.guid);
+            await apiService.deleteDevice(deviceToDelete.guid);
             setShowDeleteModal(false);
             Swal.fire('Success', 'Device deleted successfully!', 'success');
             fetchDevices(); // Refresh devices list
@@ -79,6 +81,18 @@ export default function Device() {
             Swal.fire('Error', 'Failed to delete device. Please try again.', 'error');
         }
     };
+
+    // Mengatur timeout untuk menghilangkan pesan setelah 2 detik
+    useEffect(() => {
+        if (successMessage || error) {
+            const timer = setTimeout(() => {
+                setSuccessMessage(null);
+                setError(null);
+            }, 2000); // 2000 ms = 2 detik
+
+            return () => clearTimeout(timer);
+        }
+    }, [successMessage, error]);
 
     // Pagination logic
     const indexOfLastItem = currentPage * itemsPerPage;
@@ -132,7 +146,7 @@ export default function Device() {
                         <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                             {currentItems.length === 0 ? (
                                 <tr>
-                                    <td colSpan="10" className="px-6 py-4 text-center text-gray-500 dark:text-gray-300">
+                                    <td colSpan="11" className="px-6 py-4 text-center text-gray-500 dark:text-gray-300">
                                         No devices found
                                     </td>
                                 </tr>
@@ -147,28 +161,26 @@ export default function Device() {
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{item.latitude}</td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{item.longitude}</td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{item.status ? 'True' : 'False'}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{item.active ? 'Active' : 'Inactive'}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                            <div className="flex space-x-2">
-                                                <button
-                                                    onClick={() => {
-                                                        setDeviceToEdit(item);
-                                                        setShowEditModal(true);
-                                                    }}
-                                                    className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-500"
-                                                >
-                                                    <FaEdit />
-                                                </button>
-                                                <button
-                                                    onClick={() => {
-                                                        setDeviceToDelete(item);
-                                                        setShowDeleteModal(true);
-                                                    }}
-                                                    className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-500"
-                                                >
-                                                    <FaTrash />
-                                                </button>
-                                            </div>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{item.active ? 'True' : 'False'}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                            <button
+                                                onClick={() => {
+                                                    setDeviceToEdit(item);
+                                                    setShowEditModal(true);
+                                                }}
+                                                className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 mr-4"
+                                            >
+                                                <FaEdit />
+                                            </button>
+                                            <button
+                                                onClick={() => {
+                                                    setDeviceToDelete(item);
+                                                    setShowDeleteModal(true);
+                                                }}
+                                                className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300"
+                                            >
+                                                <FaTrash />
+                                            </button>
                                         </td>
                                     </tr>
                                 ))
@@ -176,48 +188,44 @@ export default function Device() {
                         </tbody>
                     </table>
                 </div>
-
-                {/* Pagination Controls */}
+                {/* Pagination */}
                 <div className="flex justify-between items-center mt-4">
                     <button
-                        onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                        onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
                         disabled={currentPage === 1}
-                        className="bg-gray-300 text-gray-700 px-4 py-2 rounded-md disabled:opacity-50"
+                        className="px-4 py-2 bg-gray-300 rounded-md disabled:opacity-50 dark:bg-gray-700"
                     >
                         Previous
                     </button>
-                    <span className="text-gray-700 dark:text-gray-300">Page {currentPage} of {totalPages}</span>
+                    <span className="text-gray-700 dark:text-gray-300">
+                        Page {currentPage} of {totalPages}
+                    </span>
                     <button
-                        onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                        onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
                         disabled={currentPage === totalPages}
-                        className="bg-gray-300 text-gray-700 px-4 py-2 rounded-md disabled:opacity-50"
+                        className="px-4 py-2 bg-gray-300 rounded-md disabled:opacity-50 dark:bg-gray-700"
                     >
                         Next
                     </button>
                 </div>
             </div>
 
-            {/* Add Device Modal */}
             <AddDeviceModal
                 show={showAddModal}
                 onClose={() => setShowAddModal(false)}
                 onAddDevice={handleAddDevice}
             />
-
-            {/* Edit Device Modal */}
             <EditDeviceModal
                 show={showEditModal}
                 onClose={() => setShowEditModal(false)}
                 device={deviceToEdit}
                 onEditDevice={handleEditDevice}
             />
-
-            {/* Delete Device Modal */}
             <DeleteDeviceModal
                 show={showDeleteModal}
                 onClose={() => setShowDeleteModal(false)}
-                device={deviceToDelete}
                 onDeleteDevice={handleDeleteDevice}
+                device={deviceToDelete}
             />
         </div>
     );
