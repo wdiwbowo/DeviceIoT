@@ -60,23 +60,9 @@ export default function UserProfile() {
     setIsModalOpen(false);
   };
 
-  const handleUpdateProfile = async (updatedUser) => {
-    const result = await Swal.fire({
-      title: 'Profil diperbarui!',
-      text: 'Apakah Anda ingin memuat ulang profil?',
-      icon: 'success',
-      showCancelButton: true,
-      confirmButtonText: 'OK',
-      cancelButtonText: 'Batal',
-    });
-
-    if (result.isConfirmed) {
-      // Update user state with updated profile data
-      setUser(updatedUser);
-      // Optionally, fetch the user profile again
-      fetchUserProfile();
-      setIsModalOpen(false);
-    }
+  const handleUpdateProfile = (updatedUser) => {
+    setUser(updatedUser);
+    setIsModalOpen(false);
   };
 
   if (loading) {
@@ -101,7 +87,7 @@ export default function UserProfile() {
             <p className="text-gray-500 mb-4">{user.address}</p>
             <div className="flex gap-4 mb-4">
               <button
-                onClick={handleEditProfile}
+                onClick={handleEditProfile} // Corrected the function call
                 className="bg-blue-500 text-white py-2 px-4 rounded-md font-semibold hover:bg-blue-600 transition duration-200"
               >
                 Edit Profil
