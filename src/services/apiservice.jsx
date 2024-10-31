@@ -390,7 +390,7 @@ const apiService = {
     }
   },
   
-  addDeviceAdmin: async (deviceData) => {
+  addDevice: async (deviceData) => {
     try {
       const response = await apiClient.post('/devices/add', deviceData);
       Swal.fire('Success', 'Device added successfully!', 'success');
