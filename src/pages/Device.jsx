@@ -111,7 +111,7 @@ export default function Device() {
             <div className="container mx-auto py-8">
                 <div className="flex justify-between items-center mb-8">
                     <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Devices</h1>
-                    <button
+                     <button
                         onClick={() => setShowAddModal(true)}
                         className="flex items-center bg-blue-600 text-white px-4 py-2 rounded-md shadow-sm hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
                     >
