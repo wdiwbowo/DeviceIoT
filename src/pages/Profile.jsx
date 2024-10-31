@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import apiService from '../services/apiservice';
+import ModalEditProfile from '../components/profile/ModalEditProfile';
+
 import Swal from 'sweetalert2';
 import Navbar from '../components/Navbar';
 
@@ -13,6 +15,7 @@ export default function UserProfile() {
     profileImage: ''
   });
   const [loading, setLoading] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   
   const navigate = useNavigate();
 
@@ -50,6 +53,10 @@ export default function UserProfile() {
     fetchUserProfile();
   }, [navigate]);
 
+  const handleEditProfile = () => {
+    setIsModalOpen(true);
+  };
+
   if (loading) {
     return null; 
   }
@@ -85,6 +92,14 @@ export default function UserProfile() {
               </button>
             </div>
           </div>
+          {isModalOpen && (
+        <ModalEditProfile
+          isOpen={isModalOpen}
+          onClose={handleModalClose}
+          user={user}
+          onUpdate={handleUpdateProfile}
+        />
+      )}
         </div>
       </div>
     </div>
