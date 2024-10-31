@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { jwtDecode } from 'jwt-decode'; // Corrected import statement
+import {jwtDecode} from 'jwt-decode'; // Corrected import statement
 import apiService from '../services/apiservice';
 
 const Login = () => {
@@ -14,12 +14,9 @@ const Login = () => {
     setError(null);
   
     try {
-      console.log('Attempting login with username:', username);
       const response = await apiService.login(username, password);
-      console.log('Login response:', response);
-
       const userToken = localStorage.getItem('userToken');
-      console.log('Retrieved userToken from localStorage:', userToken);
+      console.log('Retrieved userToken:', userToken);
   
       if (userToken) {
         const decodedToken = jwtDecode(userToken);
@@ -27,27 +24,21 @@ const Login = () => {
   
         const userRole = decodedToken.role; // Adjust according to the correct field
         console.log('User Role:', userRole);
-        
         // Redirect based on user role
         if (userRole === 'superAdmin') {
-          console.log('Redirecting to the super admin page');
-          navigate('/device'); // Replace with the correct super admin page route
+          navigate('device'); // Redirect to the Devices page for superadmins
         } else if (userRole === 'admin') {
-          console.log('Redirecting to the admin page');
-          navigate('/admin'); // Replace with the correct admin page route
-        } else {
-          console.warn('Unrecognized user role:', userRole);
+          navigate('deviceadmin'); // Redirect to the Admin page for admins
+         } else {
           setError('Peran pengguna tidak dikenal.');
         }
       } else {
-        console.error('User token not available in localStorage.');
         setError('Token pengguna tidak tersedia.');
       }
     } catch (error) {
-      console.error('Error logging in:', error.message);
       setError('Error logging in: ' + error.message);
     }
-  };
+  };  
 
   return (
     <div className="flex items-center justify-center h-screen bg-gray-100">
