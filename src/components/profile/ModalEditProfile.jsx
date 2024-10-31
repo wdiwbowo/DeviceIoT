@@ -35,6 +35,8 @@ export default function ModalEditProfile({ isOpen, onClose, user, onUpdate }) {
 
       onClose();
     } catch (error) {
+      console.error('Error updating profile:', error); // Log the error to console
+
       // Show error message with SweetAlert
       Swal.fire({
         title: 'Gagal!',
