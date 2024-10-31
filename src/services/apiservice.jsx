@@ -523,6 +523,34 @@ const apiService = {
     }
   },
 
+  updatePassword: async (email, currentPassword, newPassword) => {
+  try {
+    const response = await apiUser.post('/users/edit-password', {
+      email,
+      currentPassword,
+      newPassword
+    });
+
+    if (response.data && response.data.success) {
+      return {
+        success: true,
+        message: 'Password updated successfully.',
+        data: response.data
+      };
+    } else {
+      return {
+        success: false,
+        message: response.data.message || 'Failed to update password.'
+      };
+    }
+  } catch (error) {
+    return {
+      success: false,
+      message: error.response?.data?.message || 'An error occurred while updating the password.'
+    };
+  }
+},
+
   updateUserProfile: async (profileData) => {
   try {
     const response = await apiUser.post(
