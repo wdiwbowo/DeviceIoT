@@ -117,7 +117,6 @@ export default function Device() {
                     >
                         <FaPlus className="mr-2" /> Add Device
                     </button>
-
                 </div>
                 <div className="mb-4">
                     <input
@@ -216,7 +215,6 @@ export default function Device() {
                 onClose={() => setShowAddModal(false)}
                 onAddDevice={handleAddDevice}
             />
-
             <EditDeviceModal
                 show={showEditModal}
                 onClose={() => setShowEditModal(false)}
