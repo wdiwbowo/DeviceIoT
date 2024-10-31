@@ -19,38 +19,38 @@ export default function UserProfile() {
   const navigate = useNavigate();
 
   useEffect(() => {
+    const fetchUserProfile = async () => {
+      Swal.fire({
+        title: 'Sedang Memuat...',
+        text: 'Harap tunggu...',
+        allowOutsideClick: false,
+        didOpen: () => {
+          Swal.showLoading();
+        },
+      });
+  
+      try {
+        const userProfile = await apiService.getUserProfile();
+        setUser({
+          name: userProfile.data.user.name || "Unknown",
+          email: userProfile.data.user.email || "Email not available",
+          phone: userProfile.data.user.phoneNumber || "Phone number not available",
+          address: userProfile.data.user.address || "Address not available",
+          profileImage: userProfile.data.profileImage || "https://via.placeholder.com/150",
+        });
+      } catch (error) {
+        Swal.fire('Error', error.message, 'error');
+        if (error.message.includes('Unauthorized')) {
+          navigate('/login'); // Redirect to login page
+        }
+      } finally {
+        Swal.close();
+        setLoading(false);
+      }
+    };    
+    
     fetchUserProfile();
   }, [navigate]);
-
-  const fetchUserProfile = async () => {
-    Swal.fire({
-      title: 'Sedang Memuat...',
-      text: 'Harap tunggu...',
-      allowOutsideClick: false,
-      didOpen: () => {
-        Swal.showLoading();
-      },
-    });
-
-    try {
-      const userProfile = await apiService.getUserProfile();
-      setUser({
-        name: userProfile.data.user.name || "Unknown",
-        email: userProfile.data.user.email || "Email not available",
-        phone: userProfile.data.user.phoneNumber || "Phone number not available",
-        address: userProfile.data.user.address || "Address not available",
-        profileImage: userProfile.data.profileImage || "https://via.placeholder.com/150",
-      });
-    } catch (error) {
-      Swal.fire('Error', error.message, 'error');
-      if (error.message.includes('Unauthorized')) {
-        navigate('/login'); // Redirect to login page
-      }
-    } finally {
-      Swal.close();
-      setLoading(false);
-    }
-  };
 
   const handleEditProfile = () => {
     setIsModalOpen(true);
@@ -61,9 +61,22 @@ export default function UserProfile() {
   };
 
   const handleUpdateProfile = async (updatedUser) => {
-    setUser(updatedUser);
-    setIsModalOpen(false);
-    await fetchUserProfile(); // Fetch updated profile data
+    const result = await Swal.fire({
+      title: 'Profil diperbarui!',
+      text: 'Apakah Anda ingin memuat ulang profil?',
+      icon: 'success',
+      showCancelButton: true,
+      confirmButtonText: 'OK',
+      cancelButtonText: 'Batal',
+    });
+
+    if (result.isConfirmed) {
+      // Update user state with updated profile data
+      setUser(updatedUser);
+      // Optionally, fetch the user profile again
+      fetchUserProfile();
+      setIsModalOpen(false);
+    }
   };
 
   if (loading) {
