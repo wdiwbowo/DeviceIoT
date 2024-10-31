@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import InputMask from 'react-input-mask';
 import Swal from 'sweetalert2';
 
 export default function ModalEditProfile({ isOpen, onClose, user, onUpdate }) {
@@ -22,7 +21,7 @@ export default function ModalEditProfile({ isOpen, onClose, user, onUpdate }) {
         address,
       };
       
-      await updateUserProfile(updatedUser);
+      await apiService.updateUserProfile(updatedUser);
       onUpdate(updatedUser);  // Call the onUpdate function passed as a prop
 
       // Show success message with SweetAlert
@@ -46,6 +45,21 @@ export default function ModalEditProfile({ isOpen, onClose, user, onUpdate }) {
     } finally {
       setLoading(false);
     }
+  };
+
+  // Function to format phone number input
+  const handlePhoneChange = (e) => {
+    const value = e.target.value.replace(/\D/g, ''); // Remove non-digit characters
+    if (value.length > 10) return; // Limit length to 10 digits (or adjust as needed)
+    
+    // Format the phone number as (xxx) xxx-xxxx
+    const formattedValue = value.length < 4 
+      ? value 
+      : value.length < 7 
+      ? `(${value.slice(0, 3)}) ${value.slice(3)}` 
+      : `(${value.slice(0, 3)}) ${value.slice(3, 6)}-${value.slice(6)}`;
+
+    setPhoneNumber(formattedValue);
   };
 
   if (!isOpen) return null;
@@ -77,12 +91,13 @@ export default function ModalEditProfile({ isOpen, onClose, user, onUpdate }) {
           </div>
           <div className="mb-4">
             <label className="block text-gray-700">Nomor Telepon</label>
-            <InputMask
-              mask="(999) 999-9999"
+            <input
+              type="text"
               value={phoneNumber}
-              onChange={(e) => setPhoneNumber(e.target.value)} // Update state correctly
+              onChange={handlePhoneChange} // Update state correctly
               className="border rounded w-full px-3 py-2"
               required
+              placeholder="(xxx) xxx-xxxx"
             />
           </div>
           <div className="mb-4">
