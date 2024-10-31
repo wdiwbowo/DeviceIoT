@@ -8,8 +8,14 @@ export default function ModalEditProfile({ isOpen, onClose, user, onUpdate }) {
   const [email] = useState(user.email); // Keep email read-only
   const [phoneNumber, setPhoneNumber] = useState(user.phone); // Use 'phoneNumber' for state
   const [address, setAddress] = useState(user.address);
+  const [profileImage, setProfileImage] = useState(null); // New state for profile image file
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+
+  // Function to handle profile image selection
+  const handleImageChange = (e) => {
+    setProfileImage(e.target.files[0]);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -22,7 +28,17 @@ export default function ModalEditProfile({ isOpen, onClose, user, onUpdate }) {
         phoneNumber, // Use 'phoneNumber' for the API call
         address,
       };
-      
+
+      // Check if profile image is selected and upload it
+      if (profileImage) {
+        const formData = new FormData();
+        formData.append('file', profileImage);
+
+        // Upload the image using the apiService
+        await apiService.uploadProfileImage(formData);
+      }
+
+      // Update the user profile
       await apiService.updateUserProfile(updatedUser);
       onUpdate(updatedUser);  // Call the onUpdate function passed as a prop
 
@@ -94,6 +110,14 @@ export default function ModalEditProfile({ isOpen, onClose, user, onUpdate }) {
               onChange={(e) => setAddress(e.target.value)}
               className="border rounded w-full px-3 py-2"
               required
+            />
+          </div>
+          <div className="mb-4">
+            <label className="block text-gray-700">Upload Foto Profil</label>
+            <input
+              type="file"
+              onChange={handleImageChange}
+              className="border rounded w-full px-3 py-2"
             />
           </div>
 
