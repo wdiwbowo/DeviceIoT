@@ -30,7 +30,7 @@ export default function UserProfile() {
           Swal.showLoading();
         },
       });
-  
+
       try {
         const userProfile = await apiService.getUserProfile();
         setUser({
@@ -38,7 +38,7 @@ export default function UserProfile() {
           email: userProfile.data.user.email || "Email not available",
           phone: userProfile.data.user.phoneNumber || "Phone number not available",
           address: userProfile.data.user.address || "Address not available",
-          profileImage: userProfile.data.profileImage || "https://via.placeholder.com/150",
+          profileImage: userProfile.data.profileImage || "https://via.placeholder.com/150", // Default image if none provided
         });
       } catch (error) {
         Swal.fire('Error', error.message, 'error');
