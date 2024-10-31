@@ -3,7 +3,6 @@ import apiService from '../../services/apiservice';
 
 export default function AddDeviceModal({ showModal, onClose, onSave }) {
     const [deviceData, setDeviceData] = useState({
-        companyGuid: "",
         deviceGuid: "",
         mac: "",
         name: "",
@@ -71,7 +70,6 @@ export default function AddDeviceModal({ showModal, onClose, onSave }) {
 
         onSave(deviceData);
         setDeviceData({
-            companyGuid: "",
             deviceGuid: "",
             mac: "",
             name: "",
@@ -97,23 +95,6 @@ export default function AddDeviceModal({ showModal, onClose, onSave }) {
                 ) : (
                     <form className="space-y-4">
                         <div className="grid grid-cols-2 gap-4">
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Company GUID</label>
-                                <select
-                                    name="companyGuid"
-                                    value={deviceData.companyGuid}
-                                    onChange={handleChange}
-                                    className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                                >
-                                    <option value="">Select company</option>
-                                    {companies.map(company => (
-                                        <option key={company.guid} value={company.guid}>
-                                            {company.name}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Device GUID</label>
                                 <input
