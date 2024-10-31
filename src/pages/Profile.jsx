@@ -57,7 +57,7 @@ export default function UserProfile() {
   return (
     <div className="min-h-screen bg-gray-100">
       <Navbar />
-      <div className="flex items-center justify-center h-full">
+      <div className="flex items-center justify-center h-full mt-10"> {/* Added mt-10 for top margin */}
         <div className="w-full max-w-3xl bg-white rounded-lg shadow-md border border-gray-300 p-8">
           <h1 className="text-2xl font-bold text-gray-800 mb-6 text-center">Profil Pengguna</h1>
           <div className="flex flex-col items-center text-center">
