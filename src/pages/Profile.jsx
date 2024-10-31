@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import apiService from '../services/apiservice';
 import ModalEditProfile from '../components/profile/ModalEditProfile';
+import ModalUpdatePassword from '../components/profile/ModalUpdatePassword';
 import Swal from 'sweetalert2';
 import Navbar from '../components/Navbar';
 
@@ -15,6 +16,7 @@ export default function UserProfile() {
   });
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
   
   const navigate = useNavigate();
 
@@ -73,6 +75,24 @@ export default function UserProfile() {
     });
   };
 
+  const handleUpdatePassword = async (currentPassword, newPassword) => {
+    try {
+      const response = await apiService.updatePassword(user.email, currentPassword, newPassword);
+      if (response.success) {
+        Swal.fire({
+          icon: 'success',
+          title: 'Password berhasil diperbarui!',
+          text: 'Silakan gunakan password baru Anda untuk masuk.',
+        });
+        setIsPasswordModalOpen(false); // Close the modal on success
+      }
+      return response; // Return the response for handling in the modal
+    } catch (error) {
+      Swal.fire('Error', error.message, 'error');
+      return { success: false, message: error.message };
+    }
+  };
+
   if (loading) {
     return null; 
   }
@@ -95,13 +115,13 @@ export default function UserProfile() {
             <p className="text-gray-500 mb-4">{user.address}</p>
             <div className="flex gap-4 mb-4">
               <button
-                onClick={handleEditProfile} // Corrected the function call
+                onClick={handleEditProfile} // Open edit profile modal
                 className="bg-blue-500 text-white py-2 px-4 rounded-md font-semibold hover:bg-blue-600 transition duration-200"
               >
                 Edit Profil
               </button>
               <button
-                onClick={() => Swal.fire('Update Password', 'Update password functionality not implemented yet.', 'info')}
+                onClick={() => setIsPasswordModalOpen(true)} // Open update password modal
                 className="bg-blue-500 text-white py-2 px-4 rounded-md font-semibold hover:bg-blue-600 transition duration-200"
               >
                 Update Password
@@ -114,6 +134,13 @@ export default function UserProfile() {
               onClose={handleModalClose}
               user={user}
               onUpdate={handleUpdateProfile}
+            />
+          )}
+          {isPasswordModalOpen && (
+            <ModalUpdatePassword
+              isOpen={isPasswordModalOpen}
+              onClose={() => setIsPasswordModalOpen(false)}
+              onUpdate={handleUpdatePassword} // Pass the update password function
             />
           )}
         </div>
