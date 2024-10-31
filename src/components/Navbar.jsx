@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import {jwtDecode} from 'jwt-decode'; // Pastikan jwtDecode sudah di-import
+import { jwtDecode } from 'jwt-decode'; // Pastikan jwtDecode sudah di-import
 
 export default function Navbar() {
   const navigate = useNavigate();
@@ -73,72 +73,50 @@ export default function Navbar() {
           </div>
           <div className="flex flex-1 items-center justify-between sm:items-stretch sm:justify-start">
             <div className="flex flex-shrink-0 items-center">
+              {/* Logo atau nama aplikasi bisa ditambahkan di sini */}
             </div>
             <div className="hidden sm:ml-6 sm:block">
               <div className="flex space-x-4">
                 {/* Conditionally render links based on userRole */}
                 {userRole === 'superAdmin' && (
                   <>
-                    <a
-                      href="/device"
-                      className="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
-                    >
+                    <a href="/device" className="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white">
                       Device
                     </a>
-                    <a
-                      href="/rules"
-                      className="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
-                    >
+                    <a href="/rules" className="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white">
                       Rules
                     </a>
-                    <a
-                      href="/projects"
-                      className="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
-                    >
+                    <a href="/projects" className="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white">
                       Projects
                     </a>
-                    <a
-                      href="/devicetype"
-                      className="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
-                    >
+                    <a href="/devicetype" className="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white">
                       Device Type
                     </a>
-                    <a
-                      href="/company"
-                      className="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
-                    >
+                    <a href="/company" className="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white">
                       Company
                     </a>
                   </>
                 )}
                 {userRole === 'admin' && (
                   <>
-                    <a
-                      href="/deviceadmin"
-                      className="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
-                    >
+                    <a href="/deviceadmin" className="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white">
                       Device
                     </a>
-                    <a
-                      href="/pengguna"
-                      className="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
-                    >
+                    <a href="/pengguna" className="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white">
                       Pengguna
                     </a>
-                    <a
-                      href="/laporanPetugas"
-                      className="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
-                    >
+                    <a href="/laporanPetugas" className="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white">
                       Laporan Petugas
                     </a>
-                    <a
-                      href="/manajemanKonflik"
-                      className="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
-                    >
+                    <a href="/manajemanKonflik" className="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white">
                       Hasil Kamera
                     </a>
                   </>
                 )}
+                {/* Tautan Profile akan ditampilkan untuk semua role */}
+                <a href="/profile" className="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white">
+                  Profile
+                </a>
                 <div className="flex items-center">
                   <button
                     onClick={handleLogout}
