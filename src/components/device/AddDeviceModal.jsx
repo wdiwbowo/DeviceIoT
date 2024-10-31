@@ -17,7 +17,7 @@ export default function AddDeviceModal({ showModal, onClose, onSave }) {
     });
 
     const [deviceTypes, setDeviceTypes] = useState([]);
-    const [companies, setCompanies] = useState([]);
+    const [companies, setCompanies] = useState([]);  // Main companies state
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(true);
 
@@ -30,7 +30,7 @@ export default function AddDeviceModal({ showModal, onClose, onSave }) {
                 console.error("Error fetching device types:", err);
                 setError('Failed to fetch device types.');
             } finally {
-                setLoading(false);
+                setLoading(false); // Ensure loading is set to false after fetch
             }
         };
 
@@ -38,7 +38,7 @@ export default function AddDeviceModal({ showModal, onClose, onSave }) {
             try {
                 const data = await apiService.getAllCompanies();
                 if (Array.isArray(data)) {
-                    setCompanies(data);
+                    setCompanies(data);  // Only set the companies
                 } else {
                     console.error('Data fetched is not an array:', data);
                     setError('Unexpected data format.');
@@ -47,7 +47,7 @@ export default function AddDeviceModal({ showModal, onClose, onSave }) {
                 console.error('Error fetching companies:', error);
                 setError('Failed to fetch companies.');
             } finally {
-                setLoading(false);
+                setLoading(false); // Ensure loading is set to false after fetch
             }
         };
 
@@ -69,7 +69,7 @@ export default function AddDeviceModal({ showModal, onClose, onSave }) {
             return;
         }
 
-        onSave(deviceData);  // Call the onSave prop function with the deviceData
+        onSave(deviceData);
         setDeviceData({
             companyGuid: "",
             deviceGuid: "",
@@ -84,7 +84,6 @@ export default function AddDeviceModal({ showModal, onClose, onSave }) {
             image: ""
         });
         setError(null);
-        onClose();  // Close the modal after saving
     };
 
     if (!showModal) return null;
@@ -217,35 +216,34 @@ export default function AddDeviceModal({ showModal, onClose, onSave }) {
                                 <label className="ml-2 block text-sm font-medium text-gray-700 dark:text-gray-300">Active</label>
                             </div>
                             <div className="col-span-2">
-                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Image URL</label>
-                                <input
-                                    type="text"
-                                    name="image"
-                                    value={deviceData.image}
-                                    onChange={handleChange}
-                                    className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                                />
-                            </div>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Image URL</label>
+                            <input
+                                type="text"
+                                name="image"
+                                value={deviceData.image}
+                                onChange={handleChange}
+                                className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                            />
+                        </div>
                         </div>
 
-                        {error && <p className="text-red-600">{error}</p>}
-                        
-                        <div className="flex justify-end mt-4">
-                            <button
-                                type="button"
-                                onClick={handleSave}
-                                className="bg-blue-500 text-white rounded-lg px-4 py-2 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                            >
-                                Add
-                            </button>
+                        <div className="flex justify-end space-x-4">
                             <button
                                 type="button"
                                 onClick={onClose}
-                                className="bg-gray-300 text-gray-700 rounded-lg px-4 py-2 ml-2 hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300"
+                                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-gray-500 hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
                             >
                                 Cancel
                             </button>
+                            <button
+                                type="button"
+                                onClick={handleSave}
+                                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-500 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                            >
+                                Save
+                            </button>
                         </div>
+                        {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
                     </form>
                 )}
             </div>
