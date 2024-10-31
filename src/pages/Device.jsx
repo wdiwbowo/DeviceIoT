@@ -210,11 +210,13 @@ export default function Device() {
                 </div>
             </div>
 
+{showAddModal && (
             <AddDeviceModal
                 show={showAddModal}
                 onClose={() => setShowAddModal(false)}
                 onAddDevice={handleAddDevice}
             />
+             )}
             <EditDeviceModal
                 show={showEditModal}
                 onClose={() => setShowEditModal(false)}
