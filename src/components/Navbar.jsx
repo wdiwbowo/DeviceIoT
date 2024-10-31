@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { jwtDecode } from 'jwt-decode'; // Pastikan jwtDecode sudah di-import
+import Swal from 'sweetalert2'; // Import SweetAlert
 
 export default function Navbar() {
   const navigate = useNavigate();
@@ -15,16 +16,28 @@ export default function Navbar() {
   }, []);
 
   const handleLogout = () => {
-    if (window.confirm('Apakah Anda yakin ingin logout?')) {
-      localStorage.removeItem('appToken');
-      if (!localStorage.getItem('appToken')) {
-        alert('Logout berhasil.');
-        navigate('/');
-        window.location.reload();
-      } else {
-        console.error('Token gagal dihapus.');
+    Swal.fire({
+      title: 'Apakah Anda yakin?',
+      text: "Anda akan keluar dari akun Anda!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Ya, keluar!',
+      cancelButtonText: 'Batal'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        localStorage.removeItem('appToken'); // Hapus token
+        Swal.fire(
+          'Keluar!',
+          'Anda telah berhasil keluar.',
+          'success'
+        ).then(() => {
+          navigate('/'); // Redirect to home after logout
+          window.location.reload();
+        });
       }
-    }
+    });
   };
 
   return (
