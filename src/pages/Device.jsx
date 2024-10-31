@@ -210,7 +210,7 @@ export default function Device() {
                 </div>
             </div>
 
-                        {/* Add Device Modal */}
+            {/* Add Device Modal */}
             <AddDeviceModal
                 show={showAddModal}
                 onClose={() => setShowAddModal(false)}
