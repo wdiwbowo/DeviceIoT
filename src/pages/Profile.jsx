@@ -19,38 +19,38 @@ export default function UserProfile() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchUserProfile = async () => {
-      Swal.fire({
-        title: 'Sedang Memuat...',
-        text: 'Harap tunggu...',
-        allowOutsideClick: false,
-        didOpen: () => {
-          Swal.showLoading();
-        },
-      });
-  
-      try {
-        const userProfile = await apiService.getUserProfile();
-        setUser({
-          name: userProfile.data.user.name || "Unknown",
-          email: userProfile.data.user.email || "Email not available",
-          phone: userProfile.data.user.phoneNumber || "Phone number not available",
-          address: userProfile.data.user.address || "Address not available",
-          profileImage: userProfile.data.profileImage || "https://via.placeholder.com/150",
-        });
-      } catch (error) {
-        Swal.fire('Error', error.message, 'error');
-        if (error.message.includes('Unauthorized')) {
-          navigate('/login'); // Redirect to login page
-        }
-      } finally {
-        Swal.close();
-        setLoading(false);
-      }
-    };    
-    
     fetchUserProfile();
   }, [navigate]);
+
+  const fetchUserProfile = async () => {
+    Swal.fire({
+      title: 'Sedang Memuat...',
+      text: 'Harap tunggu...',
+      allowOutsideClick: false,
+      didOpen: () => {
+        Swal.showLoading();
+      },
+    });
+
+    try {
+      const userProfile = await apiService.getUserProfile();
+      setUser({
+        name: userProfile.data.user.name || "Unknown",
+        email: userProfile.data.user.email || "Email not available",
+        phone: userProfile.data.user.phoneNumber || "Phone number not available",
+        address: userProfile.data.user.address || "Address not available",
+        profileImage: userProfile.data.profileImage || "https://via.placeholder.com/150",
+      });
+    } catch (error) {
+      Swal.fire('Error', error.message, 'error');
+      if (error.message.includes('Unauthorized')) {
+        navigate('/login'); // Redirect to login page
+      }
+    } finally {
+      Swal.close();
+      setLoading(false);
+    }
+  };
 
   const handleEditProfile = () => {
     setIsModalOpen(true);
@@ -60,9 +60,10 @@ export default function UserProfile() {
     setIsModalOpen(false);
   };
 
-  const handleUpdateProfile = (updatedUser) => {
+  const handleUpdateProfile = async (updatedUser) => {
     setUser(updatedUser);
     setIsModalOpen(false);
+    await fetchUserProfile(); // Fetch updated profile data
   };
 
   if (loading) {
@@ -87,7 +88,7 @@ export default function UserProfile() {
             <p className="text-gray-500 mb-4">{user.address}</p>
             <div className="flex gap-4 mb-4">
               <button
-                onClick={handleEditProfile} // Corrected the function call
+                onClick={handleEditProfile}
                 className="bg-blue-500 text-white py-2 px-4 rounded-md font-semibold hover:bg-blue-600 transition duration-200"
               >
                 Edit Profil
