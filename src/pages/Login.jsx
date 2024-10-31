@@ -18,14 +18,11 @@ const Login = () => {
     try {
       const response = await apiService.login(username, password);
       const userToken = localStorage.getItem('userToken');
-      console.log('Retrieved userToken:', userToken);
   
       if (userToken) {
         const decodedToken = jwtDecode(userToken);
-        console.log('Decoded Token:', decodedToken);
   
         const userRole = decodedToken.role; // Adjust according to the correct field
-        console.log('User Role:', userRole);
         // Redirect based on user role
         if (userRole === 'superAdmin') {
           navigate('device'); // Redirect to the Devices page for superadmins
