@@ -112,12 +112,11 @@ export default function Device() {
                 <div className="flex justify-between items-center mb-8">
                     <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Devices</h1>
                     <button
-                        onClick={() => setShowAddModal(true)} // Opens AddDeviceModal
+                        onClick={() => setShowAddModal(true)}
                         className="flex items-center bg-blue-600 text-white px-4 py-2 rounded-md shadow-sm hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
                     >
                         <FaPlus className="mr-2" /> Add Device
                     </button>
-
                 </div>
                 <div className="mb-4">
                     <input
