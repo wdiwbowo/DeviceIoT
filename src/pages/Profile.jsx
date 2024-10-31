@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import apiService from '../services/apiservice'; // Importing getUserProfile
-import Swal from 'sweetalert2'; // Import SweetAlert
+import apiService from '../services/apiservice';
+import ModalEditProfile from '../components/profile/ModalEditProfile';
+import Swal from 'sweetalert2';
 import Navbar from '../components/Navbar';
 
 export default function UserProfile() {
@@ -13,6 +14,7 @@ export default function UserProfile() {
     profileImage: ''
   });
   const [loading, setLoading] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false); // State for modal visibility
   
   const navigate = useNavigate();
 
@@ -50,6 +52,19 @@ export default function UserProfile() {
     fetchUserProfile();
   }, [navigate]);
 
+  const handleEditProfile = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleModalClose = () => {
+    setIsModalOpen(false);
+  };
+
+  const handleUpdateProfile = (updatedUser) => {
+    setUser(updatedUser);
+    setIsModalOpen(false);
+  };
+
   if (loading) {
     return null; 
   }
@@ -57,7 +72,7 @@ export default function UserProfile() {
   return (
     <div className="min-h-screen bg-gray-100">
       <Navbar />
-      <div className="flex items-center justify-center h-full mt-10"> {/* Added mt-10 for top margin */}
+      <div className="flex items-center justify-center h-full mt-10">
         <div className="w-full max-w-3xl bg-white rounded-lg shadow-md border border-gray-300 p-8">
           <h1 className="text-2xl font-bold text-gray-800 mb-6 text-center">Profil Pengguna</h1>
           <div className="flex flex-col items-center text-center">
@@ -72,7 +87,7 @@ export default function UserProfile() {
             <p className="text-gray-500 mb-4">{user.address}</p>
             <div className="flex gap-4 mb-4">
               <button
-                onClick={() => Swal.fire('Edit Profile', 'Edit profile functionality not implemented yet.', 'info')}
+                onClick={handleEditProfile}
                 className="bg-blue-500 text-white py-2 px-4 rounded-md font-semibold hover:bg-blue-600 transition duration-200"
               >
                 Edit Profil
@@ -85,6 +100,14 @@ export default function UserProfile() {
               </button>
             </div>
           </div>
+          {isModalOpen && (
+            <ModalEditProfile
+              isOpen={isModalOpen}
+              onClose={handleModalClose}
+              user={user}
+              onUpdate={handleUpdateProfile}
+            />
+          )}
         </div>
       </div>
     </div>
