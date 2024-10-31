@@ -522,6 +522,23 @@ const apiService = {
       }
     }
   },
+
+  updateUserProfile: async (profileData) => {
+  try {
+    const response = await apiClient.post(
+      '/users/edit-profile',
+      {
+        newName: profileData.name,
+        newPhoneNumber: profileData.phoneNumber,
+        newAddress: profileData.address || '' // Kirimkan alamat kosong jika tidak ada
+      }
+    );
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
+},
   
   decodeTokenUser: async () => {
     const userToken = localStorage.getItem('userToken');
