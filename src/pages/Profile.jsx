@@ -41,7 +41,7 @@ export default function UserProfile() {
       } catch (error) {
         Swal.fire('Error', error.message, 'error');
         if (error.message.includes('Unauthorized')) {
-          navigate('/login'); // Redirect to login page
+          navigate('/'); // Redirect to login page
         }
       } finally {
         Swal.close();
@@ -63,6 +63,14 @@ export default function UserProfile() {
   const handleUpdateProfile = (updatedUser) => {
     setUser(updatedUser);
     setIsModalOpen(false);
+
+    // Show success message after updating profile
+    Swal.fire({
+      title: 'Profil Berhasil Diperbarui!',
+      text: 'Silahkan reload halaman.',
+      icon: 'success',
+      confirmButtonText: 'OK',
+    });
   };
 
   if (loading) {
