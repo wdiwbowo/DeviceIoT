@@ -18,18 +18,27 @@ const ProjectsTable = () => {
     const fetchReports = async () => {
       try {
         const response = await apiService.getAllReportsByCompany(queryParams);
-
-        // Ganti console.log dengan SweetAlert
-        Swal.fire({
-          icon: 'info',
-          title: 'Raw API Response',
-          text: JSON.stringify(response, null, 2),
-          confirmButtonText: 'Ok'
-        });
-
+        
         // Akses struktur data yang benar
         const reportsData = response.data.data || [];
         setReports(reportsData);
+
+        // Show SweetAlert based on the data length
+        if (reportsData.length === 0) {
+          Swal.fire({
+            icon: 'info',
+            title: 'Data Kosong',
+            text: 'Tidak ada laporan yang ditemukan.',
+            confirmButtonText: 'Ok'
+          });
+        } else {
+          Swal.fire({
+            icon: 'success',
+            title: 'Data Ditemukan',
+            text: `${reportsData.length} laporan ditemukan.`,
+            confirmButtonText: 'Ok'
+          });
+        }
       } catch (err) {
         // Ganti dengan notifikasi SweetAlert
         Swal.fire({
