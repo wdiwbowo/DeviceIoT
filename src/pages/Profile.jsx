@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import apiService from '../services/apiservice';
 import Swal from 'sweetalert2';
 import Navbar from '../components/Navbar';
 
