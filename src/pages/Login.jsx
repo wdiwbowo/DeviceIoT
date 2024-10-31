@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {jwtDecode} from 'jwt-decode'; // Corrected import statement
+import jwtDecode from 'jwt-decode';
 import apiService from '../services/apiservice';
 
 const Login = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState(null);
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
   const handleLogin = async (event) => {
@@ -16,20 +17,16 @@ const Login = () => {
     try {
       const response = await apiService.login(username, password);
       const userToken = localStorage.getItem('userToken');
-      console.log('Retrieved userToken:', userToken);
   
       if (userToken) {
         const decodedToken = jwtDecode(userToken);
-        console.log('Decoded Token:', decodedToken);
-  
         const userRole = decodedToken.role; // Adjust according to the correct field
-        console.log('User Role:', userRole);
-        // Redirect based on user role
+
         if (userRole === 'superAdmin') {
           navigate('device'); // Redirect to the Devices page for superadmins
         } else if (userRole === 'admin') {
           navigate('deviceadmin'); // Redirect to the Admin page for admins
-         } else {
+        } else {
           setError('Peran pengguna tidak dikenal.');
         }
       } else {
@@ -38,7 +35,7 @@ const Login = () => {
     } catch (error) {
       setError('Error logging in: ' + error.message);
     }
-  };  
+  };
 
   return (
     <div className="flex items-center justify-center h-screen bg-gray-100">
@@ -59,18 +56,24 @@ const Login = () => {
               required
             />
           </div>
-          <div className="mb-6">
+          <div className="mb-6 relative">
             <label htmlFor="password" className="block text-gray-700 mb-2">
               Password
             </label>
             <input
-              type="password"
+              type={showPassword ? "text" : "password"}
               id="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="w-full p-2 border border-gray-300 rounded"
               required
             />
+            <span
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer text-gray-500"
+            >
+              <i className={`fas ${showPassword ? 'fa-eye-slash' : 'fa-eye'}`}></i>
+            </span>
           </div>
           <button
             type="submit"
