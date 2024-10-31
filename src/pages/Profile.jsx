@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ChevronRightIcon } from '@heroicons/react/24/solid';
 import { useNavigate } from 'react-router-dom';
-import apiService from '../services/apiservice';
+import apiService from '../services/apiservice'; // Importing only getUserProfile
 import Swal from 'sweetalert2'; // Import SweetAlert
 
 export default function UserProfile() {
@@ -53,6 +53,10 @@ export default function UserProfile() {
   if (loading) {
     return null; 
   }
+
+  const handleContinue = () => {
+    navigate('/laporan');
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-black via-gray-900 to-gray-800 flex items-center justify-center">
