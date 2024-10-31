@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ChevronRightIcon } from '@heroicons/react/24/solid';
 import { useNavigate } from 'react-router-dom';
-import { getUserProfile, updateUserProfile, updatePassword } from '../services/apiservice';
-import ModalEditProfile from '../components/profile/ModalEditProfile';
-import ModalUpdatePassword from '../components/profile/ModalUpdatePassword'; // Import the password modal
+import { getUserProfile } from '../services/apiservice';
 import Swal from 'sweetalert2'; // Import SweetAlert
 
 export default function UserProfile() {
@@ -15,9 +13,7 @@ export default function UserProfile() {
     profileImage: ''
   });
   const [loading, setLoading] = useState(true);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false); // State for password modal
-
+  
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -32,7 +28,6 @@ export default function UserProfile() {
       });
   
       try {
-        
         const userProfile = await getUserProfile();
         setUser({
           name: userProfile.data.user.name || "Unknown",
@@ -51,64 +46,9 @@ export default function UserProfile() {
         setLoading(false);
       }
     };    
-  
+    
     fetchUserProfile();
   }, []);
-  
-
-  const handleEditProfile = () => {
-    setIsModalOpen(true);
-  };
-
-  const handleModalClose = () => {
-    setIsModalOpen(false);
-  };
-
-  const handleUpdateProfile = async (updatedUser) => {
-    try {
-      const response = await updateUserProfile({
-        name: updatedUser.name,
-        phoneNumber: updatedUser.phoneNumber,
-        address: updatedUser.address
-      });
-      setUser((prevUser) => ({
-        ...prevUser,
-        name: response.name,
-        phone: response.phoneNumber,
-        address: response.address,
-      }));
-
-      // Show success message using SweetAlert
-      Swal.fire({
-        icon: 'success',
-        title: 'Profil berhasil diperbarui!',
-        text: 'Perubahan profil Anda telah disimpan.',
-      });
-
-      handleModalClose();
-    } catch (error) {
-      Swal.fire('Gagal memperbarui profil', error.response ? error.response.data : error.message, 'error');
-    }
-  };
-
-  const handleUpdatePassword = async (currentPassword, newPassword) => {
-    try {
-      const response = await updatePassword(user.email, currentPassword, newPassword);
-      Swal.fire({
-        icon: 'success',
-        title: 'Password berhasil diperbarui!',
-        text: 'Silakan gunakan password baru Anda untuk masuk.',
-      });
-      return response; // Return the response for handling in the modal
-    } catch (error) {
-      Swal.fire('Error', error.message, 'error');
-      return { success: false, message: error.message };
-    }
-  };
-
-  const handleContinue = () => {
-    navigate('/laporan');
-  };
 
   if (loading) {
     return null; 
@@ -130,13 +70,13 @@ export default function UserProfile() {
           <p className="text-gray-300 mb-6">{user.address}</p>
           <div className="flex gap-4 mb-6">
             <button
-              onClick={handleEditProfile}
+              onClick={() => Swal.fire('Edit Profile', 'Edit profile functionality not implemented yet.', 'info')} // Placeholder for edit profile
               className="bg-yellow-400 text-black py-2 px-4 rounded-lg font-semibold hover:bg-yellow-500 transition duration-200"
             >
               Edit Profil
             </button>
             <button
-              onClick={() => setIsPasswordModalOpen(true)} // Open password modal
+              onClick={() => Swal.fire('Update Password', 'Update password functionality not implemented yet.', 'info')} // Placeholder for update password
               className="bg-yellow-400 text-black py-2 px-4 rounded-lg font-semibold hover:bg-yellow-500 transition duration-200"
             >
               Update Password
@@ -151,21 +91,6 @@ export default function UserProfile() {
           </button>
         </div>
       </div>
-      {isModalOpen && (
-        <ModalEditProfile
-          isOpen={isModalOpen}
-          onClose={handleModalClose}
-          user={user}
-          onUpdate={handleUpdateProfile}
-        />
-      )}
-      {isPasswordModalOpen && (
-        <ModalUpdatePassword
-          isOpen={isPasswordModalOpen}
-          onClose={() => setIsPasswordModalOpen(false)}
-          onUpdate={handleUpdatePassword} // Pass the update password function
-        />
-      )}
     </div>
   );
 }
