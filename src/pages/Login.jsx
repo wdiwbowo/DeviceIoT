@@ -2,11 +2,12 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode'; // Corrected import statement
 import apiService from '../services/apiservice';
-import Swal from 'sweetalert2';
+import { FaEye, FaEyeSlash } from 'react-icons/fa'; // Importing icons
 
 const Login = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false); // State for toggling password visibility
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
@@ -17,41 +18,19 @@ const Login = () => {
     try {
       const response = await apiService.login(username, password);
       const userToken = localStorage.getItem('userToken');
-
-      // Ganti console.log dengan SweetAlert untuk menunjukkan token
-      Swal.fire({
-        icon: 'info',
-        title: 'Retrieved Token',
-        text: userToken ? userToken : 'Token pengguna tidak tersedia.',
-        confirmButtonText: 'Ok'
-      });
-
+      console.log('Retrieved userToken:', userToken);
+  
       if (userToken) {
         const decodedToken = jwtDecode(userToken);
-
-        // Ganti console.log dengan SweetAlert untuk menunjukkan decoded token
-        Swal.fire({
-          icon: 'info',
-          title: 'Decoded Token',
-          text: JSON.stringify(decodedToken, null, 2),
-          confirmButtonText: 'Ok'
-        });
-
+        console.log('Decoded Token:', decodedToken);
+  
         const userRole = decodedToken.role; // Adjust according to the correct field
-
-        // Ganti console.log dengan SweetAlert untuk menunjukkan role pengguna
-        Swal.fire({
-          icon: 'info',
-          title: 'User Role',
-          text: userRole ? userRole : 'Peran pengguna tidak tersedia.',
-          confirmButtonText: 'Ok'
-        });
-
+        console.log('User Role:', userRole);
         // Redirect based on user role
         if (userRole === 'superAdmin') {
-          navigate('/Device'); // Redirect to the Devices page for superadmins
+          navigate('/'); // Redirect to the Devices page for superadmins
         } else if (userRole === 'admin') {
-          navigate('/DeviceAdmin'); // Redirect to the Admin page for admins
+          navigate('/'); // Redirect to the Admin page for admins
         } else {
           setError('Peran pengguna tidak dikenal.');
         }
@@ -59,16 +38,9 @@ const Login = () => {
         setError('Token pengguna tidak tersedia.');
       }
     } catch (error) {
-      // Ganti dengan notifikasi SweetAlert
-      Swal.fire({
-        icon: 'error',
-        title: 'Error',
-        text: 'Error logging in: ' + error.message,
-        confirmButtonText: 'Ok'
-      });
       setError('Error logging in: ' + error.message);
     }
-  };  
+  };
 
   return (
     <div className="flex items-center justify-center h-screen bg-gray-100">
@@ -89,18 +61,26 @@ const Login = () => {
               required
             />
           </div>
-          <div className="mb-6">
+          <div className="mb-6 relative"> {/* Added relative positioning */}
             <label htmlFor="password" className="block text-gray-700 mb-2">
               Password
             </label>
             <input
-              type="password"
+              type={showPassword ? 'text' : 'password'} // Toggle input type
               id="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded"
+              className="w-full p-2 border border-gray-300 rounded pr-10" // Adjusted padding for icon
               required
             />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)} // Toggle password visibility
+              className="absolute right-2 top-2"
+              aria-label="Toggle password visibility"
+            >
+              {showPassword ? <FaEyeSlash className="text-gray-600" /> : <FaEye className="text-gray-600" />}
+            </button>
           </div>
           <button
             type="submit"
