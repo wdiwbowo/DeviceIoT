@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ChevronRightIcon } from '@heroicons/react/24/solid';
 import { useNavigate } from 'react-router-dom';
-import { getUserProfile } from '../services/apiservice';
+import apiService from '../services/apiservice';
 import Swal from 'sweetalert2'; // Import SweetAlert
 
 export default function UserProfile() {
