@@ -4,8 +4,8 @@ import apiService from '../services/apiservice';
 import AddDeviceModal from '../components/device/AddDeviceModal';
 import EditDeviceModal from '../components/device/EditDeviceModal';
 import DeleteDeviceModal from '../components/device/DeleteDeviceModal';
-import { FaPlus, FaEdit, FaTrash } from 'react-icons/fa';
-import Swal from 'sweetalert2';
+import { FaPlus, FaEdit, FaTrash } from 'react-icons/fa'; // Import the icons
+import Swal from 'sweetalert2'; // Import SweetAlert2
 
 export default function Device() {
     const [showAddModal, setShowAddModal] = useState(false);
@@ -13,13 +13,14 @@ export default function Device() {
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [devices, setDevices] = useState([]);
     const [filteredDevices, setFilteredDevices] = useState([]);
+    const [error, setError] = useState(null);
+    const [successMessage, setSuccessMessage] = useState(null);
     const [deviceToEdit, setDeviceToEdit] = useState(null);
     const [deviceToDelete, setDeviceToDelete] = useState(null);
     const [searchQuery, setSearchQuery] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 5;
 
-    // Fetch devices
     const fetchDevices = async () => {
         try {
             const response = await apiService.getAllDevices();
@@ -45,7 +46,7 @@ export default function Device() {
             device.mac.toLowerCase().includes(searchQuery.toLowerCase())
         );
         setFilteredDevices(filtered);
-        setCurrentPage(1);
+        setCurrentPage(1); // Reset to first page on new search
     }, [searchQuery, devices]);
 
     const handleAddDevice = async (deviceData) => {
@@ -53,7 +54,7 @@ export default function Device() {
             await apiService.addDevice(deviceData);
             setShowAddModal(false);
             Swal.fire('Success', 'Device added successfully!', 'success');
-            fetchDevices();
+            fetchDevices(); // Refresh devices list
         } catch (error) {
             Swal.fire('Error', 'Failed to add device. Please try again.', 'error');
         }
@@ -64,7 +65,7 @@ export default function Device() {
             await apiService.updateDevice(guid, updatedDeviceData);
             setShowEditModal(false);
             Swal.fire('Success', 'Device updated successfully!', 'success');
-            fetchDevices();
+            fetchDevices(); // Refresh devices list
         } catch (error) {
             Swal.fire('Error', 'Failed to update device. Please try again.', 'error');
         }
@@ -75,17 +76,34 @@ export default function Device() {
             await apiService.deleteDevice(deviceToDelete.guid);
             setShowDeleteModal(false);
             Swal.fire('Success', 'Device deleted successfully!', 'success');
-            fetchDevices();
+            fetchDevices(); // Refresh devices list
         } catch (error) {
             Swal.fire('Error', 'Failed to delete device. Please try again.', 'error');
         }
     };
 
+    // Mengatur timeout untuk menghilangkan pesan setelah 2 detik
+    useEffect(() => {
+        if (successMessage || error) {
+            const timer = setTimeout(() => {
+                setSuccessMessage(null);
+                setError(null);
+            }, 2000); // 2000 ms = 2 detik
+
+            return () => clearTimeout(timer);
+        }
+    }, [successMessage, error]);
+
     // Pagination logic
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
     const currentItems = filteredDevices.slice(indexOfFirstItem, indexOfLastItem);
+
     const totalPages = Math.ceil(filteredDevices.length / itemsPerPage);
+
+    const handleSearchChange = (e) => {
+        setSearchQuery(e.target.value);
+    };
 
     return (
         <div className="min-h-screen bg-gray-100 dark:bg-gray-900">
@@ -105,7 +123,7 @@ export default function Device() {
                         type="text"
                         placeholder="Search devices..."
                         value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
+                        onChange={handleSearchChange}
                         className="w-full px-4 py-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                     />
                 </div>
@@ -128,7 +146,9 @@ export default function Device() {
                         <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                             {currentItems.length === 0 ? (
                                 <tr>
-                                    <td colSpan="10" className="px-6 py-4 text-center text-gray-500 dark:text-gray-300">No devices found</td>
+                                    <td colSpan="11" className="px-6 py-4 text-center text-gray-500 dark:text-gray-300">
+                                        No devices found
+                                    </td>
                                 </tr>
                             ) : (
                                 currentItems.map((item, index) => (
@@ -140,15 +160,15 @@ export default function Device() {
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{item.type}</td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{item.latitude}</td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{item.longitude}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{item.status}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{item.active ? 'Yes' : 'No'}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{item.status ? 'True' : 'False'}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{item.active ? 'True' : 'False'}</td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                             <button
                                                 onClick={() => {
                                                     setDeviceToEdit(item);
                                                     setShowEditModal(true);
                                                 }}
-                                                className="text-blue-600 dark:text-blue-400 hover:underline"
+                                                className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 mr-4"
                                             >
                                                 <FaEdit />
                                             </button>
@@ -157,7 +177,7 @@ export default function Device() {
                                                     setDeviceToDelete(item);
                                                     setShowDeleteModal(true);
                                                 }}
-                                                className="text-red-600 dark:text-red-400 hover:underline ml-2"
+                                                className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300"
                                             >
                                                 <FaTrash />
                                             </button>
@@ -168,20 +188,28 @@ export default function Device() {
                         </tbody>
                     </table>
                 </div>
+                {/* Pagination */}
                 <div className="flex justify-between items-center mt-4">
-                    <div>
-                        <span className="text-sm text-gray-600 dark:text-gray-400">
-                            Showing {currentItems.length} of {filteredDevices.length} devices
-                        </span>
-                    </div>
-                    <div>
-                        {/* Pagination controls here */}
-                        {/* Include logic to handle pagination */}
-                    </div>
+                    <button
+                        onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                        disabled={currentPage === 1}
+                        className="px-4 py-2 bg-gray-300 rounded-md disabled:opacity-50 dark:bg-gray-700"
+                    >
+                        Previous
+                    </button>
+                    <span className="text-gray-700 dark:text-gray-300">
+                        Page {currentPage} of {totalPages}
+                    </span>
+                    <button
+                        onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                        disabled={currentPage === totalPages}
+                        className="px-4 py-2 bg-gray-300 rounded-md disabled:opacity-50 dark:bg-gray-700"
+                    >
+                        Next
+                    </button>
                 </div>
             </div>
 
-            {/* Modals */}
             <AddDeviceModal
                 show={showAddModal}
                 onClose={() => setShowAddModal(false)}
@@ -196,8 +224,8 @@ export default function Device() {
             <DeleteDeviceModal
                 show={showDeleteModal}
                 onClose={() => setShowDeleteModal(false)}
-                device={deviceToDelete}
                 onDeleteDevice={handleDeleteDevice}
+                device={deviceToDelete}
             />
         </div>
     );
