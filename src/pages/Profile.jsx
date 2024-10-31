@@ -106,7 +106,7 @@ export default function UserProfile() {
           <div className="flex flex-col items-center text-center">
             {/* Profile Image */}
             <img
-              src={data.user.profileImage}
+              src={user.profileImage}
               alt="Profile"
               className="w-32 h-32 rounded-full mb-4 object-cover border border-gray-300"
             />
