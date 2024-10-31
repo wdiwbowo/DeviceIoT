@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import apiService from '../service/apiService';
+import apiService from '../../service/apiService';
 import Swal from 'sweetalert2';
 
 export default function ModalEditProfile({ isOpen, onClose, user, onUpdate }) {
