@@ -104,6 +104,7 @@ export default function UserProfile() {
         <div className="w-full max-w-3xl bg-white rounded-lg shadow-md border border-gray-300 p-8">
           <h1 className="text-2xl font-bold text-gray-800 mb-6 text-center">Profil Pengguna</h1>
           <div className="flex flex-col items-center text-center">
+            {/* Profile Image */}
             <img
               src={user.profileImage}
               alt="Profile"
