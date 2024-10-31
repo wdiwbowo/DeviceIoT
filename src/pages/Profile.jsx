@@ -95,7 +95,7 @@ export default function UserProfile() {
             <p className="text-gray-500 mb-4">{user.address}</p>
             <div className="flex gap-4 mb-4">
               <button
-                onClick={handleEditProfile} // Corrected the function call
+                onClick={handleEditProfile} Swal.fire('Update Profile', 'Update Profile berhasil silahkan reload.', 'info')} // Corrected the function call
                 className="bg-blue-500 text-white py-2 px-4 rounded-md font-semibold hover:bg-blue-600 transition duration-200"
               >
                 Edit Profil
