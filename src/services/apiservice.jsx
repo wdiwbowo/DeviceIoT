@@ -525,7 +525,7 @@ const apiService = {
 
   updateUserProfile: async (profileData) => {
   try {
-    const response = await apiClient.post(
+    const response = await apiUser.post(
       '/users/edit-profile',
       {
         newName: profileData.name,
