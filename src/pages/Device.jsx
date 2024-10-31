@@ -210,22 +210,27 @@ export default function Device() {
                 </div>
             </div>
 
+                        {/* Add Device Modal */}
             <AddDeviceModal
                 show={showAddModal}
                 onClose={() => setShowAddModal(false)}
                 onAddDevice={handleAddDevice}
             />
+
+            {/* Edit Device Modal */}
             <EditDeviceModal
                 show={showEditModal}
                 onClose={() => setShowEditModal(false)}
                 device={deviceToEdit}
                 onEditDevice={handleEditDevice}
             />
+
+            {/* Delete Device Modal */}
             <DeleteDeviceModal
                 show={showDeleteModal}
                 onClose={() => setShowDeleteModal(false)}
-                onDeleteDevice={handleDeleteDevice}
                 device={deviceToDelete}
+                onDeleteDevice={handleDeleteDevice}
             />
         </div>
     );
