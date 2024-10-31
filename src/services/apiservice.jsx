@@ -390,20 +390,26 @@ const apiService = {
     }
   },
   
-  addDevices: async (deviceData) => {
+ addDevices: async (deviceData) => {
     try {
-      const response = await apiClient.post('/devices/add', deviceData);
-      Swal.fire('Success', 'Device added successfully!', 'success');
-      return response.data;
+        const token = localStorage.getItem('appToken'); // Ambil token dari local storage atau sumber lainnya
+        const response = await apiClient.post('/devices/add', deviceData, {
+            headers: {
+                Authorization: `Bearer ${token}` // Tambahkan header Authorization
+            }
+        });
+        Swal.fire('Success', 'Device added successfully!', 'success');
+        return response.data;
     } catch (error) {
-      if (error.response?.status === 401) {
-        Swal.fire('Error', 'Unauthorized access. Please log in again.', 'error');
-      } else {
-        Swal.fire('Error', error.response?.data?.message || 'Failed to add device', 'error');
-      }
-      throw new Error(error.response?.data?.message || 'Failed to add device');
+        if (error.response?.status === 401) {
+            Swal.fire('Error', 'Unauthorized access. Please log in again.', 'error');
+        } else {
+            Swal.fire('Error', error.response?.data?.message || 'Failed to add device', 'error');
+        }
+        throw new Error(error.response?.data?.message || 'Failed to add device');
     }
-  },
+},
+
 
   updateDeviceCompany: async (guid, deviceData) => {
       if (!guid) {
