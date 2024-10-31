@@ -566,6 +566,17 @@ const apiService = {
     throw error;
   }
 },
+
+  uploadProfileImage: async (formData) => {
+  const token = localStorage.getItem('appToken');
+  const response = await apiUser.post('/images/profile', formData, {
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+  return response;
+},
   
   decodeTokenUser: async () => {
     const userToken = localStorage.getItem('userToken');
