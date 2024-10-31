@@ -17,7 +17,7 @@ export default function AddDeviceModal({ showModal, onClose, onSave }) {
     });
 
     const [deviceTypes, setDeviceTypes] = useState([]);
-    const [companies, setCompanies] = useState([]);  // Main companies state
+    const [companies, setCompanies] = useState([]);
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(true);
 
@@ -29,8 +29,6 @@ export default function AddDeviceModal({ showModal, onClose, onSave }) {
             } catch (err) {
                 console.error("Error fetching device types:", err);
                 setError('Failed to fetch device types.');
-            } finally {
-                setLoading(false); // Ensure loading is set to false after fetch
             }
         };
 
@@ -38,7 +36,7 @@ export default function AddDeviceModal({ showModal, onClose, onSave }) {
             try {
                 const data = await apiService.getAllCompanies();
                 if (Array.isArray(data)) {
-                    setCompanies(data);  // Only set the companies
+                    setCompanies(data);
                 } else {
                     console.error('Data fetched is not an array:', data);
                     setError('Unexpected data format.');
@@ -46,13 +44,12 @@ export default function AddDeviceModal({ showModal, onClose, onSave }) {
             } catch (error) {
                 console.error('Error fetching companies:', error);
                 setError('Failed to fetch companies.');
-            } finally {
-                setLoading(false); // Ensure loading is set to false after fetch
             }
         };
 
         fetchDeviceTypes();
         fetchCompanies();
+        setLoading(false); // Set loading to false after both fetches
     }, []);
 
     const handleChange = (e) => {
@@ -70,6 +67,11 @@ export default function AddDeviceModal({ showModal, onClose, onSave }) {
         }
 
         onSave(deviceData);
+        resetForm();
+        onClose(); // Close modal after saving
+    };
+
+    const resetForm = () => {
         setDeviceData({
             companyGuid: "",
             deviceGuid: "",
@@ -230,14 +232,14 @@ export default function AddDeviceModal({ showModal, onClose, onSave }) {
                         <div className="flex justify-end space-x-4">
                             <button
                                 type="button"
-                                onClick={onClose}
+                                onClick={onClose} // Close modal
                                 className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-gray-500 hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
                             >
                                 Cancel
                             </button>
                             <button
                                 type="button"
-                                onClick={handleSave}
+                                onClick={handleSave} // Save data
                                 className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-500 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                             >
                                 Save
