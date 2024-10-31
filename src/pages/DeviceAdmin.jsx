@@ -49,7 +49,7 @@ export default function Device() {
 
     const handleAddDevice = async (deviceData) => {
         try {
-            await apiService.addDevice(deviceData);
+            await apiService.addDevices(deviceData);
             setShowAddModal(false);
             Swal.fire('Success', 'Device added successfully!', 'success');
             fetchDevices(); // Refresh devices list
