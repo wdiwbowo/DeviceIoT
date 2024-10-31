@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import apiService from '../services/apiservice'; // Importing getUserProfile
+import apiService from '../services/apiservice'; // Importing only getUserProfile
 import Swal from 'sweetalert2'; // Import SweetAlert
 import Navbar from '../components/Navbar';
 
@@ -31,9 +31,9 @@ export default function UserProfile() {
         const userProfile = await apiService.getUserProfile();
         setUser({
           name: userProfile.data.user.name || "Unknown",
-          email: userProfile.data.user.email || "Email not available",
-          phone: userProfile.data.user.phoneNumber || "Phone number not available",
-          address: userProfile.data.user.address || "Address not available",
+          email: userProfile.data.user.email || "Email tidak tersedia",
+          phone: userProfile.data.user.phoneNumber || "Nomor telepon tidak tersedia",
+          address: userProfile.data.user.address || "Alamat tidak tersedia",
           profileImage: userProfile.data.profileImage || "https://via.placeholder.com/150",
         });
       } catch (error) {
@@ -51,39 +51,47 @@ export default function UserProfile() {
   }, [navigate]);
 
   if (loading) {
-    return null; 
+    return (
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+        <Navbar />
+        <div className="w-full max-w-3xl bg-white rounded-lg shadow-md border border-gray-300 p-8 flex items-center justify-center">
+          <div className="flex flex-col items-center">
+            <div className="animate-spin h-16 w-16 border-4 border-blue-500 border-t-transparent rounded-full"></div>
+            <p className="mt-4 text-gray-700">Sedang Memuat...</p>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-gray-100 flex items-center justify-center">
       <Navbar />
-      <div className="flex items-center justify-center h-full mt-10"> {/* Added mt-10 for top margin */}
-        <div className="w-full max-w-3xl bg-white rounded-lg shadow-md border border-gray-300 p-8">
-          <h1 className="text-2xl font-bold text-gray-800 mb-6 text-center">Profil Pengguna</h1>
-          <div className="flex flex-col items-center text-center">
-            <img
-              src={user.profileImage}
-              alt="Profile"
-              className="w-32 h-32 rounded-full mb-4 object-cover border border-gray-300"
-            />
-            <h2 className="text-xl font-semibold text-gray-700">{user.name}</h2>
-            <p className="text-gray-500 mb-2">{user.email}</p>
-            <p className="text-gray-500 mb-2">{user.phone}</p>
-            <p className="text-gray-500 mb-4">{user.address}</p>
-            <div className="flex gap-4 mb-4">
-              <button
-                onClick={() => Swal.fire('Edit Profile', 'Edit profile functionality not implemented yet.', 'info')}
-                className="bg-blue-500 text-white py-2 px-4 rounded-md font-semibold hover:bg-blue-600 transition duration-200"
-              >
-                Edit Profil
-              </button>
-              <button
-                onClick={() => Swal.fire('Update Password', 'Update password functionality not implemented yet.', 'info')}
-                className="bg-blue-500 text-white py-2 px-4 rounded-md font-semibold hover:bg-blue-600 transition duration-200"
-              >
-                Update Password
-              </button>
-            </div>
+      <div className="w-full max-w-3xl bg-white rounded-lg shadow-md border border-gray-300 p-8">
+        <h1 className="text-2xl font-bold text-gray-800 mb-6 text-center">Profil Pengguna</h1>
+        <div className="flex flex-col items-center text-center">
+          <img
+            src={user.profileImage}
+            alt="Profile"
+            className="w-32 h-32 rounded-full mb-4 object-cover border border-gray-300"
+          />
+          <h2 className="text-xl font-semibold text-gray-700">{user.name}</h2>
+          <p className="text-gray-500 mb-2">{user.email}</p>
+          <p className="text-gray-500 mb-2">{user.phone}</p>
+          <p className="text-gray-500 mb-4">{user.address}</p>
+          <div className="flex gap-4 mb-4">
+            <button
+              onClick={() => Swal.fire('Edit Profile', 'Edit profile functionality not implemented yet.', 'info')}
+              className="bg-blue-500 text-white py-2 px-4 rounded-md font-semibold hover:bg-blue-600 transition duration-200"
+            >
+              Edit Profil
+            </button>
+            <button
+              onClick={() => Swal.fire('Update Password', 'Update password functionality not implemented yet.', 'info')}
+              className="bg-blue-500 text-white py-2 px-4 rounded-md font-semibold hover:bg-blue-600 transition duration-200"
+            >
+              Update Password
+            </button>
           </div>
         </div>
       </div>
