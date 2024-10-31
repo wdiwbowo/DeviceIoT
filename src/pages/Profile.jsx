@@ -28,7 +28,7 @@ export default function UserProfile() {
       });
   
       try {
-        const userProfile = await getUserProfile();
+        const userProfile = await apiService.getUserProfile();
         setUser({
           name: userProfile.data.user.name || "Unknown",
           email: userProfile.data.user.email || "Email not available",
