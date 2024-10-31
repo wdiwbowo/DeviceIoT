@@ -105,7 +105,7 @@ export default function Device() {
         setSearchQuery(e.target.value);
     };
 
-    return (
+    eturn(
         <div className="min-h-screen bg-gray-100 dark:bg-gray-900">
             <Navbar />
             <div className="container mx-auto py-8">
@@ -209,14 +209,13 @@ export default function Device() {
                     </button>
                 </div>
             </div>
-
-{showAddModal && (
-            <AddDeviceModal
-                show={showAddModal}
-                onClose={() => setShowAddModal(false)}
-                onAddDevice={handleAddDevice}
-            />
-             )}
+            {showAddModal && (
+                <AddDeviceModal
+                    show={showAddModal}
+                    onClose={() => setShowAddModal(false)}
+                    onAddDevice={handleAddDevice}
+                />
+            )}
             <EditDeviceModal
                 show={showEditModal}
                 onClose={() => setShowEditModal(false)}
