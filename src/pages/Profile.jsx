@@ -31,9 +31,9 @@ export default function UserProfile() {
         const userProfile = await apiService.getUserProfile();
         setUser({
           name: userProfile.data.user.name || "Unknown",
-          email: userProfile.data.user.email || "Email tidak tersedia",
-          phone: userProfile.data.user.phoneNumber || "Nomor telepon tidak tersedia",
-          address: userProfile.data.user.address || "Alamat tidak tersedia",
+          email: userProfile.data.user.email || "Email not available",
+          phone: userProfile.data.user.phoneNumber || "Phone number not available",
+          address: userProfile.data.user.address || "Address not available",
           profileImage: userProfile.data.profileImage || "https://via.placeholder.com/150",
         });
       } catch (error) {
@@ -48,25 +48,15 @@ export default function UserProfile() {
     };    
     
     fetchUserProfile();
-  }, [navigate]);
+  }, []);
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-        <Navbar />
-        <div className="w-full max-w-3xl bg-white rounded-lg shadow-md border border-gray-300 p-8 flex items-center justify-center">
-          <div className="flex flex-col items-center">
-            <div className="animate-spin h-16 w-16 border-4 border-blue-500 border-t-transparent rounded-full"></div>
-            <p className="mt-4 text-gray-700">Sedang Memuat...</p>
-          </div>
-        </div>
-      </div>
-    );
+    return null; 
   }
 
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-      <Navbar />
+        <Navbar/>
       <div className="w-full max-w-3xl bg-white rounded-lg shadow-md border border-gray-300 p-8">
         <h1 className="text-2xl font-bold text-gray-800 mb-6 text-center">Profil Pengguna</h1>
         <div className="flex flex-col items-center text-center">
