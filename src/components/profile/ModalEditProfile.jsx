@@ -29,7 +29,7 @@ export default function ModalEditProfile({ isOpen, onClose, user, onUpdate }) {
       // Show success message with SweetAlert
       Swal.fire({
         title: 'Berhasil!',
-        text: 'Profil berhasil diperbarui.',
+        text: 'Profil berhasil diperbarui silahkan Reload.',
         icon: 'success',
         confirmButtonText: 'OK',
       });
