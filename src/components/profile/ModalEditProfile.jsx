@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import InputMask from 'react-input-mask';
-import { updateUserProfile } from '../../services/apiservice';
+import updateUserProfile from '../../services/apiservice';
 import Swal from 'sweetalert2';
 
 export default function ModalEditProfile({ isOpen, onClose, user, onUpdate }) {
