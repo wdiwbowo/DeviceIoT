@@ -63,7 +63,7 @@ export default function AddDeviceModal({ showModal, onClose, onSave }) {
     };
 
     const handleSave = () => {
-        if (!deviceData.companyGuid || !deviceData.deviceGuid || !deviceData.name) {
+        if (!deviceData.deviceGuid || !deviceData.name) {
             setError('Please fill out all required fields.');
             return;
         }
