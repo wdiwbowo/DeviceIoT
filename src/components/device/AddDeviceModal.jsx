@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import apiService from '../../services/apiservice';
 
-const AddDeviceModal = ({ show, onClose, onAddDevice }) => {
+export default function AddDeviceModal({ showModal, onClose, onSave }) {
     const [deviceData, setDeviceData] = useState({
         companyGuid: "",
         deviceGuid: "",
@@ -88,7 +88,7 @@ const AddDeviceModal = ({ show, onClose, onAddDevice }) => {
         setError(null);
     };
 
-    if (!show) return null;
+    if (!showModal) return null;
 
     return (
         <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50">
@@ -218,20 +218,32 @@ const AddDeviceModal = ({ show, onClose, onAddDevice }) => {
                                 <label className="ml-2 block text-sm font-medium text-gray-700 dark:text-gray-300">Active</label>
                             </div>
                             <div className="col-span-2">
-                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Image URL</label>
-                                <input
-                                    type="text"
-                                    name="image"
-                                    value={deviceData.image}
-                                    onChange={handleChange}
-                                    className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                                />
-                            </div>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Image URL</label>
+                            <input
+                                type="text"
+                                name="image"
+                                value={deviceData.image}
+                                onChange={handleChange}
+                                className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                            />
+                        </div>
                         </div>
 
                         <div className="flex justify-end space-x-4">
-                            <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded">Add</button>
-                            <button type="button" onClick={onClose} className="ml-2 bg-gray-300 px-4 py-2 rounded">Cancel</button>
+                            <button
+                                type="button"
+                                onClick={onClose} // Close modal
+                                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-gray-500 hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                type="button"
+                                onClick={handleSave} // Save data
+                                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-500 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                            >
+                                Save
+                            </button>
                         </div>
                         {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
                     </form>
