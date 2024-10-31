@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import InputMask from 'react-input-mask';
 import Swal from 'sweetalert2';
 
 export default function ModalEditProfile({ isOpen, onClose, user, onUpdate }) {
@@ -20,7 +21,7 @@ export default function ModalEditProfile({ isOpen, onClose, user, onUpdate }) {
         phoneNumber, // Use 'phoneNumber' for the API call
         address,
       };
-
+      
       await updateUserProfile(updatedUser);
       onUpdate(updatedUser);  // Call the onUpdate function passed as a prop
 
@@ -34,8 +35,6 @@ export default function ModalEditProfile({ isOpen, onClose, user, onUpdate }) {
 
       onClose();
     } catch (error) {
-      console.error('Error updating profile:', error); // Log the error to the console
-
       // Show error message with SweetAlert
       Swal.fire({
         title: 'Gagal!',
@@ -78,8 +77,8 @@ export default function ModalEditProfile({ isOpen, onClose, user, onUpdate }) {
           </div>
           <div className="mb-4">
             <label className="block text-gray-700">Nomor Telepon</label>
-            <input
-              type="text" // Use a standard input for the phone number
+            <InputMask
+              mask="(999) 999-9999"
               value={phoneNumber}
               onChange={(e) => setPhoneNumber(e.target.value)} // Update state correctly
               className="border rounded w-full px-3 py-2"
