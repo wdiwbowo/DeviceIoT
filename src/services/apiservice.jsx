@@ -537,7 +537,6 @@ const apiService = {
   } catch (error) {
     throw error;
   }
-}
 },
   
   decodeTokenUser: async () => {
