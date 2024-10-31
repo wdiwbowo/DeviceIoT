@@ -1,12 +1,11 @@
 import React, { useState } from 'react';
 import InputMask from 'react-input-mask';
-import updateUserProfile from '../../services/apiservice';
 import Swal from 'sweetalert2';
 
 export default function ModalEditProfile({ isOpen, onClose, user, onUpdate }) {
   const [name, setName] = useState(user.name);
-  const [email] = useState(user.email); // Keep email read-only
-  const [phoneNumber, setPhoneNumber] = useState(user.phone); // Use 'phoneNumber' for state
+  const [email] = useState(user.email); // Email read-only
+  const [phoneNumber, setPhoneNumber] = useState(user.phone);
   const [address, setAddress] = useState(user.address);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -17,16 +16,10 @@ export default function ModalEditProfile({ isOpen, onClose, user, onUpdate }) {
     setError('');
 
     try {
-      const updatedUser = {
-        name,
-        phoneNumber, // Use 'phoneNumber' for the API call
-        address,
-      };
-      
-      await updateUserProfile(updatedUser);
-      onUpdate(updatedUser);  // Call the onUpdate function passed as a prop
+      const updatedUser = { name, phoneNumber, address };
+      await apiService.updateUserProfile(updatedUser);
+      onUpdate(updatedUser);
 
-      // Show success message with SweetAlert
       Swal.fire({
         title: 'Berhasil!',
         text: 'Profil berhasil diperbarui.',
@@ -36,7 +29,6 @@ export default function ModalEditProfile({ isOpen, onClose, user, onUpdate }) {
 
       onClose();
     } catch (error) {
-      // Show error message with SweetAlert
       Swal.fire({
         title: 'Gagal!',
         text: 'Gagal memperbarui profil. Silakan coba lagi.',
@@ -81,7 +73,7 @@ export default function ModalEditProfile({ isOpen, onClose, user, onUpdate }) {
             <InputMask
               mask="(999) 999-9999"
               value={phoneNumber}
-              onChange={(e) => setPhoneNumber(e.target.value)} // Update state correctly
+              onChange={(e) => setPhoneNumber(e.target.value)}
               className="border rounded w-full px-3 py-2"
               required
             />
