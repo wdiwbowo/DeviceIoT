@@ -509,7 +509,7 @@ const apiService = {
 
   getUserProfile: async () => {
     try {
-      const response = await apiClient.get('/users/profile');
+      const response = await apiUser.get('/users/profile');
       return response.data;
     } catch (error) {
       if (error.response) {
