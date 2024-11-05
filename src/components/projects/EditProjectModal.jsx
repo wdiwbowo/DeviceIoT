@@ -6,6 +6,7 @@ const EditProjectModal = ({ show, onClose, project, onUpdate }) => {
 
   useEffect(() => {
     setUpdatedProject({ ...project });
+    setFormError(""); // Reset form error when project changes
   }, [project]);
 
   const handleInputChange = (e) => {
@@ -16,14 +17,20 @@ const EditProjectModal = ({ show, onClose, project, onUpdate }) => {
     }));
   };
 
-  const handleUpdateProject = () => {
-    if (updatedProject.name === "") {
+  const validateForm = () => {
+    if (!updatedProject.name) {
       setFormError("Name is required.");
-      return;
+      return false;
     }
+    setFormError(""); // Clear error if validation passes
+    return true;
+  };
 
-    onUpdate(updatedProject);
-    onClose();
+  const handleUpdateProject = () => {
+    if (validateForm()) {
+      onUpdate(updatedProject);
+      onClose();
+    }
   };
 
   if (!show) return null;
