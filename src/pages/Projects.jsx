@@ -63,21 +63,19 @@ const Projects = () => {
   };
 
     const handleEditProject = async (updatedProject) => {
-    if (!updatedProject || updatedProject.name === "") {
-      setError("Name is required.");
-      return;
-    }
-
-    try {
-      await apiService.updateProject(updatedProject.guid, updatedProject);
-      setShowEditModal(false);
-      setSuccessMessage("Project updated successfully!");
-      fetchProjects();
-    } catch (error) {
-      console.error("Failed to update project:", error);
-      setError("Failed to update project. Please try again.");
-    }
-  };
+  if (!updatedProject || !updatedProject.name) {
+    setError("Name is required.");
+    return;
+  }
+  
+  try {
+    await apiService.updateProject(updatedProject.guid, updatedProject);
+    setShowEditModal(false);
+    fetchProjects();
+  } catch (error) {
+    setError("Failed to update project. Please try again.");
+  }
+};
 
 
   const handleDeleteProject = async () => {
