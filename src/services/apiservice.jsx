@@ -292,7 +292,7 @@ const apiService = {
 
   try {
     // Mendapatkan data proyek saat ini jika diperlukan untuk menyertakan data lengkap.
-    const currentData = await apiClient.get(`/projects/get/${guid}`);
+    const currentData = await apiClient.get('/projects/get/');
     const updatedData = { ...currentData.data, ...projectData }; // Gabungkan data baru dengan data saat ini.
 
     const response = await apiClient.put(`/projects/update/${guid}`, updatedData);
