@@ -131,15 +131,15 @@ export default function Device() {
                         onChange={handleSearchChange}
                         className="w-full px-4 py-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                     />
-                <select
-                    value={selectedType}
-                    onChange={handleTypeChange}
-                    className="px-4 py-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                >
-                    {deviceTypes.map((type, index) => (
-                        <option key={index} value={type}>{type}</option>
-                    ))}
-                </select>
+                    <select
+                        value={selectedType}
+                        onChange={handleTypeChange}
+                        className="px-4 py-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                    >
+                        {deviceTypes.map((type, index) => (
+                            <option key={index} value={type}>{type}</option>
+                        ))}
+                    </select>
                 </div>
                 <div className="overflow-x-auto bg-white dark:bg-gray-800 rounded-lg shadow-md">
                     <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
