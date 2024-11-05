@@ -62,21 +62,21 @@ const Projects = () => {
     }
   };
 
-    const handleEditProject = async (updatedProject) => {
+  const handleEditProject = async (updatedProject) => {
   if (!updatedProject || !updatedProject.name) {
     setError("Name is required.");
     return;
   }
-  
+
   try {
     await apiService.updateProject(updatedProject.guid, updatedProject);
     setShowEditModal(false);
     fetchProjects();
   } catch (error) {
+    console.error("Error updating project:", error); // Log error details
     setError("Failed to update project. Please try again.");
   }
 };
-
 
   const handleDeleteProject = async () => {
     if (!projectToDelete || !projectToDelete.guid) {
