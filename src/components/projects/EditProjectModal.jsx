@@ -3,43 +3,27 @@ import React, { useState, useEffect } from 'react';
 const EditProjectModal = ({ show, onClose, project, onUpdate }) => {
   const [updatedProject, setUpdatedProject] = useState({ ...project });
   const [formError, setFormError] = useState("");
-  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (project) {
-      console.log("Project data on modal open:", project);
-      setUpdatedProject({ ...project });
-    }
+    setUpdatedProject({ ...project });
   }, [project]);
-
-  const handleUpdateProject = async () => {
-    console.log("Updated project data before update:", updatedProject);
-
-    if (!updatedProject.name) {
-      setFormError("Name is required.");
-      return;
-    }
-
-    setLoading(true);
-    try {
-      await onUpdate(updatedProject);
-      console.log("Project updated successfully");
-      onClose();
-    } catch (error) {
-      console.error("Error updating project:", error);
-      setFormError("Failed to update project. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setUpdatedProject((prevState) => ({
       ...prevState,
-      [name]: value,
+      [name]: value
     }));
-    setFormError("");
+  };
+
+  const handleUpdateProject = () => {
+    if (updatedProject.name === "") {
+      setFormError("Name is required.");
+      return;
+    }
+
+    onUpdate(updatedProject);
+    onClose();
   };
 
   if (!show) return null;
@@ -72,10 +56,9 @@ const EditProjectModal = ({ show, onClose, project, onUpdate }) => {
         <div className="flex justify-end">
           <button
             onClick={handleUpdateProject}
-            disabled={loading}
-            className={bg-blue-600 text-white px-4 py-2 rounded-lg shadow-md ${loading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-700'} dark:bg-blue-500 dark:hover:bg-blue-600}
+            className="bg-blue-600 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
           >
-            {loading ? 'Updating...' : 'Update Project'}
+            Update Project
           </button>
           <button
             onClick={onClose}
