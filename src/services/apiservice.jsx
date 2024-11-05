@@ -284,9 +284,9 @@ const apiService = {
     }
   },
   
-updateProject: async (projectId, projectData) => {
+updateProject: async (guid, projectData) => {
     try {
-        const response = await apiClient.put(`/projects/update/${projectId}`, projectData);
+        const response = await apiClient.put(`/projects/update/${guid}`, projectData);
         console.log('Update Project Response:', response.data);
         return response.data;
     } catch (error) {
