@@ -227,24 +227,33 @@ const apiService = {
   },
   
   deleteRule: async (guid) => {
-    if (!guid) {
-      Swal.fire('Error', 'GUID is required.', 'error');
-      throw new Error('GUID is required.');
+  if (!guid) {
+    Swal.fire('Error', 'GUID is required.', 'error');
+    console.error('Error: GUID is required.');
+    throw new Error('GUID is required.');
+  }
+
+  try {
+    console.log(`Attempting to delete rule with GUID: ${guid}`);
+    const response = await apiClient.delete(`/rules/delete/${guid}`);
+    console.log('Delete Rule Response:', response.data);
+    Swal.fire('Success', 'Rule deleted successfully!', 'success');
+    return response.data;
+  } catch (error) {
+    console.error('Error deleting rule:', error);
+
+    if (error.response?.status === 401) {
+      Swal.fire('Error', 'Unauthorized access. Please log in again.', 'error');
+      console.error('Unauthorized access. Redirecting to login.');
+      throw new Error('Unauthorized access. Please log in again.');
+    } else {
+      const errorMessage = error.response?.data?.message || 'Failed to delete rule';
+      Swal.fire('Error', errorMessage, 'error');
+      console.error('Failed to delete rule:', errorMessage);
+      throw new Error(errorMessage);
     }
-  
-    try {
-      const response = await apiClient.delete(`/rules/delete/${guid}`);
-      Swal.fire('Success', 'Rule deleted successfully!', 'success');
-      return response.data;
-    } catch (error) {
-      if (error.response?.status === 401) {
-        Swal.fire('Error', 'Unauthorized access. Please log in again.', 'error');
-      } else {
-        Swal.fire('Error', error.response?.data?.message || 'Failed to delete rule', 'error');
-      }
-      throw new Error(error.response?.data?.message || 'Failed to delete rule');
-    }
-  },
+  }
+},
   
   getAllProjects: async () => {
     try {
