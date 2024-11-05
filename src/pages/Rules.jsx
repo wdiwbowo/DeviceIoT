@@ -124,16 +124,16 @@ const Rules = () => {
         setLoading(true);
         setErrorMessage("");
         setSuccessMessage("");
+
         try {
-            const response = await apiService.deleteRule(selectedRule.guid);
-            // console.log('Rule deleted successfully:', response);
+            await apiService.deleteRule(selectedRule.guid);
             const updatedData = data.filter((rule) => rule.guid !== selectedRule.guid);
             setData(updatedData);
             setFilteredData(updatedData);
             setSuccessMessage("Rule deleted successfully!");
             setShowDeleteModal(false);
         } catch (error) {
-            setErrorMessage(error.message || "Failed to delete rule.");
+            setErrorMessage("Failed to delete rule.");
             console.error('Failed to delete rule:', error);
         } finally {
             setLoading(false);
