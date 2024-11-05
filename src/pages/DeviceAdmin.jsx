@@ -1,90 +1,91 @@
 import React, { useState, useEffect } from "react";
 import Navbar from "../components/Navbar";
 import apiService from '../services/apiservice';
-import AddTypeModal from '../components/type/AddTypeModal';
-import EditTypeModal from '../components/type/EditTypeModal';
-import DeleteTypeModal from '../components/type/DeleteTypeModal';
+import AddDeviceModal from "../components/deviceadmin/AddDeviceModal";
+import EditDeviceModal from '../components/deviceadmin/EditDeviceModal';
+import DeleteDeviceModal from '../components/deviceadmin/DeleteDeviceModal';
 import { FaPlus, FaEdit, FaTrash } from 'react-icons/fa'; // Import the icons
 import Swal from 'sweetalert2'; // Import SweetAlert2
 
-export default function TypeAdmin() {
+export default function Device() {
     const [showAddModal, setShowAddModal] = useState(false);
     const [showEditModal, setShowEditModal] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
-    const [types, setTypes] = useState([]);
-    const [filteredTypes, setFilteredTypes] = useState([]);
-    const [error, setError] = useState(null);
-    const [successMessage, setSuccessMessage] = useState(null);
-    const [typeToEdit, setTypeToEdit] = useState(null);
-    const [typeToDelete, setTypeToDelete] = useState(null);
+    const [devices, setDevices] = useState([]);
+    const [filteredDevices, setFilteredDevices] = useState([]);
+    const [deviceToEdit, setDeviceToEdit] = useState(null);
+    const [deviceToDelete, setDeviceToDelete] = useState(null);
     const [searchQuery, setSearchQuery] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 5;
 
-    const fetchTypes = async () => {
+    const fetchDevices = async () => {
         try {
-            const response = await apiService.getAllDeviceTypes(); // Adjust this to your API endpoint for types
-            if (response.success && Array.isArray(response.data.types)) {
-                setTypes(response.data.types);
-                setFilteredTypes(response.data.types);
+            const response = await apiService.getAllDevicesCompany();
+            if (response.success && Array.isArray(response.data.devices)) {
+                setDevices(response.data.devices);
+                setFilteredDevices(response.data.devices);
             } else {
                 Swal.fire('Error', 'Data fetched is not an array', 'error');
             }
         } catch (error) {
-            Swal.fire('Error', 'Failed to fetch types.', 'error');
+            Swal.fire('Error', 'Failed to fetch devices.', 'error');
         }
     };
 
     useEffect(() => {
-        fetchTypes();
+        fetchDevices();
     }, []);
 
     useEffect(() => {
-        const filtered = types.filter(type =>
-            type.name.toLowerCase().includes(searchQuery.toLowerCase()) // Adjust to the property you want to search by
+        const filtered = devices.filter(device =>
+            device.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            device.deviceGuid.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            device.mac.toLowerCase().includes(searchQuery.toLowerCase())
         );
-        setFilteredTypes(filtered);
+        setFilteredDevices(filtered);
         setCurrentPage(1); // Reset to first page on new search
-    }, [searchQuery, types]);
+    }, [searchQuery, devices]);
 
-    const handleAddType = async (typeData) => {
+    const handleAddDevice = async (deviceData) => {
         try {
-            await apiService.addDeviceType(typeData); // Adjust this to your API service for adding types
+            await apiService.addDevices(deviceData);
             setShowAddModal(false);
-            Swal.fire('Success', 'Type added successfully!', 'success');
-            fetchTypes(); // Refresh types list
+            Swal.fire('Success', 'Device added successfully!', 'success');
+            fetchDevices(); // Refresh devices list
         } catch (error) {
-            Swal.fire('Error', 'Failed to add type. Please try again.', 'error');
+            Swal.fire('Error', 'Failed to add device. Please try again.', 'error');
         }
     };
 
-    const handleEditType = async (guid, updatedTypeData) => {
+    const handleEditDevice = async (guid, updatedDeviceData) => {
         try {
-            await apiService.updateDeviceType(guid, updatedTypeData); // Adjust this to your API service for updating types
+            await apiService.updateDevice(guid, updatedDeviceData);
             setShowEditModal(false);
-            Swal.fire('Success', 'Type updated successfully!', 'success');
-            fetchTypes(); // Refresh types list
+            Swal.fire('Success', 'Device updated successfully!', 'success');
+            fetchDevices(); // Refresh devices list
         } catch (error) {
-            Swal.fire('Error', 'Failed to update type. Please try again.', 'error');
+            Swal.fire('Error', 'Failed to update device. Please try again.', 'error');
         }
     };
 
-    const handleDeleteType = async () => {
+    const handleDeleteDevice = async () => {
         try {
-            await apiService.deleteDeviceType(typeToDelete.guid); // Adjust this to your API service for deleting types
+            await apiService.deleteDeviceCompany(deviceToDelete.guid);
             setShowDeleteModal(false);
-            Swal.fire('Success', 'Type deleted successfully!', 'success');
-            fetchTypes(); // Refresh types list
+            Swal.fire('Success', 'Device deleted successfully!', 'success');
+            fetchDevices(); // Refresh devices list
         } catch (error) {
-            Swal.fire('Error', 'Failed to delete type. Please try again.', 'error');
+            Swal.fire('Error', 'Failed to delete device. Please try again.', 'error');
         }
     };
 
     // Pagination logic
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    const currentItems = filteredTypes.slice(indexOfFirstItem, indexOfLastItem);
-    const totalPages = Math.ceil(filteredTypes.length / itemsPerPage);
+    const currentItems = filteredDevices.slice(indexOfFirstItem, indexOfLastItem);
+
+    const totalPages = Math.ceil(filteredDevices.length / itemsPerPage);
 
     const handleSearchChange = (e) => {
         setSearchQuery(e.target.value);
@@ -95,18 +96,18 @@ export default function TypeAdmin() {
             <Navbar />
             <div className="container mx-auto py-8">
                 <div className="flex justify-between items-center mb-8">
-                    <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Device Types</h1>
+                    <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Devices</h1>
                     <button
                         onClick={() => setShowAddModal(true)}
                         className="flex items-center bg-blue-600 text-white px-4 py-2 rounded-md shadow-sm hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
                     >
-                        <FaPlus className="mr-2" /> Add Type
+                        <FaPlus className="mr-2" /> Add Device
                     </button>
                 </div>
                 <div className="mb-4">
                     <input
                         type="text"
-                        placeholder="Search types..."
+                        placeholder="Search devices..."
                         value={searchQuery}
                         onChange={handleSearchChange}
                         className="w-full px-4 py-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
@@ -117,31 +118,57 @@ export default function TypeAdmin() {
                         <thead className="bg-gray-50 dark:bg-gray-700">
                             <tr>
                                 <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">#</th>
-                                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">Type GUID</th>
+                                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">Device GUID</th>
+                                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">MAC Address</th>
                                 <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">Name</th>
+                                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">Type</th>
+                                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">Latitude</th>
+                                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">Longitude</th>
+                                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">Status</th>
+                                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">Active</th>
                                 <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">Action</th>
                             </tr>
                         </thead>
                         <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                             {currentItems.length === 0 ? (
                                 <tr>
-                                    <td colSpan="4" className="px-6 py-4 text-center text-gray-500 dark:text-gray-300">
-                                        No types found
+                                    <td colSpan="10" className="px-6 py-4 text-center text-gray-500 dark:text-gray-300">
+                                        No devices found
                                     </td>
                                 </tr>
                             ) : (
-                                currentItems.map((type, index) => (
-                                    <tr key={type.guid}>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">{index + 1 + indexOfFirstItem}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">{type.guid}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">{type.name}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
-                                            <button onClick={() => { setTypeToEdit(type); setShowEditModal(true); }} className="text-blue-500 hover:text-blue-700 mr-2">
-                                                <FaEdit />
-                                            </button>
-                                            <button onClick={() => { setTypeToDelete(type); setShowDeleteModal(true); }} className="text-red-500 hover:text-red-700">
-                                                <FaTrash />
-                                            </button>
+                                currentItems.map((item, index) => (
+                                    <tr key={item.deviceGuid || index} className="hover:bg-gray-100 dark:hover:bg-gray-700">
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">{indexOfFirstItem + index + 1}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{item.deviceGuid}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{item.mac}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{item.name}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{item.type}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{item.latitude}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{item.longitude}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{item.status ? 'True' : 'False'}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{item.active ? 'Active' : 'Inactive'}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                            <div className="flex space-x-2">
+                                                <button
+                                                    onClick={() => {
+                                                        setDeviceToEdit(item);
+                                                        setShowEditModal(true);
+                                                    }}
+                                                    className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-500"
+                                                >
+                                                    <FaEdit />
+                                                </button>
+                                                <button
+                                                    onClick={() => {
+                                                        setDeviceToDelete(item);
+                                                        setShowDeleteModal(true);
+                                                    }}
+                                                    className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-500"
+                                                >
+                                                    <FaTrash />
+                                                </button>
+                                            </div>
                                         </td>
                                     </tr>
                                 ))
@@ -149,28 +176,48 @@ export default function TypeAdmin() {
                         </tbody>
                     </table>
                 </div>
-                <div className="mt-4 flex justify-between">
+
+                {/* Pagination Controls */}
+                <div className="flex justify-between items-center mt-4">
                     <button
-                        onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                        onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
                         disabled={currentPage === 1}
-                        className="px-4 py-2 bg-gray-300 text-gray-800 rounded-md disabled:opacity-50"
+                        className="bg-gray-300 text-gray-700 px-4 py-2 rounded-md disabled:opacity-50"
                     >
                         Previous
                     </button>
-                    <span>Page {currentPage} of {totalPages}</span>
+                    <span className="text-gray-700 dark:text-gray-300">Page {currentPage} of {totalPages}</span>
                     <button
-                        onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                        onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
                         disabled={currentPage === totalPages}
-                        className="px-4 py-2 bg-gray-300 text-gray-800 rounded-md disabled:opacity-50"
+                        className="bg-gray-300 text-gray-700 px-4 py-2 rounded-md disabled:opacity-50"
                     >
                         Next
                     </button>
                 </div>
             </div>
 
-            {showAddModal && <AddTypeModal onClose={() => setShowAddModal(false)} onAdd={handleAddType} />}
-            {showEditModal && <EditTypeModal type={typeToEdit} onClose={() => setShowEditModal(false)} onEdit={handleEditType} />}
-            {showDeleteModal && <DeleteTypeModal type={typeToDelete} onClose={() => setShowDeleteModal(false)} onDelete={handleDeleteType} />}
+            <AddDeviceModal
+                    showModal={showAddModal}
+                    onClose={() => setShowAddModal(false)}
+                    onSave={handleAddDevice}
+                />
+                {deviceToEdit && (
+                    <EditDeviceModal
+                        showModal={showEditModal}
+                        onClose={() => setShowEditModal(false)}
+                        device={deviceToEdit}
+                        onSave={handleEditDevice}
+                    />
+                )}
+                  {deviceToDelete && (
+                    <DeleteDeviceModal
+                        isOpen={showDeleteModal}
+                        onClose={() => setShowDeleteModal(false)}
+                        device={deviceToDelete}
+                        onDelete={handleDeleteDevice}
+                    />
+                )}
         </div>
     );
 }
