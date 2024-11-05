@@ -6,11 +6,11 @@ const EditProjectModal = ({ show, onClose, project, onUpdate }) => {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (project) {
-      console.log("Project data on modal open:", project);
-      setUpdatedProject({ ...project });
-    }
-  }, [project]);
+  if (project) {
+    console.log("Project data on modal open:", project);
+    setUpdatedProject({ ...project });
+  }
+}, [project]);
 
   const handleUpdateProject = async () => {
     console.log("Updated project data before update:", updatedProject);
