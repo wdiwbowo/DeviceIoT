@@ -241,7 +241,7 @@ const DeviceTypes = () => {
             <AddDeviceTypeModal
                 show={showAddModal}
                 onClose={() => setShowAddModal(false)}
-                onAdd={handleAddProject}
+                onAdd={handleAddDeviceType}
             />
             
             {showEditModal && (
