@@ -35,6 +35,7 @@ const Rules = () => {
                 setFilteredData(response.data);
             } catch (error) {
                 setErrorMessage(error.message || "Failed to fetch rules data.");
+                console.error("Error fetching rules data:", error);
             } finally {
                 setLoading(false);
             }
@@ -70,6 +71,7 @@ const Rules = () => {
         setSuccessMessage("");
         try {
             const response = await apiService.addRule(guidInput, valueInput, guidOutput, valueOutput);
+            // console.log('Rule added successfully:', response);
             const newRule = { guidInput, valueInput, guidOutput, valueOutput };
             setData((prevData) => [...prevData, newRule]);
             setFilteredData((prevData) => [...prevData, newRule]);
@@ -77,11 +79,13 @@ const Rules = () => {
             setShowAddModal(false);
         } catch (error) {
             setErrorMessage(error.message || "Failed to add rule.");
+            console.error('Failed to add rule:', error);
         } finally {
             setLoading(false);
         }
     };
 
+    // Handle edit rule
     // Handle edit rule
     const handleEdit = async () => {
         if (!selectedRule) return;
@@ -91,8 +95,11 @@ const Rules = () => {
         setSuccessMessage("");
 
         try {
+            // Kirim request untuk memperbarui aturan
             const response = await apiService.updateRule(selectedRule.guid, guidInput, valueInput, guidOutput, valueOutput);
+            // console.log('Rule updated successfully:', response);
 
+            // Perbarui data di state
             const updatedData = data.map((rule) =>
                 rule.guid === selectedRule.guid
                     ? { ...rule, guidInput, valueInput, guidOutput, valueOutput }
@@ -105,6 +112,7 @@ const Rules = () => {
             setShowEditModal(false);
         } catch (error) {
             setErrorMessage(error.message || "Failed to update rule.");
+            console.error('Failed to update rule:', error);
         } finally {
             setLoading(false);
         }
@@ -126,6 +134,7 @@ const Rules = () => {
             setShowDeleteModal(false);
         } catch (error) {
             setErrorMessage("Failed to delete rule.");
+            console.error('Failed to delete rule:', error);
         } finally {
             setLoading(false);
         }
@@ -202,80 +211,86 @@ const Rules = () => {
                                                         setValueOutput(item.valueOutput);
                                                         setShowEditModal(true);
                                                     }}
-                                                    className="flex items-center bg-yellow-500 text-white px-3 py-2 rounded-md shadow-sm hover:bg-yellow-600"
+                                                    className="flex items-center bg-blue-600 text-white px-3 py-2 rounded-md shadow-sm hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
                                                 >
-                                                    <FaEdit className="mr-1" />Edit
+                                                    <FaEdit className="mr-2" /> Edit
                                                 </button>
                                                 <button
                                                     onClick={() => {
                                                         setSelectedRule(item);
                                                         setShowDeleteModal(true);
                                                     }}
-                                                    className="flex items-center bg-red-500 text-white px-3 py-2 rounded-md shadow-sm hover:bg-red-600"
+                                                    className="flex items-center bg-red-600 text-white px-3 py-2 rounded-md shadow-sm hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600"
                                                 >
-                                                    <FaTrash className="mr-1" />Delete
+                                                    <FaTrash className="mr-2" /> Delete
                                                 </button>
                                             </div>
                                         </td>
+
                                     </tr>
                                 ))}
                             </tbody>
                         </table>
+
                     </div>
                 )}
-
                 {/* Pagination */}
-                <div className="flex justify-center mt-4">
-                    {Array.from({ length: totalPages }, (_, index) => (
-                        <button
-                            key={index}
-                            onClick={() => setCurrentPage(index + 1)}
-                            className={`px-3 py-2 mx-1 rounded-md ${currentPage === index + 1 ? 'bg-blue-600 text-white' : 'bg-gray-200 dark:bg-gray-700 dark:text-white'}`}
-                        >
-                            {index + 1}
-                        </button>
-                    ))}
+                <div className="flex justify-between items-center mt-6">
+                    <button
+                        className="bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-gray-100 px-4 py-2 rounded-lg shadow-md disabled:opacity-50"
+                        onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                        disabled={currentPage === 1}
+                    >
+                        Previous
+                    </button>
+                    <span className="text-gray-700 dark:text-gray-300">
+                        Page {currentPage} of {totalPages}
+                    </span>
+                    <button
+                        className="bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-gray-100 px-4 py-2 rounded-lg shadow-md disabled:opacity-50"
+                        onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                        disabled={currentPage === totalPages}
+                    >
+                        Next
+                    </button>
                 </div>
 
-                {/* Modals */}
-                {showAddModal && (
-                    <AddModal
-                        isOpen={showAddModal}
-                        onClose={() => setShowAddModal(false)}
-                        onSave={handleSave}
-                        guidInput={guidInput}
-                        setGuidInput={setGuidInput}
-                        valueInput={valueInput}
-                        setValueInput={setValueInput}
-                        guidOutput={guidOutput}
-                        setGuidOutput={setGuidOutput}
-                        valueOutput={valueOutput}
-                        setValueOutput={setValueOutput}
-                    />
-                )}
-                {showEditModal && selectedRule && (
-                    <EditModal
-                        isOpen={showEditModal}
-                        onClose={() => setShowEditModal(false)}
-                        onSave={handleEdit}
-                        guidInput={guidInput}
-                        setGuidInput={setGuidInput}
-                        valueInput={valueInput}
-                        setValueInput={setValueInput}
-                        guidOutput={guidOutput}
-                        setGuidOutput={setGuidOutput}
-                        valueOutput={valueOutput}
-                        setValueOutput={setValueOutput}
-                    />
-                )}
-                {showDeleteModal && selectedRule && (
-                    <DeleteModal
-                        isOpen={showDeleteModal}
-                        onClose={() => setShowDeleteModal(false)}
-                        onDelete={handleDelete}
-                        rule={selectedRule}
-                    />
-                )}
+                {/* Add Modal */}
+                <AddModal
+                    isOpen={showAddModal}
+                    onClose={() => setShowAddModal(false)}
+                    onSave={() => handleSave()}
+                    guidInput={guidInput}
+                    setGuidInput={setGuidInput}
+                    valueInput={valueInput}
+                    setValueInput={setValueInput}
+                    guidOutput={guidOutput}
+                    setGuidOutput={setGuidOutput}
+                    valueOutput={valueOutput}
+                    setValueOutput={setValueOutput}
+                />
+
+                {/* Edit Modal */}
+                <EditModal
+                    isOpen={showEditModal}
+                    onClose={() => setShowEditModal(false)}
+                    onSave={() => handleEdit()}
+                    guidInput={guidInput}
+                    setGuidInput={setGuidInput}
+                    valueInput={valueInput}
+                    setValueInput={setValueInput}
+                    guidOutput={guidOutput}
+                    setGuidOutput={setGuidOutput}
+                    valueOutput={valueOutput}
+                    setValueOutput={setValueOutput}
+                />
+
+                {/* Delete Modal */}
+                <DeleteModal
+                    isOpen={showDeleteModal}
+                    onClose={() => setShowDeleteModal(false)}
+                    onDelete={() => handleDelete()}
+                />
             </div>
         </div>
     );
