@@ -292,13 +292,13 @@ updateProject: async (guid, projectData) => {
 
   try {
     const response = await apiClient.put(`/projects/update/${guid}`, projectData);
-    
+
     // Cek apakah server mengembalikan status sukses
     if (!response.data.success) {
       Swal.fire('Error', response.data.message || 'Failed to update project', 'error');
       throw new Error(response.data.message || 'Failed to update project');
     }
-    
+
     Swal.fire('Success', 'Project updated successfully!', 'success');
     return response.data;
   } catch (error) {
