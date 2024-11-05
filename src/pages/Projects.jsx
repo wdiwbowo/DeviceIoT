@@ -101,15 +101,17 @@ const Projects = () => {
   };  
 
   const copyToClipboard = (text) => {
-    navigator.clipboard.writeText(text)
-      .then(() => {
-        setSuccessMessage("GUID copied to clipboard!");
-      })
-      .catch(err => {
-        console.error("Failed to copy: ", err);
-        setError("Failed to copy GUID.");
-      });
-  };
+  navigator.clipboard.writeText(text)
+    .then(() => {
+      Swal.fire("Success", "GUID copied to clipboard!", "success"); // SweetAlert for success
+    })
+    .catch(err => {
+      console.error("Failed to copy: ", err); // Keep console log for error
+      setError("Failed to copy GUID."); // Set error state
+      Swal.fire("Error", "Failed to copy GUID.", "error"); // SweetAlert for error
+    });
+};
+
 
   useEffect(() => {
     if (successMessage || error) {
