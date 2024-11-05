@@ -16,7 +16,6 @@ const EditProjectModal = ({ show, onClose, project, onUpdate }) => {
     try {
         const response = await updateProject(projectId, updatedProjectData);
         if (response.success) {
-            console.log('Project updated successfully');
         } else {
             console.error('Project update failed:', response.message);
         }
