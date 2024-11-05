@@ -4,7 +4,7 @@ import apiService from "../services/apiservice";
 import AddProjectModal from "../components/projects/AddProjectModal";
 import EditProjectModal from "../components/projects/EditProjectModal";
 import DeleteProjectModal from "../components/projects/DeleteProjectModal";
-import { FaPlus, FaEdit, FaTrash, FaClipboard } from 'react-icons/fa';
+import { FaPlus, FaEdit, FaTrash } from 'react-icons/fa';
 
 const Projects = () => {
   const [projects, setProjects] = useState([]);
@@ -85,15 +85,15 @@ const Projects = () => {
       setError("No project selected for deletion.");
       return;
     }
-
+  
     try {
       await apiService.deleteProject(projectToDelete.guid);
       setShowDeleteModal(false);
       setSuccessMessage("Project deleted successfully!");
-
+  
       // Refresh the project list
       fetchProjects();
-
+  
       // Handle edge case: If deleting the last item on the page, go to the previous page
       if (filteredProjects.length % itemsPerPage === 1 && currentPage > 1) {
         setCurrentPage((prev) => prev - 1);
@@ -103,17 +103,6 @@ const Projects = () => {
       setError("Failed to delete project. Please try again.");
     }
   };  
-
-  const copyToClipboard = (text) => {
-    navigator.clipboard.writeText(text)
-      .then(() => {
-        setSuccessMessage("GUID copied to clipboard!");
-      })
-      .catch((error) => {
-        setError("Failed to copy GUID.");
-        console.error("Copy error:", error);
-      });
-  };
 
   useEffect(() => {
     if (successMessage || error) {
@@ -172,7 +161,7 @@ const Projects = () => {
                   <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">#</th>
                   <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">Project Name</th>
                   <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">GUID</th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">Secret Key</th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">Secret Key</th> {/* New Column for Secret Key */}
                   <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">Actions</th>
                 </tr>
               </thead>
@@ -181,17 +170,8 @@ const Projects = () => {
                   <tr key={project.guid}>
                     <td className="px-6 py-4 whitespace-nowrap">{index + 1}</td>
                     <td className="px-6 py-4 whitespace-nowrap">{project.name}</td>
-                    <td className="px-6 py-4 whitespace-nowrap flex items-center">
-                      {project.guid}
-                      <button
-                        onClick={() => copyToClipboard(project.guid)}
-                        className="ml-2 text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200"
-                        title="Copy GUID"
-                      >
-                        <FaClipboard />
-                      </button>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">{project.secretKey}</td>
+                    <td className="px-6 py-4 whitespace-nowrap">{project.guid}</td>
+                    <td className="px-6 py-4 whitespace-nowrap">{project.secretKey}</td> {/* Displaying Secret Key */}
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex space-x-2">
                         <button
@@ -218,52 +198,42 @@ const Projects = () => {
                 ))}
               </tbody>
             </table>
+            {currentItems.length === 0 && (
+              <div className="text-center py-8">
+                <p className="text-gray-500">No projects found.</p>
+              </div>
+            )}
+            <div className="flex justify-between items-center mt-4">
+              <div>
+                <p className="text-sm text-gray-500">
+                  Showing {indexOfFirstItem + 1} to {Math.min(indexOfLastItem, filteredProjects.length)} of {filteredProjects.length} projects
+                </p>
+              </div>
+              <div>
+                <button
+                  onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                  disabled={currentPage === 1}
+                  className="px-3 py-1 bg-gray-200 rounded-md disabled:bg-gray-300"
+                >
+                  Previous
+                </button>
+                <button
+                  onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                  disabled={currentPage === totalPages}
+                  className="px-3 py-1 bg-gray-200 rounded-md disabled:bg-gray-300"
+                >
+                  Next
+                </button>
+              </div>
+            </div>
           </div>
         )}
-        {successMessage && (
-          <div className="mt-4 text-green-600">{successMessage}</div>
-        )}
-        {error && (
-          <div className="mt-4 text-red-600">{error}</div>
-        )}
-        <div className="flex justify-between mt-4">
-          <button
-            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-            disabled={currentPage === 1}
-            className="bg-gray-300 hover:bg-gray-400 text-black font-bold py-2 px-4 rounded disabled:opacity-50"
-          >
-            Previous
-          </button>
-          <span>{`Page ${currentPage} of ${totalPages}`}</span>
-          <button
-            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-            disabled={currentPage === totalPages}
-            className="bg-gray-300 hover:bg-gray-400 text-black font-bold py-2 px-4 rounded disabled:opacity-50"
-          >
-            Next
-          </button>
-        </div>
+        {error && <div className="mt-4 text-red-600">{error}</div>}
+        {successMessage && <div className="mt-4 text-green-600">{successMessage}</div>}
       </div>
-      {showAddModal && (
-        <AddProjectModal
-          onClose={() => setShowAddModal(false)}
-          onAdd={handleAddProject}
-        />
-      )}
-      {showEditModal && (
-        <EditProjectModal
-          onClose={() => setShowEditModal(false)}
-          project={projectToEdit}
-          onEdit={handleEditProject}
-        />
-      )}
-      {showDeleteModal && (
-        <DeleteProjectModal
-          onClose={() => setShowDeleteModal(false)}
-          project={projectToDelete}
-          onDelete={handleDeleteProject}
-        />
-      )}
+      <AddProjectModal isOpen={showAddModal} onClose={() => setShowAddModal(false)} onAdd={handleAddProject} />
+      <EditProjectModal isOpen={showEditModal} onClose={() => setShowEditModal(false)} project={projectToEdit} onEdit={handleEditProject} />
+      <DeleteProjectModal isOpen={showDeleteModal} onClose={() => setShowDeleteModal(false)} project={projectToDelete} onDelete={handleDeleteProject} />
     </div>
   );
 };
