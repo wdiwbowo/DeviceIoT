@@ -13,25 +13,25 @@ const EditProjectModal = ({ show, onClose, project, onUpdate }) => {
 }, [project]);
 
   const handleUpdateProject = async () => {
-    console.log("Updated project data before update:", updatedProject);
+  console.log("Updated project data before update:", updatedProject); // Check the data
 
-    if (!updatedProject.name) {
-      setFormError("Name is required.");
-      return;
-    }
+  if (!updatedProject.name) {
+    setFormError("Name is required.");
+    return;
+  }
 
-    setLoading(true);
-    try {
-      await onUpdate(updatedProject);
-      console.log("Project updated successfully");
-      onClose();
-    } catch (error) {
-      console.error("Error updating project:", error);
-      setFormError("Failed to update project. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  };
+  setLoading(true);
+  try {
+    await onUpdate(updatedProject);
+    console.log("Project updated successfully");
+    onClose();
+  } catch (error) {
+    console.error("Error updating project:", error);
+    setFormError("Failed to update project. Please try again.");
+  } finally {
+    setLoading(false);
+  }
+};
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
