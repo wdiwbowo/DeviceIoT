@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import jwtDecode from 'jwt-decode'; // Corrected import for jwt-decode
+import {jwtDecode} from 'jwt-decode'; // Corrected import for jwt-decode
 import apiService from '../services/apiservice';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import Swal from 'sweetalert2';
