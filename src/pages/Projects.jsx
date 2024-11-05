@@ -4,7 +4,7 @@ import apiService from "../services/apiservice";
 import AddProjectModal from "../components/projects/AddProjectModal";
 import EditProjectModal from "../components/projects/EditProjectModal";
 import DeleteProjectModal from "../components/projects/DeleteProjectModal";
-import { FaPlus, FaEdit, FaTrash, FaCopy  } from 'react-icons/fa';
+import { FaPlus, FaEdit, FaTrash, FaCopy } from 'react-icons/fa';
 
 const Projects = () => {
   const [projects, setProjects] = useState([]);
@@ -83,13 +83,13 @@ const Projects = () => {
       setError("No project selected for deletion.");
       return;
     }
-  
+
     try {
       await apiService.deleteProject(projectToDelete.guid);
       setShowDeleteModal(false);
       // Refresh the project list
       fetchProjects();
-  
+
       // Handle edge case: If deleting the last item on the page, go to the previous page
       if (filteredProjects.length % itemsPerPage === 1 && currentPage > 1) {
         setCurrentPage((prev) => prev - 1);
@@ -98,27 +98,27 @@ const Projects = () => {
       console.error("Failed to delete project:", error);
       setError("Failed to delete project. Please try again.");
     }
-  };  
+  };
 
-const copyToClipboard = (text) => {
-  navigator.clipboard.writeText(text)
-    .then(() => {
-      Swal.fire({
-        title: "Berhasil!",
-        text: "GUID berhasil disalin ke clipboard!",
-        icon: "success",
-        confirmButtonText: "OK"
+  const copyToClipboard = (text) => {
+    navigator.clipboard.writeText(text)
+      .then(() => {
+        Swal.fire({
+          title: "Berhasil!",
+          text: "GUID berhasil disalin ke clipboard!",
+          icon: "success",
+          confirmButtonText: "OK"
+        });
+      })
+      .catch(err => {
+        Swal.fire({
+          title: "Gagal!",
+          text: "Gagal menyalin GUID.",
+          icon: "error",
+          confirmButtonText: "OK"
+        });
       });
-    })
-    .catch(err => {
-      Swal.fire({
-        title: "Gagal!",
-        text: "Gagal menyalin GUID.",
-        icon: "error",
-        confirmButtonText: "OK"
-      });
-    });
-};
+  };
 
   useEffect(() => {
     if (successMessage || error) {
@@ -150,8 +150,8 @@ const copyToClipboard = (text) => {
           <button
             onClick={() => setShowAddModal(true)}
             className="flex items-center bg-blue-600 text-white px-4 py-2 rounded-md shadow-sm hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
-            >
-                <FaPlus className="mr-2" />Add Project
+          >
+            <FaPlus className="mr-2" />Add Project
           </button>
         </div>
         <div className="mb-4">
@@ -177,7 +177,7 @@ const copyToClipboard = (text) => {
                   <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">#</th>
                   <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">Project Name</th>
                   <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">GUID</th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">Secret Key</th> 
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">Secret Key</th>
                   <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">Actions</th>
                 </tr>
               </thead>
@@ -195,29 +195,29 @@ const copyToClipboard = (text) => {
                         <FaCopy />
                       </button>
                     </td>
-                     <td className="px-6 py-4 whitespace-nowrap">{project.secretKey}</td>
+                    <td className="px-6 py-4 whitespace-nowrap">{project.secretKey}</td>
                     <td className="px-6 py-4 whitespace-nowrap">
-  <div className="flex space-x-2">
-    <button
-      onClick={() => {
-        setProjectToEdit(project);
-        setShowEditModal(true);
-      }}
-      className="flex items-center bg-blue-600 text-white px-3 py-2 rounded-md shadow-sm hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
-    >
-      <FaEdit className="mr-2" /> Edit
-    </button>
-    <button
-      onClick={() => {
-        setProjectToDelete(project);
-        setShowDeleteModal(true);
-      }}
-      className="flex items-center bg-red-600 text-white px-3 py-2 rounded-md shadow-sm hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600"
-    >
-      <FaTrash className="mr-2" /> Delete
-    </button>
-  </div>
-</td>
+                      <div className="flex space-x-2">
+                        <button
+                          onClick={() => {
+                            setProjectToEdit(project);
+                            setShowEditModal(true);
+                          }}
+                          className="flex items-center bg-blue-600 text-white px-3 py-2 rounded-md shadow-sm hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
+                        >
+                          <FaEdit className="mr-2" /> Edit
+                        </button>
+                        <button
+                          onClick={() => {
+                            setProjectToDelete(project);
+                            setShowDeleteModal(true);
+                          }}
+                          className="flex items-center bg-red-600 text-white px-3 py-2 rounded-md shadow-sm hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600"
+                        >
+                          <FaTrash className="mr-2" /> Delete
+                        </button>
+                      </div>
+                    </td>
 
                   </tr>
                 ))}
