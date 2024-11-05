@@ -20,6 +20,8 @@ export default function Device() {
     const [searchQuery, setSearchQuery] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 5;
+    const [selectedType, setSelectedType] = useState("All"); // State for selected device type
+    const [deviceTypes, setDeviceTypes] = useState([]); // State for device types
 
     const fetchDevices = async () => {
         try {
@@ -27,6 +29,9 @@ export default function Device() {
             if (response.success && Array.isArray(response.data.devices)) {
                 setDevices(response.data.devices);
                 setFilteredDevices(response.data.devices);
+                // Assume you can get types from devices, modify this logic as needed
+                const types = [...new Set(response.data.devices.map(device => device.type))];
+                setDeviceTypes(["All", ...types]); // Add "All" to the types
             } else {
                 Swal.fire('Error', 'Data fetched is not an array', 'error');
             }
@@ -41,13 +46,14 @@ export default function Device() {
 
     useEffect(() => {
         const filtered = devices.filter(device =>
-            device.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            (device.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
             device.deviceGuid.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            device.mac.toLowerCase().includes(searchQuery.toLowerCase())
+            device.mac.toLowerCase().includes(searchQuery.toLowerCase())) &&
+            (selectedType === "All" || device.type === selectedType) // Filter by type
         );
         setFilteredDevices(filtered);
-        setCurrentPage(1); // Reset to first page on new search
-    }, [searchQuery, devices]);
+        setCurrentPage(1); // Reset to first page on new search or filter
+    }, [searchQuery, devices, selectedType]); // Add selectedType to dependencies
 
     const handleAddDevice = async (deviceData) => {
         try {
@@ -105,6 +111,10 @@ export default function Device() {
         setSearchQuery(e.target.value);
     };
 
+    const handleTypeChange = (e) => {
+        setSelectedType(e.target.value); // Update selected type
+    };
+
     return (
         <div className="min-h-screen bg-gray-100 dark:bg-gray-900">
             <Navbar />
@@ -118,7 +128,7 @@ export default function Device() {
                         <FaPlus className="mr-2" /> Add Device
                     </button>
                 </div>
-                <div className="mb-4">
+                <div className="mb-4 flex space-x-4">
                     <input
                         type="text"
                         placeholder="Search devices..."
@@ -126,6 +136,15 @@ export default function Device() {
                         onChange={handleSearchChange}
                         className="w-full px-4 py-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                     />
+                    <select
+                        value={selectedType}
+                        onChange={handleTypeChange}
+                        className="px-4 py-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                    >
+                        {deviceTypes.map((type, index) => (
+                            <option key={index} value={type}>{type}</option>
+                        ))}
+                    </select>
                 </div>
                 <div className="overflow-x-auto bg-white dark:bg-gray-800 rounded-lg shadow-md">
                     <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
@@ -145,43 +164,26 @@ export default function Device() {
                         <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                             {currentItems.length === 0 ? (
                                 <tr>
-                                    <td colSpan="11" className="px-6 py-4 text-center text-gray-500 dark:text-gray-300">
+                                    <td colSpan="9" className="px-6 py-4 text-center text-gray-500 dark:text-gray-300">
                                         No devices found
                                     </td>
                                 </tr>
                             ) : (
-                                currentItems.map((item, index) => (
-                                    <tr key={item.deviceGuid || index} className="hover:bg-gray-100 dark:hover:bg-gray-700">
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">{indexOfFirstItem + index + 1}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{item.deviceGuid}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{item.mac}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{item.name}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{item.type}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{item.latitude}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{item.longitude}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm">
-                                            <span className={`font-medium ${item.active ? 'text-green-500' : 'text-red-500'}`}>
-                                                {item.active ? 'On' : 'Off'}
-                                            </span>
-                                        </td>
-
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                            <button
-                                                onClick={() => {
-                                                    setDeviceToEdit(item);
-                                                    setShowEditModal(true);
-                                                }}
-                                                className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 mr-4"
-                                            >
+                                currentItems.map((device, index) => (
+                                    <tr key={device.guid}>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">{index + 1 + indexOfFirstItem}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">{device.deviceGuid}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">{device.mac}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">{device.name}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">{device.type}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">{device.latitude}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">{device.longitude}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">{device.active ? 'Yes' : 'No'}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+                                            <button onClick={() => { setDeviceToEdit(device); setShowEditModal(true); }} className="text-blue-500 hover:text-blue-700 mr-2">
                                                 <FaEdit />
                                             </button>
-                                            <button
-                                                onClick={() => {
-                                                    setDeviceToDelete(item);
-                                                    setShowDeleteModal(true);
-                                                }}
-                                                className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300"
-                                            >
+                                            <button onClick={() => { setDeviceToDelete(device); setShowDeleteModal(true); }} className="text-red-500 hover:text-red-700">
                                                 <FaTrash />
                                             </button>
                                         </td>
@@ -191,49 +193,28 @@ export default function Device() {
                         </tbody>
                     </table>
                 </div>
-                {/* Pagination */}
-                <div className="flex justify-between items-center mt-4">
+                <div className="mt-4 flex justify-between">
                     <button
                         onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
                         disabled={currentPage === 1}
-                        className="px-4 py-2 bg-gray-300 rounded-md disabled:opacity-50 dark:bg-gray-700"
+                        className="px-4 py-2 bg-gray-300 text-gray-800 rounded-md disabled:opacity-50"
                     >
                         Previous
                     </button>
-                    <span className="text-gray-700 dark:text-gray-300">
-                        Page {currentPage} of {totalPages}
-                    </span>
+                    <span>Page {currentPage} of {totalPages}</span>
                     <button
                         onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
                         disabled={currentPage === totalPages}
-                        className="px-4 py-2 bg-gray-300 rounded-md disabled:opacity-50 dark:bg-gray-700"
+                        className="px-4 py-2 bg-gray-300 text-gray-800 rounded-md disabled:opacity-50"
                     >
                         Next
                     </button>
                 </div>
             </div>
 
-            <AddDeviceModal
-                showModal={showAddModal}
-                onClose={() => setShowAddModal(false)}
-                onSave={handleAddDevice}
-            />
-            {deviceToEdit && (
-                <EditDeviceModal
-                    showModal={showEditModal}
-                    onClose={() => setShowEditModal(false)}
-                    device={deviceToEdit}
-                    onSave={handleEditDevice}
-                />
-            )}
-            {deviceToDelete && (
-                <DeleteDeviceModal
-                    isOpen={showDeleteModal}
-                    onClose={() => setShowDeleteModal(false)}
-                    device={deviceToDelete}
-                    onDelete={handleDeleteDevice}
-                />
-            )}
+            {showAddModal && <AddDeviceModal onClose={() => setShowAddModal(false)} onAdd={handleAddDevice} />}
+            {showEditModal && <EditDeviceModal device={deviceToEdit} onClose={() => setShowEditModal(false)} onEdit={handleEditDevice} />}
+            {showDeleteModal && <DeleteDeviceModal device={deviceToDelete} onClose={() => setShowDeleteModal(false)} onDelete={handleDeleteDevice} />}
         </div>
     );
 }
