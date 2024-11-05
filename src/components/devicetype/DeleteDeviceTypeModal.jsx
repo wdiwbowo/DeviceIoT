@@ -6,6 +6,13 @@ const DeleteDeviceTypeModal = ({ show, onClose, onDelete, deviceType }) => {
 
     const deviceName = deviceType ? deviceType.name : 'Unknown Device Type';
 
+    const handleDelete = () => {
+        if (deviceType && deviceType.guid) {
+            onDelete(deviceType.guid);
+            onClose();
+        }
+    };
+
     return (
         <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50">
             <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg w-full max-w-lg">
@@ -13,12 +20,7 @@ const DeleteDeviceTypeModal = ({ show, onClose, onDelete, deviceType }) => {
                 <p className="mb-4">Are you sure you want to delete the device type <strong>{deviceName}</strong>?</p>
                 <div className="flex justify-end">
                     <button
-                        onClick={() => {
-                            if (deviceType && deviceType.guid) {
-                                onDelete(deviceType.guid);
-                                onClose();
-                            }
-                        }}
+                        onClick={handleDelete}
                         className="bg-red-600 text-white px-4 py-2 rounded-lg shadow-md hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600"
                     >
                         Delete
