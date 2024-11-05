@@ -285,35 +285,26 @@ const apiService = {
   },
   
  updateProject: async (guid, projectData) => {
-    if (!guid) {
-      Swal.fire('Error', 'GUID is required.', 'error');
-      throw new Error('GUID is required.');
+  if (!guid) {
+    Swal.fire('Error', 'GUID is required.', 'error');
+    throw new Error('GUID is required.');
+  }
+
+  try {
+    const response = await apiClient.put(`/projects/update/${guid}`, projectData);
+    Swal.fire('Success', 'Project updated successfully!', 'success');
+    return response.data;
+  } catch (error) {
+    console.error("Error updating project:", error); // Log the error to the console
+
+    if (error.response?.status === 401) {
+      Swal.fire('Error', 'Unauthorized access. Please log in again.', 'error');
+    } else {
+      Swal.fire('Error', error.response?.data?.message || 'Failed to update project', 'error');
     }
-  
-    try {
-      // Inisiasi FormData
-      const formData = new FormData();
-      Object.keys(projectData).forEach((key) => {
-        formData.append(key, projectData[key]);
-      });
-  
-      const response = await apiClient.put(`/projects/update/${guid}`, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data', // Set content type untuk form-data
-        },
-      });
-  
-      Swal.fire('Success', 'Project updated successfully!', 'success');
-      return response.data;
-    } catch (error) {
-      if (error.response?.status === 401) {
-        Swal.fire('Error', 'Unauthorized access. Please log in again.', 'error');
-      } else {
-        Swal.fire('Error', error.response?.data?.message || 'Failed to update project', 'error');
-      }
-      throw new Error(error.response?.data?.message || 'Failed to update project');
-    }
-  },
+    throw new Error(error.response?.data?.message || 'Failed to update project');
+  }
+},
   
   deleteProject: async (guid) => {
     if (!guid) {
