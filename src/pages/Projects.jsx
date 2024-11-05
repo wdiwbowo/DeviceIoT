@@ -9,6 +9,8 @@ import { FaPlus, FaEdit, FaTrash } from 'react-icons/fa';
 const Projects = () => {
   const [projects, setProjects] = useState([]);
   const [filteredProjects, setFilteredProjects] = useState([]);
+  const [error, setError] = useState(null);
+  const [successMessage, setSuccessMessage] = useState(null);
   const [projectToEdit, setProjectToEdit] = useState(null);
   const [projectToDelete, setProjectToDelete] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
@@ -31,6 +33,7 @@ const Projects = () => {
       }
     } catch (error) {
       console.error("Error fetching projects:", error);
+      setError("Failed to fetch projects.");
     } finally {
       setIsLoading(false); // Stop loading
     }
@@ -53,36 +56,40 @@ const Projects = () => {
     try {
       await apiService.addProject(newProject);
       setShowAddModal(false);
+      setSuccessMessage("Project added successfully!");
       fetchProjects();
     } catch (error) {
-      console.error("Failed to add project:", error);
+      setError("Failed to add project. Please try again.");
     }
   };
 
   const handleEditProject = async (updatedProject) => {
     if (!updatedProject || updatedProject.name === "") {
-      console.error("Name is required.");
+      setError("Name is required.");
       return;
     }
 
     try {
       await apiService.updateProject(updatedProject.guid, updatedProject);
       setShowEditModal(false);
+      setSuccessMessage("Project updated successfully!");
       fetchProjects();
     } catch (error) {
       console.error("Failed to update project:", error);
+      setError("Failed to update project. Please try again.");
     }
   };
 
   const handleDeleteProject = async () => {
     if (!projectToDelete || !projectToDelete.guid) {
-      console.error("No project selected for deletion.");
+      setError("No project selected for deletion.");
       return;
     }
   
     try {
       await apiService.deleteProject(projectToDelete.guid);
       setShowDeleteModal(false);
+      setSuccessMessage("Project deleted successfully!");
   
       // Refresh the project list
       fetchProjects();
@@ -93,8 +100,20 @@ const Projects = () => {
       }
     } catch (error) {
       console.error("Failed to delete project:", error);
+      setError("Failed to delete project. Please try again.");
     }
   };  
+
+  useEffect(() => {
+    if (successMessage || error) {
+      const timer = setTimeout(() => {
+        setSuccessMessage(null);
+        setError(null);
+      }, 2000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [successMessage, error]);
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
@@ -115,8 +134,8 @@ const Projects = () => {
           <button
             onClick={() => setShowAddModal(true)}
             className="flex items-center bg-blue-600 text-white px-4 py-2 rounded-md shadow-sm hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
-          >
-            <FaPlus className="mr-2" /> Add Project
+            >
+                <FaPlus className="mr-2" />Add Project
           </button>
         </div>
         <div className="mb-4">
@@ -152,29 +171,30 @@ const Projects = () => {
                     <td className="px-6 py-4 whitespace-nowrap">{index + 1}</td>
                     <td className="px-6 py-4 whitespace-nowrap">{project.name}</td>
                     <td className="px-6 py-4 whitespace-nowrap">{project.guid}</td>
-                    <td className="px-6 py-4 whitespace-nowrap">{project.secretKey}</td>
+                     <td className="px-6 py-4 whitespace-nowrap">{project.secretKey}</td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex space-x-2">
-                        <button
-                          onClick={() => {
-                            setProjectToEdit(project);
-                            setShowEditModal(true);
-                          }}
-                          className="flex items-center bg-blue-600 text-white px-3 py-2 rounded-md shadow-sm hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
-                        >
-                          <FaEdit className="mr-2" /> Edit
-                        </button>
-                        <button
-                          onClick={() => {
-                            setProjectToDelete(project);
-                            setShowDeleteModal(true);
-                          }}
-                          className="flex items-center bg-red-600 text-white px-3 py-2 rounded-md shadow-sm hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600"
-                        >
-                          <FaTrash className="mr-2" /> Delete
-                        </button>
-                      </div>
-                    </td>
+  <div className="flex space-x-2">
+    <button
+      onClick={() => {
+        setProjectToEdit(project);
+        setShowEditModal(true);
+      }}
+      className="flex items-center bg-blue-600 text-white px-3 py-2 rounded-md shadow-sm hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
+    >
+      <FaEdit className="mr-2" /> Edit
+    </button>
+    <button
+      onClick={() => {
+        setProjectToDelete(project);
+        setShowDeleteModal(true);
+      }}
+      className="flex items-center bg-red-600 text-white px-3 py-2 rounded-md shadow-sm hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600"
+    >
+      <FaTrash className="mr-2" /> Delete
+    </button>
+  </div>
+</td>
+
                   </tr>
                 ))}
               </tbody>
@@ -214,16 +234,32 @@ const Projects = () => {
       />
       <EditProjectModal
         show={showEditModal}
-        onClose={() => setShowEditModal(false)}
+        onClose={() => {
+          setShowEditModal(false);
+          setProjectToEdit(null);
+        }}
         project={projectToEdit}
-        onEdit={handleEditProject}
+        onUpdate={handleEditProject}
       />
       <DeleteProjectModal
         show={showDeleteModal}
-        onClose={() => setShowDeleteModal(false)}
-        project={projectToDelete}
+        onClose={() => {
+          setShowDeleteModal(false);
+          setProjectToDelete(null);
+        }}
         onDelete={handleDeleteProject}
       />
+
+      {successMessage && (
+        <div className="fixed bottom-4 right-4 bg-green-500 text-white px-4 py-2 rounded-md shadow-md">
+          {successMessage}
+        </div>
+      )}
+      {error && (
+        <div className="fixed bottom-4 right-4 bg-red-500 text-white px-4 py-2 rounded-md shadow-md">
+          {error}
+        </div>
+      )}
     </div>
   );
 };
