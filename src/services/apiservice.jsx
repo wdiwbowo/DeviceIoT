@@ -284,26 +284,20 @@ const apiService = {
     }
   },
   
-updateProject: async (guid, projectData) => {
-  if (!guid) {
-    Swal.fire('Error', 'GUID is required.', 'error');
-    throw new Error('GUID is required.');
-  }
-
-  try {
-    const response = await apiClient.put(`/projects/update/${guid}`, projectData);
-    console.log('Update Project Response:', response); // Log the response
-    Swal.fire('Success', 'Project updated successfully!', 'success');
-    return response.data;
-  } catch (error) {
-    console.error('Error details:', error); // Log the error
-    if (error.response?.status === 401) {
-      Swal.fire('Error', 'Unauthorized access. Please log in again.', 'error');
-    } else {
-      Swal.fire('Error', error.response?.data?.message || 'Failed to update project', 'error');
+updateProject: async (projectId, projectData) => {
+    try {
+        const response = await apiClient.put(`/projects/update/${projectId}`, projectData);
+        console.log('Update Project Response:', response.data);
+        return response.data;
+    } catch (error) {
+        console.error('Error updating project:', error);
+        // Additional logging for server errors
+        if (error.response) {
+            console.error('Server responded with status:', error.response.status);
+            console.error('Response data:', error.response.data);
+        }
+        throw new Error(error.response?.data?.message || 'Failed to update project');
     }
-    throw new Error(error.response?.data?.message || 'Failed to update project');
-  }
 },
   
   deleteProject: async (guid) => {
