@@ -237,20 +237,20 @@ const DeviceTypes = () => {
                 </div>
             </div>
 
-            {/* Modals */}
             <AddDeviceTypeModal
                 show={showAddModal}
                 onClose={() => setShowAddModal(false)}
                 onAdd={handleAddDeviceType}
             />
-            
-            {showEditModal && (
-                <EditDeviceTypeModal
-                    onClose={() => setShowEditModal(false)}
-                    deviceType={currentDeviceType}
-                    onUpdate={handleUpdateDeviceType}
-                />
-            )}
+
+
+            <EditDeviceTypeModal
+                show={showEditModal}
+                onClose={() => setShowEditModal(false)}
+                deviceType={currentDeviceType}
+                onUpdate={handleUpdateDeviceType}
+            />
+
             {showDeleteModal && (
                 <DeleteDeviceTypeModal
                     onClose={() => setShowDeleteModal(false)}
