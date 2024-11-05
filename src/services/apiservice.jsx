@@ -284,14 +284,25 @@ const apiService = {
     }
   },
   
-  updateProject: async (guid, projectData) => {
+ updateProject: async (guid, projectData) => {
     if (!guid) {
       Swal.fire('Error', 'GUID is required.', 'error');
       throw new Error('GUID is required.');
     }
   
     try {
-      const response = await apiClient.put(`/projects/update/${guid}`, projectData);
+      // Inisiasi FormData
+      const formData = new FormData();
+      Object.keys(projectData).forEach((key) => {
+        formData.append(key, projectData[key]);
+      });
+  
+      const response = await apiClient.put(`/projects/update/${guid}`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data', // Set content type untuk form-data
+        },
+      });
+  
       Swal.fire('Success', 'Project updated successfully!', 'success');
       return response.data;
     } catch (error) {
