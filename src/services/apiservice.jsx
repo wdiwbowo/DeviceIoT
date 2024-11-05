@@ -72,26 +72,38 @@ const apiService = {
   // Existing methods
 
   login: async (email, password) => {
-    try {
-      const response = await apiUser.post('/users/login', {
-        email,
-        password,
-        guidAplication: 'PROJECT-519391a1-bff6-4e8c-a854-bed3984cc0bb-2024',
-      });
+  try {
+    const response = await apiUser.post('/users/login', {
+      email,
+      password,
+      guidAplication: 'PROJECT-519391a1-bff6-4e8c-a854-bed3984cc0bb-2024',
+    });
 
-      const token = response.data?.data; // Adjust based on actual API response
-      if (token) {
-        localStorage.setItem('appToken', token.appToken); 
-        localStorage.setItem('userToken', token.userToken); 
+    const token = response.data?.data; // Adjust based on actual API response
+    if (token) {
+      localStorage.setItem('appToken', token.appToken);
+      localStorage.setItem('userToken', token.userToken);
+
+      // Decode the appToken to determine the user role
+      const decodedToken = jwtDecode(token.appToken);
+      const userRole = decodedToken.role;
+
+      // Show SweetAlert based on user role
+      if (userRole === 'superAdmin') {
+        Swal.fire('Login Successful', 'You have logged in successfully as Super Admin!', 'success');
+      } else if (userRole === 'admin') {
+        Swal.fire('Login Successful', 'You have logged in successfully as Admin!', 'success');
+      } else {
+        Swal.fire('Login Successful', 'You have logged in successfully!', 'success');
       }
-
-      Swal.fire('Login Successful', 'You have logged in successfully!', 'success');
-      return response.data;
-    } catch (error) {
-      Swal.fire('Error', error.response?.data || 'Error logging in', 'error');
-      throw error;
     }
-  },
+
+    return response.data;
+  } catch (error) {
+    Swal.fire('Error', error.response?.data || 'Error logging in', 'error');
+    throw error;
+  }
+},
 
   getAllCompanies: async () => {
     try {
