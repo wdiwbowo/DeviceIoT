@@ -4,33 +4,35 @@ const EditProjectModal = ({ show, onClose, project, onUpdate }) => {
   const [updatedProject, setUpdatedProject] = useState({ ...project });
   const [formError, setFormError] = useState("");
 
+  // Ini memastikan updatedProject akan diperbarui setiap kali project berubah
   useEffect(() => {
-    setUpdatedProject({ ...project });
+    if (project) {
+      setUpdatedProject({ ...project });
+    }
   }, [project]);
 
   const handleUpdateProject = async () => {
-  if (!updatedProject.name) {
-    setFormError("Name is required.");
-    return;
-  }
+    if (!updatedProject.name) {
+      setFormError("Name is required.");
+      return;
+    }
 
-  try {
-    await onUpdate(updatedProject);
-    onClose(); // Close only if the update was successful
-  } catch (error) {
-    setFormError("Failed to update project. Please try again.");
-  }
-};
+    try {
+      await onUpdate(updatedProject);
+      onClose(); // Tutup modal jika pembaruan berhasil
+    } catch (error) {
+      setFormError("Failed to update project. Please try again.");
+    }
+  };
 
-// Optionally, consider resetting form error on input change
-const handleInputChange = (e) => {
-  const { name, value } = e.target;
-  setUpdatedProject((prevState) => ({
-    ...prevState,
-    [name]: value
-  }));
-  setFormError(""); // Reset error on change
-};
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setUpdatedProject((prevState) => ({
+      ...prevState,
+      [name]: value,
+    }));
+    setFormError(""); // Reset error saat ada perubahan input
+  };
 
   if (!show) return null;
 
