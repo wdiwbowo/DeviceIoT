@@ -6,23 +6,32 @@ const EditProjectModal = ({ show, onClose, project, onUpdate }) => {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-  if (project) {
-    console.log("Project data on modal open:", project);
-    setUpdatedProject({ ...project });
-  }
-}, [project]);
+    if (project) {
+      console.log("Project data on modal open:", project);
+      setUpdatedProject({ ...project });
+    }
+  }, [project]);
 
   const handleUpdateProject = async () => {
-    try {
-        const response = await updateProject(projectId, updatedProjectData);
-        if (response.success) {
-        } else {
-            console.error('Project update failed:', response.message);
-        }
-    } catch (error) {
-        console.error('Error during project update:', error.message);
+    console.log("Updated project data before update:", updatedProject);
+
+    if (!updatedProject.name) {
+      setFormError("Name is required.");
+      return;
     }
-};
+
+    setLoading(true);
+    try {
+      await onUpdate(updatedProject);
+      console.log("Project updated successfully");
+      onClose();
+    } catch (error) {
+      console.error("Error updating project:", error);
+      setFormError("Failed to update project. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -64,7 +73,7 @@ const EditProjectModal = ({ show, onClose, project, onUpdate }) => {
           <button
             onClick={handleUpdateProject}
             disabled={loading}
-            className={`bg-blue-600 text-white px-4 py-2 rounded-lg shadow-md ${loading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-700'} dark:bg-blue-500 dark:hover:bg-blue-600`}
+            className={bg-blue-600 text-white px-4 py-2 rounded-lg shadow-md ${loading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-700'} dark:bg-blue-500 dark:hover:bg-blue-600}
           >
             {loading ? 'Updating...' : 'Update Project'}
           </button>
