@@ -251,13 +251,15 @@ const DeviceTypes = () => {
                 onUpdate={handleUpdateDeviceType}
             />
 
-            {showDeleteModal && (
-                <DeleteDeviceTypeModal
-                    onClose={() => setShowDeleteModal(false)}
-                    deviceType={currentDeviceType}
-                    onDelete={handleDeleteDeviceType}
-                />
-            )}
+
+            <DeleteDeviceTypeModal
+                show={showDeleteModal}
+                onClose={() => {
+                    setShowDeleteModal(false);
+                    setCurrentDeviceType(null); // Change to setCurrentDeviceType to clear the current device type
+                }}
+                onDelete={() => handleDeleteDeviceType(currentDeviceType.guid)} // Use the current device type's GUID for deletion
+            />
         </div>
     );
 };
