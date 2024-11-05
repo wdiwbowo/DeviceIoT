@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import Navbar from "../components/Navbar";
 import apiService from "../services/apiservice";
@@ -5,7 +6,6 @@ import AddProjectModal from "../components/projects/AddProjectModal";
 import EditProjectModal from "../components/projects/EditProjectModal";
 import DeleteProjectModal from "../components/projects/DeleteProjectModal";
 import { FaPlus, FaEdit, FaTrash, FaClipboard } from 'react-icons/fa';
-import Swal from 'sweetalert2';
 
 const Projects = () => {
   const [projects, setProjects] = useState([]);
@@ -19,23 +19,24 @@ const Projects = () => {
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false); // Loading state
   const itemsPerPage = 5;
 
   const fetchProjects = async () => {
-    setIsLoading(true);
+    setIsLoading(true); // Start loading
     try {
       const response = await apiService.getAllProjects();
       if (Array.isArray(response.data)) {
         setProjects(response.data);
         setFilteredProjects(response.data);
       } else {
-        Swal.fire('Error', 'Data fetched is not an array.', 'error');
+        console.error("Data fetched is not an array:", response);
       }
     } catch (error) {
-      Swal.fire('Error', 'Failed to fetch projects.', 'error');
+      console.error("Error fetching projects:", error);
+      setError("Failed to fetch projects.");
     } finally {
-      setIsLoading(false);
+      setIsLoading(false); // Stop loading
     }
   };
 
@@ -107,12 +108,24 @@ const Projects = () => {
   const copyToClipboard = (text) => {
     navigator.clipboard.writeText(text)
       .then(() => {
-        Swal.fire('Success', 'GUID copied to clipboard!', 'success');
+        setSuccessMessage("GUID copied to clipboard!");
       })
       .catch((error) => {
-        Swal.fire('Error', 'Failed to copy GUID.', 'error');
+        setError("Failed to copy GUID.");
+        console.error("Copy error:", error);
       });
   };
+
+  useEffect(() => {
+    if (successMessage || error) {
+      const timer = setTimeout(() => {
+        setSuccessMessage(null);
+        setError(null);
+      }, 2000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [successMessage, error]);
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
@@ -133,8 +146,8 @@ const Projects = () => {
           <button
             onClick={() => setShowAddModal(true)}
             className="flex items-center bg-blue-600 text-white px-4 py-2 rounded-md shadow-sm hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
-          >
-            <FaPlus className="mr-2" /> Add Project
+            >
+                <FaPlus className="mr-2" />Add Project
           </button>
         </div>
         <div className="mb-4">
@@ -208,27 +221,30 @@ const Projects = () => {
             </table>
           </div>
         )}
-        {totalPages > 1 && (
-          <div className="mt-4">
-            <button
-              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-              disabled={currentPage === 1}
-              className="bg-gray-200 text-gray-600 px-4 py-2 rounded-md hover:bg-gray-300 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600"
-            >
-              Previous
-            </button>
-            <span className="mx-2">Page {currentPage} of {totalPages}</span>
-            <button
-              onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-              disabled={currentPage === totalPages}
-              className="bg-gray-200 text-gray-600 px-4 py-2 rounded-md hover:bg-gray-300 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600"
-            >
-              Next
-            </button>
-          </div>
+        {successMessage && (
+          <div className="mt-4 text-green-600">{successMessage}</div>
         )}
+        {error && (
+          <div className="mt-4 text-red-600">{error}</div>
+        )}
+        <div className="flex justify-between mt-4">
+          <button
+            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+            disabled={currentPage === 1}
+            className="bg-gray-300 hover:bg-gray-400 text-black font-bold py-2 px-4 rounded disabled:opacity-50"
+          >
+            Previous
+          </button>
+          <span>{`Page ${currentPage} of ${totalPages}`}</span>
+          <button
+            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+            disabled={currentPage === totalPages}
+            className="bg-gray-300 hover:bg-gray-400 text-black font-bold py-2 px-4 rounded disabled:opacity-50"
+          >
+            Next
+          </button>
+        </div>
       </div>
-
       {showAddModal && (
         <AddProjectModal
           onClose={() => setShowAddModal(false)}
