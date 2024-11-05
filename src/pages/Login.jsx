@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {jwtDecode} from 'jwt-decode'; // Corrected import for jwt-decode
+import { jwtDecode } from 'jwt-decode';
 import apiService from '../services/apiservice';
-import { FaEye, FaEyeSlash } from 'react-icons/fa';
-import Swal from 'sweetalert2';
+import { FaEye, FaEyeSlash } from 'react-icons/fa'; // Importing icons
+import Swal from 'sweetalert2'; // Import SweetAlert
 
 const Login = () => {
   const [username, setUsername] = useState('');
@@ -20,11 +20,10 @@ const Login = () => {
 
       if (userToken) {
         const decodedToken = jwtDecode(userToken);
-        const userRole = decodedToken.role;
+        const userRole = decodedToken.role; // Adjust according to the correct field
 
-        // Display success message for superAdmin
+        // Redirect based on user role
         if (userRole === 'superAdmin') {
-          Swal.fire('Login Successful', 'You have logged in successfully!', 'success');
           navigate('device'); // Redirect to the Devices page for superadmins
         } else if (userRole === 'admin') {
           navigate('deviceadmin'); // Redirect to the Admin page for admins
