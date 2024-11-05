@@ -28,11 +28,8 @@ const Projects = () => {
       if (Array.isArray(response.data)) {
         setProjects(response.data);
         setFilteredProjects(response.data);
-      } else {
-        console.error("Data fetched is not an array:", response);
       }
     } catch (error) {
-      console.error("Error fetching projects:", error);
       setError("Failed to fetch projects.");
     } finally {
       setIsLoading(false); // Stop loading
@@ -75,7 +72,6 @@ const Projects = () => {
       setSuccessMessage("Project updated successfully!");
       fetchProjects();
     } catch (error) {
-      console.error("Failed to update project:", error);
       setError("Failed to update project. Please try again.");
     }
   };
@@ -99,7 +95,6 @@ const Projects = () => {
         setCurrentPage((prev) => prev - 1);
       }
     } catch (error) {
-      console.error("Failed to delete project:", error);
       setError("Failed to delete project. Please try again.");
     }
   };  
@@ -173,28 +168,27 @@ const Projects = () => {
                     <td className="px-6 py-4 whitespace-nowrap">{project.guid}</td>
                      <td className="px-6 py-4 whitespace-nowrap">{project.secretKey}</td>
                     <td className="px-6 py-4 whitespace-nowrap">
-  <div className="flex space-x-2">
-    <button
-      onClick={() => {
-        setProjectToEdit(project);
-        setShowEditModal(true);
-      }}
-      className="flex items-center bg-blue-600 text-white px-3 py-2 rounded-md shadow-sm hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
-    >
-      <FaEdit className="mr-2" /> Edit
-    </button>
-    <button
-      onClick={() => {
-        setProjectToDelete(project);
-        setShowDeleteModal(true);
-      }}
-      className="flex items-center bg-red-600 text-white px-3 py-2 rounded-md shadow-sm hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600"
-    >
-      <FaTrash className="mr-2" /> Delete
-    </button>
-  </div>
-</td>
-
+                      <div className="flex space-x-2">
+                        <button
+                          onClick={() => {
+                            setProjectToEdit(project);
+                            setShowEditModal(true);
+                          }}
+                          className="flex items-center bg-blue-600 text-white px-3 py-2 rounded-md shadow-sm hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
+                        >
+                          <FaEdit className="mr-2" /> Edit
+                        </button>
+                        <button
+                          onClick={() => {
+                            setProjectToDelete(project);
+                            setShowDeleteModal(true);
+                          }}
+                          className="flex items-center bg-red-600 text-white px-3 py-2 rounded-md shadow-sm hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600"
+                        >
+                          <FaTrash className="mr-2" /> Delete
+                        </button>
+                      </div>
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -226,40 +220,11 @@ const Projects = () => {
           </button>
         </div>
       </div>
-
-      <AddProjectModal
-        show={showAddModal}
-        onClose={() => setShowAddModal(false)}
-        onAdd={handleAddProject}
-      />
-      <EditProjectModal
-        show={showEditModal}
-        onClose={() => {
-          setShowEditModal(false);
-          setProjectToEdit(null);
-        }}
-        project={projectToEdit}
-        onUpdate={handleEditProject}
-      />
-      <DeleteProjectModal
-        show={showDeleteModal}
-        onClose={() => {
-          setShowDeleteModal(false);
-          setProjectToDelete(null);
-        }}
-        onDelete={handleDeleteProject}
-      />
-
-      {successMessage && (
-        <div className="fixed bottom-4 right-4 bg-green-500 text-white px-4 py-2 rounded-md shadow-md">
-          {successMessage}
-        </div>
-      )}
-      {error && (
-        <div className="fixed bottom-4 right-4 bg-red-500 text-white px-4 py-2 rounded-md shadow-md">
-          {error}
-        </div>
-      )}
+      {showAddModal && <AddProjectModal onClose={() => setShowAddModal(false)} onAddProject={handleAddProject} />}
+      {showEditModal && <EditProjectModal project={projectToEdit} onClose={() => setShowEditModal(false)} onEditProject={handleEditProject} />}
+      {showDeleteModal && <DeleteProjectModal project={projectToDelete} onClose={() => setShowDeleteModal(false)} onDeleteProject={handleDeleteProject} />}
+      {successMessage && <div className="fixed bottom-5 left-1/2 transform -translate-x-1/2 bg-green-500 text-white p-3 rounded">{successMessage}</div>}
+      {error && <div className="fixed bottom-5 left-1/2 transform -translate-x-1/2 bg-red-500 text-white p-3 rounded">{error}</div>}
     </div>
   );
 };
