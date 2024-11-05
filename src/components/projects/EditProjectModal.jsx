@@ -3,29 +3,33 @@ import React, { useState, useEffect } from 'react';
 const EditProjectModal = ({ show, onClose, project, onUpdate }) => {
   const [updatedProject, setUpdatedProject] = useState({ ...project });
   const [formError, setFormError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (project) {
-      console.log("Project data on modal open:", project); // Debug: Lihat data proyek yang diterima saat modal dibuka
+      console.log("Project data on modal open:", project);
       setUpdatedProject({ ...project });
     }
   }, [project]);
 
   const handleUpdateProject = async () => {
-    console.log("Updated project data before update:", updatedProject); // Debug: Lihat data proyek yang akan dikirim untuk update
+    console.log("Updated project data before update:", updatedProject);
 
     if (!updatedProject.name) {
       setFormError("Name is required.");
       return;
     }
 
+    setLoading(true);
     try {
       await onUpdate(updatedProject);
-      console.log("Project updated successfully"); // Debug: Konfirmasi jika update berhasil
-      onClose(); // Tutup modal jika update berhasil
+      console.log("Project updated successfully");
+      onClose();
     } catch (error) {
-      console.error("Error updating project:", error); // Debug: Menampilkan error jika terjadi masalah saat update
+      console.error("Error updating project:", error);
       setFormError("Failed to update project. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -35,7 +39,7 @@ const EditProjectModal = ({ show, onClose, project, onUpdate }) => {
       ...prevState,
       [name]: value,
     }));
-    setFormError(""); // Reset error on change
+    setFormError("");
   };
 
   if (!show) return null;
@@ -68,9 +72,10 @@ const EditProjectModal = ({ show, onClose, project, onUpdate }) => {
         <div className="flex justify-end">
           <button
             onClick={handleUpdateProject}
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
+            disabled={loading}
+            className={`bg-blue-600 text-white px-4 py-2 rounded-lg shadow-md ${loading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-700'} dark:bg-blue-500 dark:hover:bg-blue-600`}
           >
-            Update Project
+            {loading ? 'Updating...' : 'Update Project'}
           </button>
           <button
             onClick={onClose}
