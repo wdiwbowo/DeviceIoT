@@ -232,21 +232,21 @@ const Projects = () => {
       {showAddModal && (
         <AddProjectModal
           onClose={() => setShowAddModal(false)}
-          onAddProject={handleAddProject}
+          onAdd={handleAddProject}
         />
       )}
-      {showEditModal && projectToEdit && (
+      {showEditModal && (
         <EditProjectModal
-          project={projectToEdit}
           onClose={() => setShowEditModal(false)}
-          onEditProject={handleEditProject}
+          project={projectToEdit}
+          onEdit={handleEditProject}
         />
       )}
-      {showDeleteModal && projectToDelete && (
+      {showDeleteModal && (
         <DeleteProjectModal
-          project={projectToDelete}
           onClose={() => setShowDeleteModal(false)}
-          onDeleteProject={handleDeleteProject}
+          project={projectToDelete}
+          onDelete={handleDeleteProject}
         />
       )}
     </div>
