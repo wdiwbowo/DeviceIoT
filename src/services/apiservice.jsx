@@ -1,4 +1,4 @@
-import axios from 'axios';
+Fimport axios from 'axios';
 import Swal from 'sweetalert2';
 import { jwtDecode } from 'jwt-decode';
 
@@ -290,10 +290,12 @@ updateProject: async (projectId, projectData) => {
         console.log('Update Project Response:', response.data);
         return response.data;
     } catch (error) {
-        console.error('Error updating project:', error);
         if (error.response) {
+            // Log more details from the error response
             console.error('Server responded with status:', error.response.status);
             console.error('Response data:', error.response.data);
+        } else {
+            console.error('Error message:', error.message);
         }
         throw new Error(error.response?.data?.message || 'Failed to update project');
     }
