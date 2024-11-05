@@ -100,13 +100,23 @@ const Projects = () => {
     }
   };  
 
- const copyToClipboard = (text) => {
+const copyToClipboard = (text) => {
   navigator.clipboard.writeText(text)
     .then(() => {
-      Swal.fire("Success", "GUID copied to clipboard!", "success"); // SweetAlert for success
+      Swal.fire({
+        title: "Berhasil!",
+        text: "GUID berhasil disalin ke clipboard!",
+        icon: "success",
+        confirmButtonText: "OK"
+      });
     })
     .catch(err => {
-      Swal.fire("Error", "Failed to copy GUID.", "error"); // SweetAlert for error
+      Swal.fire({
+        title: "Gagal!",
+        text: "Gagal menyalin GUID.",
+        icon: "error",
+        confirmButtonText: "OK"
+      });
     });
 };
 
