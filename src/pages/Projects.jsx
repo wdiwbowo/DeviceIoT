@@ -71,7 +71,6 @@ const Projects = () => {
     try {
       await apiService.updateProject(updatedProject.guid, updatedProject);
       setShowEditModal(false);
-      setSuccessMessage("Project updated successfully!");
       fetchProjects();
     } catch (error) {
       console.error("Failed to update project:", error);
