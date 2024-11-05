@@ -291,7 +291,6 @@ updateProject: async (projectId, projectData) => {
         return response.data;
     } catch (error) {
         console.error('Error updating project:', error);
-        // Additional logging for server errors
         if (error.response) {
             console.error('Server responded with status:', error.response.status);
             console.error('Response data:', error.response.data);
