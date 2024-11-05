@@ -159,7 +159,12 @@ export default function Device() {
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{item.type}</td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{item.latitude}</td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{item.longitude}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{item.active ? 'True' : 'False'}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm">
+                                            <span className={`font-medium ${item.active ? 'text-green-500' : 'text-red-500'}`}>
+                                                {item.active ? 'On' : 'Off'}
+                                            </span>
+                                        </td>
+
                                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                             <button
                                                 onClick={() => {
@@ -209,26 +214,26 @@ export default function Device() {
             </div>
 
             <AddDeviceModal
-                    showModal={showAddModal}
-                    onClose={() => setShowAddModal(false)}
-                    onSave={handleAddDevice}
+                showModal={showAddModal}
+                onClose={() => setShowAddModal(false)}
+                onSave={handleAddDevice}
+            />
+            {deviceToEdit && (
+                <EditDeviceModal
+                    showModal={showEditModal}
+                    onClose={() => setShowEditModal(false)}
+                    device={deviceToEdit}
+                    onSave={handleEditDevice}
                 />
-                {deviceToEdit && (
-                    <EditDeviceModal
-                        showModal={showEditModal}
-                        onClose={() => setShowEditModal(false)}
-                        device={deviceToEdit}
-                        onSave={handleEditDevice}
-                    />
-                )}
-                  {deviceToDelete && (
-                    <DeleteDeviceModal
-                        isOpen={showDeleteModal}
-                        onClose={() => setShowDeleteModal(false)}
-                        device={deviceToDelete}
-                        onDelete={handleDeleteDevice}
-                    />
-                )}
+            )}
+            {deviceToDelete && (
+                <DeleteDeviceModal
+                    isOpen={showDeleteModal}
+                    onClose={() => setShowDeleteModal(false)}
+                    device={deviceToDelete}
+                    onDelete={handleDeleteDevice}
+                />
+            )}
         </div>
     );
 }
