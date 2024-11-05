@@ -292,22 +292,17 @@ updateProject: async (guid, projectData) => {
 
   try {
     const response = await apiClient.put(`/projects/update/${guid}`, projectData);
-
-    // Cek apakah server mengembalikan status sukses
-    if (!response.data.success) {
-      Swal.fire('Error', response.data.message || 'Failed to update project', 'error');
-      throw new Error(response.data.message || 'Failed to update project');
-    }
-
+    console.log('Update Project Response:', response); // Log the response
     Swal.fire('Success', 'Project updated successfully!', 'success');
     return response.data;
   } catch (error) {
+    console.error('Error details:', error); // Log the error
     if (error.response?.status === 401) {
       Swal.fire('Error', 'Unauthorized access. Please log in again.', 'error');
     } else {
-      Swal.fire('Error', error.message || 'Failed to update project', 'error');
+      Swal.fire('Error', error.response?.data?.message || 'Failed to update project', 'error');
     }
-    throw new Error(error.message || 'Failed to update project');
+    throw new Error(error.response?.data?.message || 'Failed to update project');
   }
 },
   
