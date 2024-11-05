@@ -4,7 +4,7 @@ import apiService from "../services/apiservice";
 import AddProjectModal from "../components/projects/AddProjectModal";
 import EditProjectModal from "../components/projects/EditProjectModal";
 import DeleteProjectModal from "../components/projects/DeleteProjectModal";
-import { FaPlus, FaEdit, FaTrash } from 'react-icons/fa';
+import { FaPlus, FaEdit, FaTrash, FaCopy  } from 'react-icons/fa';
 
 const Projects = () => {
   const [projects, setProjects] = useState([]);
