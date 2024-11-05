@@ -56,39 +56,40 @@ const Projects = () => {
     try {
       await apiService.addProject(newProject);
       setShowAddModal(false);
-      Swal.fire('Success', 'Project added successfully!', 'success');
+      setSuccessMessage("Project added successfully!");
       fetchProjects();
     } catch (error) {
-      Swal.fire('Error', 'Failed to add project. Please try again.', 'error');
+      setError("Failed to add project. Please try again.");
     }
   };
 
   const handleEditProject = async (updatedProject) => {
     if (!updatedProject || updatedProject.name === "") {
-      Swal.fire('Error', 'Name is required.', 'error');
+      setError("Name is required.");
       return;
     }
 
     try {
       await apiService.updateProject(updatedProject.guid, updatedProject);
       setShowEditModal(false);
-      Swal.fire('Success', 'Project updated successfully!', 'success');
+      setSuccessMessage("Project updated successfully!");
       fetchProjects();
     } catch (error) {
-      Swal.fire('Error', 'Failed to update project. Please try again.', 'error');
+      console.error("Failed to update project:", error);
+      setError("Failed to update project. Please try again.");
     }
   };
 
   const handleDeleteProject = async () => {
     if (!projectToDelete || !projectToDelete.guid) {
-      Swal.fire('Error', 'No project selected for deletion.', 'error');
+      setError("No project selected for deletion.");
       return;
     }
 
     try {
       await apiService.deleteProject(projectToDelete.guid);
       setShowDeleteModal(false);
-      Swal.fire('Success', 'Project deleted successfully!', 'success');
+      setSuccessMessage("Project deleted successfully!");
 
       // Refresh the project list
       fetchProjects();
@@ -98,9 +99,10 @@ const Projects = () => {
         setCurrentPage((prev) => prev - 1);
       }
     } catch (error) {
-      Swal.fire('Error', 'Failed to delete project. Please try again.', 'error');
+      console.error("Failed to delete project:", error);
+      setError("Failed to delete project. Please try again.");
     }
-  };
+  };  
 
   const copyToClipboard = (text) => {
     navigator.clipboard.writeText(text)
