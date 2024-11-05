@@ -161,6 +161,7 @@ const Projects = () => {
                   <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">#</th>
                   <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">Project Name</th>
                   <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">GUID</th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">Secret Key</th> {/* New Column for Secret Key */}
                   <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">Actions</th>
                 </tr>
               </thead>
@@ -170,94 +171,69 @@ const Projects = () => {
                     <td className="px-6 py-4 whitespace-nowrap">{index + 1}</td>
                     <td className="px-6 py-4 whitespace-nowrap">{project.name}</td>
                     <td className="px-6 py-4 whitespace-nowrap">{project.guid}</td>
+                    <td className="px-6 py-4 whitespace-nowrap">{project.secretKey}</td> {/* Displaying Secret Key */}
                     <td className="px-6 py-4 whitespace-nowrap">
-  <div className="flex space-x-2">
-    <button
-      onClick={() => {
-        setProjectToEdit(project);
-        setShowEditModal(true);
-      }}
-      className="flex items-center bg-blue-600 text-white px-3 py-2 rounded-md shadow-sm hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
-    >
-      <FaEdit className="mr-2" /> Edit
-    </button>
-    <button
-      onClick={() => {
-        setProjectToDelete(project);
-        setShowDeleteModal(true);
-      }}
-      className="flex items-center bg-red-600 text-white px-3 py-2 rounded-md shadow-sm hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600"
-    >
-      <FaTrash className="mr-2" /> Delete
-    </button>
-  </div>
-</td>
-
+                      <div className="flex space-x-2">
+                        <button
+                          onClick={() => {
+                            setProjectToEdit(project);
+                            setShowEditModal(true);
+                          }}
+                          className="flex items-center bg-blue-600 text-white px-3 py-2 rounded-md shadow-sm hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
+                        >
+                          <FaEdit className="mr-2" /> Edit
+                        </button>
+                        <button
+                          onClick={() => {
+                            setProjectToDelete(project);
+                            setShowDeleteModal(true);
+                          }}
+                          className="flex items-center bg-red-600 text-white px-3 py-2 rounded-md shadow-sm hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600"
+                        >
+                          <FaTrash className="mr-2" /> Delete
+                        </button>
+                      </div>
+                    </td>
                   </tr>
                 ))}
               </tbody>
             </table>
             {currentItems.length === 0 && (
               <div className="text-center py-8">
-                <p className="text-gray-600 dark:text-gray-300">No projects found.</p>
+                <p className="text-gray-500">No projects found.</p>
               </div>
             )}
+            <div className="flex justify-between items-center mt-4">
+              <div>
+                <p className="text-sm text-gray-500">
+                  Showing {indexOfFirstItem + 1} to {Math.min(indexOfLastItem, filteredProjects.length)} of {filteredProjects.length} projects
+                </p>
+              </div>
+              <div>
+                <button
+                  onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                  disabled={currentPage === 1}
+                  className="px-3 py-1 bg-gray-200 rounded-md disabled:bg-gray-300"
+                >
+                  Previous
+                </button>
+                <button
+                  onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                  disabled={currentPage === totalPages}
+                  className="px-3 py-1 bg-gray-200 rounded-md disabled:bg-gray-300"
+                >
+                  Next
+                </button>
+              </div>
+            </div>
           </div>
         )}
-        <div className="flex justify-between items-center mt-6">
-          <button
-            className="bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-gray-100 px-4 py-2 rounded-lg shadow-md disabled:opacity-50"
-            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-            disabled={currentPage === 1}
-          >
-            Previous
-          </button>
-          <span className="text-gray-700 dark:text-gray-300">
-            Page {currentPage} of {totalPages}
-          </span>
-          <button
-            className="bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-gray-100 px-4 py-2 rounded-lg shadow-md disabled:opacity-50"
-            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-            disabled={currentPage === totalPages}
-          >
-            Next
-          </button>
-        </div>
+        {error && <div className="mt-4 text-red-600">{error}</div>}
+        {successMessage && <div className="mt-4 text-green-600">{successMessage}</div>}
       </div>
-
-      <AddProjectModal
-        show={showAddModal}
-        onClose={() => setShowAddModal(false)}
-        onAdd={handleAddProject}
-      />
-      <EditProjectModal
-        show={showEditModal}
-        onClose={() => {
-          setShowEditModal(false);
-          setProjectToEdit(null);
-        }}
-        project={projectToEdit}
-        onUpdate={handleEditProject}
-      />
-      <DeleteProjectModal
-        show={showDeleteModal}
-        onClose={() => {
-          setShowDeleteModal(false);
-          setProjectToDelete(null);
-        }}
-        onDelete={handleDeleteProject}
-      />
-
-      {successMessage && (
-        <div className="fixed bottom-4 right-4 bg-green-500 text-white px-4 py-2 rounded-md shadow-md">
-          {successMessage}
-        </div>
-      )}
-      {error && (
-        <div className="fixed bottom-4 right-4 bg-red-500 text-white px-4 py-2 rounded-md shadow-md">
-          {error}
-        </div>
-      )}
+      <AddProjectModal isOpen={showAddModal} onClose={() => setShowAddModal(false)} onAdd={handleAddProject} />
+      <EditProjectModal isOpen={showEditModal} onClose={() => setShowEditModal(false)} project={projectToEdit} onEdit={handleEditProject} />
+      <DeleteProjectModal isOpen={showDeleteModal} onClose={() => setShowDeleteModal(false)} project={projectToDelete} onDelete={handleDeleteProject} />
     </div>
   );
 };
