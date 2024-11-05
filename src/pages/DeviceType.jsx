@@ -221,27 +221,23 @@ const DeviceTypes = () => {
 
                 {/* Pagination */}
                 <div className="flex justify-between items-center mt-4">
-                    <div>
-                        <button
-                            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-                            disabled={currentPage === 1}
-                            className="mr-2 px-4 py-2 bg-gray-300 rounded-md hover:bg-gray-400 dark:bg-gray-700 dark:hover:bg-gray-600"
-                        >
-                            Previous
-                        </button>
-                        <button
-                            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-                            disabled={currentPage === totalPages}
-                            className="px-4 py-2 bg-gray-300 rounded-md hover:bg-gray-400 dark:bg-gray-700 dark:hover:bg-gray-600"
-                        >
-                            Next
-                        </button>
-                    </div>
-                    <div>
-                        <span className="text-gray-700 dark:text-gray-300">
-                            Page {currentPage} of {totalPages}
-                        </span>
-                    </div>
+                    <button
+                        onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                        disabled={currentPage === 1}
+                        className="px-4 py-2 bg-gray-300 rounded-md disabled:opacity-50 dark:bg-gray-700"
+                    >
+                        Previous
+                    </button>
+                    <span className="text-gray-700 dark:text-gray-300">
+                        Page {currentPage} of {totalPages}
+                    </span>
+                    <button
+                        onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                        disabled={currentPage === totalPages}
+                        className="px-4 py-2 bg-gray-300 rounded-md disabled:opacity-50 dark:bg-gray-700"
+                    >
+                        Next
+                    </button>
                 </div>
             </div>
 
