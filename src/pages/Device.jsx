@@ -178,7 +178,11 @@ export default function Device() {
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">{device.type}</td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">{device.latitude}</td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">{device.longitude}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">{device.active ? 'Yes' : 'No'}</td>
+                         <td className="px-6 py-4 whitespace-nowrap text-sm">
+                    <span className={`font-semibold ${device.active ? 'text-green-500' : 'text-red-500'}`}>
+                        {device.active ? 'On' : 'Off'}
+                    </span>
+                </td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
                                             <button onClick={() => { setDeviceToEdit(device); setShowEditModal(true); }} className="text-blue-500 hover:text-blue-700 mr-2">
                                                 <FaEdit />
