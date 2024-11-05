@@ -4,8 +4,8 @@ import apiService from '../services/apiservice';
 import AddDeviceModal from "../components/deviceadmin/AddDeviceModal";
 import EditDeviceModal from '../components/deviceadmin/EditDeviceModal';
 import DeleteDeviceModal from '../components/deviceadmin/DeleteDeviceModal';
-import { FaPlus, FaEdit, FaTrash } from 'react-icons/fa';
-import Swal from 'sweetalert2';
+import { FaPlus, FaEdit, FaTrash } from 'react-icons/fa'; // Import the icons
+import Swal from 'sweetalert2'; // Import SweetAlert2
 
 export default function Device() {
     const [showAddModal, setShowAddModal] = useState(false);
@@ -18,7 +18,6 @@ export default function Device() {
     const [searchQuery, setSearchQuery] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 5;
-    const [selectedType, setSelectedType] = useState(""); // State for selected device type
 
     const fetchDevices = async () => {
         try {
@@ -39,22 +38,21 @@ export default function Device() {
     }, []);
 
     useEffect(() => {
-        const filtered = devices.filter(device => 
-            (device.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        const filtered = devices.filter(device =>
+            device.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
             device.deviceGuid.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            device.mac.toLowerCase().includes(searchQuery.toLowerCase())) &&
-            (selectedType === "" || device.type === selectedType) // Filter by selected type
+            device.mac.toLowerCase().includes(searchQuery.toLowerCase())
         );
         setFilteredDevices(filtered);
-        setCurrentPage(1);
-    }, [searchQuery, devices, selectedType]);
+        setCurrentPage(1); // Reset to first page on new search
+    }, [searchQuery, devices]);
 
     const handleAddDevice = async (deviceData) => {
         try {
             await apiService.addDevices(deviceData);
             setShowAddModal(false);
             Swal.fire('Success', 'Device added successfully!', 'success');
-            fetchDevices();
+            fetchDevices(); // Refresh devices list
         } catch (error) {
             Swal.fire('Error', 'Failed to add device. Please try again.', 'error');
         }
@@ -65,7 +63,7 @@ export default function Device() {
             await apiService.updateDevice(guid, updatedDeviceData);
             setShowEditModal(false);
             Swal.fire('Success', 'Device updated successfully!', 'success');
-            fetchDevices();
+            fetchDevices(); // Refresh devices list
         } catch (error) {
             Swal.fire('Error', 'Failed to update device. Please try again.', 'error');
         }
@@ -76,12 +74,13 @@ export default function Device() {
             await apiService.deleteDeviceCompany(deviceToDelete.guid);
             setShowDeleteModal(false);
             Swal.fire('Success', 'Device deleted successfully!', 'success');
-            fetchDevices();
+            fetchDevices(); // Refresh devices list
         } catch (error) {
             Swal.fire('Error', 'Failed to delete device. Please try again.', 'error');
         }
     };
 
+    // Pagination logic
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
     const currentItems = filteredDevices.slice(indexOfFirstItem, indexOfLastItem);
@@ -90,10 +89,6 @@ export default function Device() {
 
     const handleSearchChange = (e) => {
         setSearchQuery(e.target.value);
-    };
-
-    const handleTypeChange = (e) => {
-        setSelectedType(e.target.value); // Update the selected type state
     };
 
     return (
@@ -109,23 +104,13 @@ export default function Device() {
                         <FaPlus className="mr-2" /> Add Device
                     </button>
                 </div>
-                <div className="flex mb-4 space-x-2">
-                    <select
-                        value={selectedType}
-                        onChange={handleTypeChange}
-                        className="px-4 py-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                    >
-                        <option value="">All Types</option>
-                        <option value="Type1">Type 1</option>
-                        <option value="Type2">Type 2</option>
-                        {/* Add more types as needed */}
-                    </select>
+                <div className="mb-4">
                     <input
                         type="text"
                         placeholder="Search devices..."
                         value={searchQuery}
                         onChange={handleSearchChange}
-                        className="flex-1 px-4 py-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                        className="w-full px-4 py-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                     />
                 </div>
                 <div className="overflow-x-auto bg-white dark:bg-gray-800 rounded-lg shadow-md">
@@ -161,11 +146,29 @@ export default function Device() {
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{item.type}</td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{item.latitude}</td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{item.longitude}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{item.status}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{item.active ? "Yes" : "No"}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
-                                            <button onClick={() => { setDeviceToEdit(item); setShowEditModal(true); }} className="text-blue-600 dark:text-blue-400 hover:underline"><FaEdit /></button>
-                                            <button onClick={() => { setDeviceToDelete(item); setShowDeleteModal(true); }} className="ml-4 text-red-600 dark:text-red-400 hover:underline"><FaTrash /></button>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{item.status ? 'True' : 'False'}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{item.active ? 'Active' : 'Inactive'}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                            <div className="flex space-x-2">
+                                                <button
+                                                    onClick={() => {
+                                                        setDeviceToEdit(item);
+                                                        setShowEditModal(true);
+                                                    }}
+                                                    className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-500"
+                                                >
+                                                    <FaEdit />
+                                                </button>
+                                                <button
+                                                    onClick={() => {
+                                                        setDeviceToDelete(item);
+                                                        setShowDeleteModal(true);
+                                                    }}
+                                                    className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-500"
+                                                >
+                                                    <FaTrash />
+                                                </button>
+                                            </div>
                                         </td>
                                     </tr>
                                 ))
@@ -173,27 +176,48 @@ export default function Device() {
                         </tbody>
                     </table>
                 </div>
-                <div className="mt-4 flex justify-between">
+
+                {/* Pagination Controls */}
+                <div className="flex justify-between items-center mt-4">
                     <button
                         onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
                         disabled={currentPage === 1}
-                        className="px-4 py-2 text-white bg-blue-600 rounded-md disabled:bg-gray-400"
+                        className="bg-gray-300 text-gray-700 px-4 py-2 rounded-md disabled:opacity-50"
                     >
                         Previous
                     </button>
-                    <span>Page {currentPage} of {totalPages}</span>
+                    <span className="text-gray-700 dark:text-gray-300">Page {currentPage} of {totalPages}</span>
                     <button
                         onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
                         disabled={currentPage === totalPages}
-                        className="px-4 py-2 text-white bg-blue-600 rounded-md disabled:bg-gray-400"
+                        className="bg-gray-300 text-gray-700 px-4 py-2 rounded-md disabled:opacity-50"
                     >
                         Next
                     </button>
                 </div>
             </div>
-            {showAddModal && <AddDeviceModal onClose={() => setShowAddModal(false)} onAdd={handleAddDevice} />}
-            {showEditModal && <EditDeviceModal device={deviceToEdit} onClose={() => setShowEditModal(false)} onEdit={handleEditDevice} />}
-            {showDeleteModal && <DeleteDeviceModal device={deviceToDelete} onClose={() => setShowDeleteModal(false)} onDelete={handleDeleteDevice} />}
+
+            <AddDeviceModal
+                    showModal={showAddModal}
+                    onClose={() => setShowAddModal(false)}
+                    onSave={handleAddDevice}
+                />
+                {deviceToEdit && (
+                    <EditDeviceModal
+                        showModal={showEditModal}
+                        onClose={() => setShowEditModal(false)}
+                        device={deviceToEdit}
+                        onSave={handleEditDevice}
+                    />
+                )}
+                  {deviceToDelete && (
+                    <DeleteDeviceModal
+                        isOpen={showDeleteModal}
+                        onClose={() => setShowDeleteModal(false)}
+                        device={deviceToDelete}
+                        onDelete={handleDeleteDevice}
+                    />
+                )}
         </div>
     );
 }
