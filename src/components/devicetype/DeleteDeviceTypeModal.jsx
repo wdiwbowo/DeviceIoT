@@ -6,7 +6,7 @@ const DeleteDeviceTypeModal = ({ show, onClose, onDelete, deviceType }) => {
 
     const deviceName = deviceType ? deviceType.name : 'Unknown Device Type';
 
-    const onDelete = () => {
+    const handleDelete = () => {
         if (deviceType && deviceType.guid) {
             onDelete(deviceType.guid);
             onClose();
