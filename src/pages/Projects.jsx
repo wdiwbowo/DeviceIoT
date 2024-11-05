@@ -5,12 +5,11 @@ import AddProjectModal from "../components/projects/AddProjectModal";
 import EditProjectModal from "../components/projects/EditProjectModal";
 import DeleteProjectModal from "../components/projects/DeleteProjectModal";
 import { FaPlus, FaEdit, FaTrash, FaCopy } from 'react-icons/fa';
+import Swal from 'sweetalert2'; // Make sure to import SweetAlert if not already
 
 const Projects = () => {
   const [projects, setProjects] = useState([]);
   const [filteredProjects, setFilteredProjects] = useState([]);
-  const [error, setError] = useState(null);
-  const [successMessage, setSuccessMessage] = useState(null);
   const [projectToEdit, setProjectToEdit] = useState(null);
   const [projectToDelete, setProjectToDelete] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
@@ -18,24 +17,21 @@ const Projects = () => {
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [isLoading, setIsLoading] = useState(false); // Loading state
+  const [isLoading, setIsLoading] = useState(false);
   const itemsPerPage = 5;
 
   const fetchProjects = async () => {
-    setIsLoading(true); // Start loading
+    setIsLoading(true);
     try {
       const response = await apiService.getAllProjects();
       if (Array.isArray(response.data)) {
         setProjects(response.data);
         setFilteredProjects(response.data);
-      } else {
-        console.error("Data fetched is not an array:", response);
       }
-    } catch (error) {
-      console.error("Error fetching projects:", error);
-      setError("Failed to fetch projects.");
+    } catch {
+      // Handle error silently or show a general error message
     } finally {
-      setIsLoading(false); // Stop loading
+      setIsLoading(false);
     }
   };
 
@@ -57,46 +53,35 @@ const Projects = () => {
       await apiService.addProject(newProject);
       setShowAddModal(false);
       fetchProjects();
-    } catch (error) {
-      setError("Failed to add project. Please try again.");
+    } catch {
+      // Handle error silently or show a general error message
     }
   };
 
   const handleEditProject = async (updatedProject) => {
-    if (!updatedProject || updatedProject.name === "") {
-      setError("Name is required.");
-      return;
-    }
+    if (!updatedProject || updatedProject.name === "") return;
 
     try {
       await apiService.updateProject(updatedProject.guid, updatedProject);
       setShowEditModal(false);
       fetchProjects();
-    } catch (error) {
-      console.error("Failed to update project:", error);
-      setError("Failed to update project. Please try again.");
+    } catch {
+      // Handle error silently or show a general error message
     }
   };
 
   const handleDeleteProject = async () => {
-    if (!projectToDelete || !projectToDelete.guid) {
-      setError("No project selected for deletion.");
-      return;
-    }
+    if (!projectToDelete || !projectToDelete.guid) return;
 
     try {
       await apiService.deleteProject(projectToDelete.guid);
       setShowDeleteModal(false);
-      // Refresh the project list
       fetchProjects();
-
-      // Handle edge case: If deleting the last item on the page, go to the previous page
       if (filteredProjects.length % itemsPerPage === 1 && currentPage > 1) {
         setCurrentPage((prev) => prev - 1);
       }
-    } catch (error) {
-      console.error("Failed to delete project:", error);
-      setError("Failed to delete project. Please try again.");
+    } catch {
+      // Handle error silently or show a general error message
     }
   };
 
@@ -110,7 +95,7 @@ const Projects = () => {
           confirmButtonText: "OK"
         });
       })
-      .catch(err => {
+      .catch(() => {
         Swal.fire({
           title: "Gagal!",
           text: "Gagal menyalin GUID.",
@@ -120,21 +105,9 @@ const Projects = () => {
       });
   };
 
-  useEffect(() => {
-    if (successMessage || error) {
-      const timer = setTimeout(() => {
-        setSuccessMessage(null);
-        setError(null);
-      }, 2000);
-
-      return () => clearTimeout(timer);
-    }
-  }, [successMessage, error]);
-
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = filteredProjects.slice(indexOfFirstItem, indexOfLastItem);
-
   const totalPages = Math.ceil(filteredProjects.length / itemsPerPage);
 
   const handleSearchChange = (e) => {
@@ -151,7 +124,7 @@ const Projects = () => {
             onClick={() => setShowAddModal(true)}
             className="flex items-center bg-blue-600 text-white px-4 py-2 rounded-md shadow-sm hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
           >
-            <FaPlus className="mr-2" />Add Project
+            <FaPlus className="mr-2" /> Add Project
           </button>
         </div>
         <div className="mb-4">
@@ -218,7 +191,6 @@ const Projects = () => {
                         </button>
                       </div>
                     </td>
-
                   </tr>
                 ))}
               </tbody>
@@ -251,38 +223,25 @@ const Projects = () => {
         </div>
       </div>
 
-      <AddProjectModal
-        show={showAddModal}
-        onClose={() => setShowAddModal(false)}
-        onAdd={handleAddProject}
-      />
-      <EditProjectModal
-        show={showEditModal}
-        onClose={() => {
-          setShowEditModal(false);
-          setProjectToEdit(null);
-        }}
-        project={projectToEdit}
-        onUpdate={handleEditProject}
-      />
-      <DeleteProjectModal
-        show={showDeleteModal}
-        onClose={() => {
-          setShowDeleteModal(false);
-          setProjectToDelete(null);
-        }}
-        onDelete={handleDeleteProject}
-      />
-
-      {successMessage && (
-        <div className="fixed bottom-4 right-4 bg-green-500 text-white px-4 py-2 rounded-md shadow-md">
-          {successMessage}
-        </div>
+      {/* Add Project Modal */}
+      {showAddModal && <AddProjectModal onClose={() => setShowAddModal(false)} onAddProject={handleAddProject} />}
+      
+      {/* Edit Project Modal */}
+      {showEditModal && (
+        <EditProjectModal
+          project={projectToEdit}
+          onClose={() => setShowEditModal(false)}
+          onEditProject={handleEditProject}
+        />
       )}
-      {error && (
-        <div className="fixed bottom-4 right-4 bg-red-500 text-white px-4 py-2 rounded-md shadow-md">
-          {error}
-        </div>
+
+      {/* Delete Project Modal */}
+      {showDeleteModal && (
+        <DeleteProjectModal
+          project={projectToDelete}
+          onClose={() => setShowDeleteModal(false)}
+          onDeleteProject={handleDeleteProject}
+        />
       )}
     </div>
   );
