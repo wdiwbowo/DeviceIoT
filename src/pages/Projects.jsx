@@ -56,7 +56,6 @@ const Projects = () => {
     try {
       await apiService.addProject(newProject);
       setShowAddModal(false);
-      setSuccessMessage("Project added successfully!");
       fetchProjects();
     } catch (error) {
       setError("Failed to add project. Please try again.");
@@ -72,7 +71,6 @@ const Projects = () => {
     try {
       await apiService.updateProject(updatedProject.guid, updatedProject);
       setShowEditModal(false);
-      setSuccessMessage("Project updated successfully!");
       fetchProjects();
     } catch (error) {
       console.error("Failed to update project:", error);
@@ -89,8 +87,6 @@ const Projects = () => {
     try {
       await apiService.deleteProject(projectToDelete.guid);
       setShowDeleteModal(false);
-      setSuccessMessage("Project deleted successfully!");
-  
       // Refresh the project list
       fetchProjects();
   
