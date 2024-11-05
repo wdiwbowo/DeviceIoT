@@ -12,7 +12,7 @@ export default function UserProfile() {
     email: '',
     phone: '',
     address: '',
-    imageProfile: ''
+    imageProfile: '' // Pastikan ini konsisten
   });
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -38,7 +38,7 @@ export default function UserProfile() {
           email: userProfile.data.user.email || "Email not available",
           phone: userProfile.data.user.phoneNumber || "Phone number not available",
           address: userProfile.data.user.address || "Address not available",
-          profileImage: userProfile.data.profileImage || "https://via.placeholder.com/150", // Default image if none provided
+          imageProfile: userProfile.data.user.imageProfile || "https://via.placeholder.com/150", // Ganti ke imageProfile di sini
         });
       } catch (error) {
         Swal.fire('Error', error.message, 'error');
@@ -66,7 +66,6 @@ export default function UserProfile() {
     setUser(updatedUser);
     setIsModalOpen(false);
 
-    // Show success message after updating profile
     Swal.fire({
       title: 'Profil Berhasil Diperbarui!',
       text: 'Silahkan reload halaman.',
@@ -84,9 +83,9 @@ export default function UserProfile() {
           title: 'Password berhasil diperbarui!',
           text: 'Silakan gunakan password baru Anda untuk masuk.',
         });
-        setIsPasswordModalOpen(false); // Close the modal on success
+        setIsPasswordModalOpen(false);
       }
-      return response; // Return the response for handling in the modal
+      return response;
     } catch (error) {
       Swal.fire('Error', error.message, 'error');
       return { success: false, message: error.message };
@@ -106,7 +105,7 @@ export default function UserProfile() {
           <div className="flex flex-col items-center text-center">
             {/* Profile Image */}
             <img
-              src={user.imageProfile}
+              src={user.imageProfile} // Pastikan ini konsisten
               alt="Profile"
               className="w-32 h-32 rounded-full mb-4 object-cover border border-gray-300"
             />
@@ -116,13 +115,13 @@ export default function UserProfile() {
             <p className="text-gray-500 mb-4">{user.address}</p>
             <div className="flex gap-4 mb-4">
               <button
-                onClick={handleEditProfile} // Open edit profile modal
+                onClick={handleEditProfile}
                 className="bg-blue-500 text-white py-2 px-4 rounded-md font-semibold hover:bg-blue-600 transition duration-200"
               >
                 Edit Profil
               </button>
               <button
-                onClick={() => setIsPasswordModalOpen(true)} // Open update password modal
+                onClick={() => setIsPasswordModalOpen(true)}
                 className="bg-blue-500 text-white py-2 px-4 rounded-md font-semibold hover:bg-blue-600 transition duration-200"
               >
                 Update Password
@@ -141,7 +140,7 @@ export default function UserProfile() {
             <ModalUpdatePassword
               isOpen={isPasswordModalOpen}
               onClose={() => setIsPasswordModalOpen(false)}
-              onUpdate={handleUpdatePassword} // Pass the update password function
+              onUpdate={handleUpdatePassword}
             />
           )}
         </div>
