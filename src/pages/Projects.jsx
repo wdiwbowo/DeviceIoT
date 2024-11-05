@@ -18,11 +18,11 @@ const Projects = () => {
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [isLoading, setIsLoading] = useState(false); // Loading state
+  const [isLoading, setIsLoading] = useState(false);
   const itemsPerPage = 5;
 
   const fetchProjects = async () => {
-    setIsLoading(true); // Start loading
+    setIsLoading(true);
     try {
       const response = await apiService.getAllProjects();
       if (Array.isArray(response.data)) {
@@ -35,7 +35,7 @@ const Projects = () => {
       console.error("Error fetching projects:", error);
       setError("Failed to fetch projects.");
     } finally {
-      setIsLoading(false); // Stop loading
+      setIsLoading(false);
     }
   };
 
@@ -62,36 +62,31 @@ const Projects = () => {
     }
   };
 
-    const handleEditProject = async (updatedProject) => {
-  if (!updatedProject || !updatedProject.name) {
-    setError("Name is required.");
-    return;
-  }
-  
-  try {
-    await apiService.updateProject(updatedProject.guid, updatedProject);
-    setShowEditModal(false);
-    fetchProjects();
-  } catch (error) {
-    setError("Failed to update project. Please try again.");
-  }
-};
-
+  const handleEditProject = async (updatedProject) => {
+    if (!updatedProject || !updatedProject.name) {
+      setError("Name is required.");
+      return;
+    }
+    
+    try {
+      await apiService.updateProject(updatedProject.guid, updatedProject);
+      setShowEditModal(false);
+      fetchProjects();
+    } catch (error) {
+      setError("Failed to update project. Please try again.");
+    }
+  };
 
   const handleDeleteProject = async () => {
     if (!projectToDelete || !projectToDelete.guid) {
       setError("No project selected for deletion.");
       return;
     }
-  
+
     try {
       await apiService.deleteProject(projectToDelete.guid);
       setShowDeleteModal(false);
-  
-      // Refresh the project list
       fetchProjects();
-  
-      // Handle edge case: If deleting the last item on the page, go to the previous page
       if (filteredProjects.length % itemsPerPage === 1 && currentPage > 1) {
         setCurrentPage((prev) => prev - 1);
       }
@@ -99,7 +94,7 @@ const Projects = () => {
       console.error("Failed to delete project:", error);
       setError("Failed to delete project. Please try again.");
     }
-  };  
+  };
 
   useEffect(() => {
     if (successMessage || error) {
@@ -107,7 +102,6 @@ const Projects = () => {
         setSuccessMessage(null);
         setError(null);
       }, 2000);
-
       return () => clearTimeout(timer);
     }
   }, [successMessage, error]);
@@ -115,7 +109,6 @@ const Projects = () => {
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = filteredProjects.slice(indexOfFirstItem, indexOfLastItem);
-
   const totalPages = Math.ceil(filteredProjects.length / itemsPerPage);
 
   const handleSearchChange = (e) => {
@@ -131,8 +124,8 @@ const Projects = () => {
           <button
             onClick={() => setShowAddModal(true)}
             className="flex items-center bg-blue-600 text-white px-4 py-2 rounded-md shadow-sm hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
-            >
-                <FaPlus className="mr-2" />Add Project
+          >
+            <FaPlus className="mr-2" /> Add Project
           </button>
         </div>
         <div className="mb-4">
@@ -155,108 +148,74 @@ const Projects = () => {
             <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
               <thead className="bg-gray-50 dark:bg-gray-700">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">#</th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">Project Name</th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">GUID</th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">Secret Key</th> 
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">Actions</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Name</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Icon</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Actions</th>
                 </tr>
               </thead>
-              <tbody>
-                {currentItems.map((project, index) => (
-                  <tr key={project.guid}>
-                    <td className="px-6 py-4 whitespace-nowrap">{index + 1}</td>
-                    <td className="px-6 py-4 whitespace-nowrap">{project.name}</td>
-                    <td className="px-6 py-4 whitespace-nowrap">{project.guid}</td>
-                     <td className="px-6 py-4 whitespace-nowrap">{project.secretKey}</td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-  <div className="flex space-x-2">
-    <button
-      onClick={() => {
-        setProjectToEdit(project);
-        setShowEditModal(true);
-      }}
-      className="flex items-center bg-blue-600 text-white px-3 py-2 rounded-md shadow-sm hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
-    >
-      <FaEdit className="mr-2" /> Edit
-    </button>
-    <button
-      onClick={() => {
-        setProjectToDelete(project);
-        setShowDeleteModal(true);
-      }}
-      className="flex items-center bg-red-600 text-white px-3 py-2 rounded-md shadow-sm hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600"
-    >
-      <FaTrash className="mr-2" /> Delete
-    </button>
-  </div>
-</td>
-
+              <tbody className="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
+                {currentItems.length > 0 ? (
+                  currentItems.map((project) => (
+                    <tr key={project.guid}>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">{project.name}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+                        <img src={project.icon} alt={project.name} className="w-8 h-8" />
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        <button
+                          onClick={() => {
+                            setProjectToEdit(project);
+                            setShowEditModal(true);
+                          }}
+                          className="text-yellow-500 hover:text-yellow-600"
+                        >
+                          <FaEdit />
+                        </button>
+                        <button
+                          onClick={() => {
+                            setProjectToDelete(project);
+                            setShowDeleteModal(true);
+                          }}
+                          className="text-red-500 hover:text-red-600 ml-4"
+                        >
+                          <FaTrash />
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="3" className="px-6 py-4 text-center text-sm text-gray-500 dark:text-gray-400">
+                      No projects found.
+                    </td>
                   </tr>
-                ))}
+                )}
               </tbody>
             </table>
-            {currentItems.length === 0 && (
-              <div className="text-center py-8">
-                <p className="text-gray-600 dark:text-gray-300">No projects found.</p>
-              </div>
-            )}
           </div>
         )}
-        <div className="flex justify-between items-center mt-6">
-          <button
-            className="bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-gray-100 px-4 py-2 rounded-lg shadow-md disabled:opacity-50"
-            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-            disabled={currentPage === 1}
-          >
-            Previous
-          </button>
-          <span className="text-gray-700 dark:text-gray-300">
-            Page {currentPage} of {totalPages}
-          </span>
-          <button
-            className="bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-gray-100 px-4 py-2 rounded-lg shadow-md disabled:opacity-50"
-            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-            disabled={currentPage === totalPages}
-          >
-            Next
-          </button>
+        <div className="flex justify-between items-center mt-4">
+          <div>
+            <span className="text-gray-700 dark:text-gray-300">Page {currentPage} of {totalPages}</span>
+          </div>
+          <div>
+            {Array.from({ length: totalPages }, (_, index) => (
+              <button
+                key={index + 1}
+                onClick={() => setCurrentPage(index + 1)}
+                className={`px-4 py-2 mx-1 rounded-md ${currentPage === index + 1 ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-600 dark:text-white dark:hover:bg-gray-700'}`}
+              >
+                {index + 1}
+              </button>
+            ))}
+          </div>
         </div>
+        {error && <div className="text-red-500 mt-4">{error}</div>}
+        {successMessage && <div className="text-green-500 mt-4">{successMessage}</div>}
       </div>
-
-      <AddProjectModal
-        show={showAddModal}
-        onClose={() => setShowAddModal(false)}
-        onAdd={handleAddProject}
-      />
-      <EditProjectModal
-        show={showEditModal}
-        onClose={() => {
-          setShowEditModal(false);
-          setProjectToEdit(null);
-        }}
-        project={projectToEdit}
-        onUpdate={handleEditProject}
-      />
-      <DeleteProjectModal
-        show={showDeleteModal}
-        onClose={() => {
-          setShowDeleteModal(false);
-          setProjectToDelete(null);
-        }}
-        onDelete={handleDeleteProject}
-      />
-
-      {successMessage && (
-        <div className="fixed bottom-4 right-4 bg-green-500 text-white px-4 py-2 rounded-md shadow-md">
-          {successMessage}
-        </div>
-      )}
-      {error && (
-        <div className="fixed bottom-4 right-4 bg-red-500 text-white px-4 py-2 rounded-md shadow-md">
-          {error}
-        </div>
-      )}
+      <AddProjectModal show={showAddModal} onClose={() => setShowAddModal(false)} onAdd={handleAddProject} />
+      <EditProjectModal show={showEditModal} onClose={() => setShowEditModal(false)} project={projectToEdit} onUpdate={handleEditProject} />
+      <DeleteProjectModal show={showDeleteModal} onClose={() => setShowDeleteModal(false)} project={projectToDelete} onDelete={handleDeleteProject} />
     </div>
   );
 };
