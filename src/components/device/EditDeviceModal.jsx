@@ -7,6 +7,7 @@ function EditDeviceModal({ showModal, onClose, device, onSave }) {
     const [deviceTypes, setDeviceTypes] = useState([]); // Add state for device types
     const [error, setError] = useState(''); // Add state for errors
     const [loading, setLoading] = useState(true); // Add state for loading
+    const [companies, setCompanies] = useState([]);
 
     useEffect(() => {
         setDeviceData(device);
@@ -25,8 +26,27 @@ function EditDeviceModal({ showModal, onClose, device, onSave }) {
             }
         };
 
+        const fetchCompanies = async () => {
+            try {
+                const data = await apiService.getAllCompanies();
+                if (Array.isArray(data)) {
+                    setCompanies(data);
+                } else {
+                    console.error('Data fetched is not an array:', data);
+                    setError('Unexpected data format.');
+                }
+            } catch (error) {
+                console.error('Error fetching companies:', error);
+                setError('Failed to fetch companies.');
+            }
+        };
+
         fetchDeviceTypes();
+        fetchCompanies();
+        setLoading(false); 
     }, []);
+
+    
 
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
@@ -79,6 +99,22 @@ function EditDeviceModal({ showModal, onClose, device, onSave }) {
                 )}
                 <form className="space-y-4">
                     <div className="grid grid-cols-2 gap-4">
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">GUID</label>
+                            <select
+                                    name="companyGuid"
+                                    value={deviceData.companyGuid}
+                                    onChange={handleChange}
+                                    className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                                >
+                                    <option value="">Select company</option>
+                                    {companies.map(company => (
+                                        <option key={company.guid} value={company.guid}>
+                                            {company.name}
+                                        </option>
+                                    ))}
+                                </select>
+                        </div>
                         <div>
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">GUID</label>
                             <input
