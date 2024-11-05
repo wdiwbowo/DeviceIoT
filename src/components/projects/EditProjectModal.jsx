@@ -9,23 +9,24 @@ const EditProjectModal = ({ show, onClose, project, onUpdate }) => {
   }, [project]);
 
   const handleUpdateProject = () => {
-    if (!updatedProject.name) {
-      setFormError("Name is required.");
-      return;
-    }
+  if (!updatedProject.name) {
+    setFormError("Name is required.");
+    return;
+  }
+  
+  onUpdate(updatedProject);
+  onClose(); // Close modal only after successful update
+};
 
-    onUpdate(updatedProject);
-    onClose(); // Close modal only after successful update
-  };
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setUpdatedProject((prevState) => ({
-      ...prevState,
-      [name]: value
-    }));
-    setFormError(""); // Reset error on change
-  };
+// Optionally, consider resetting form error on input change
+const handleInputChange = (e) => {
+  const { name, value } = e.target;
+  setUpdatedProject((prevState) => ({
+    ...prevState,
+    [name]: value
+  }));
+  setFormError(""); // Reset error on change
+};
 
   if (!show) return null;
 
