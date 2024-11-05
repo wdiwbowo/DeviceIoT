@@ -5,12 +5,12 @@ import AddProjectModal from "../components/projects/AddProjectModal";
 import EditProjectModal from "../components/projects/EditProjectModal";
 import DeleteProjectModal from "../components/projects/DeleteProjectModal";
 import { FaPlus, FaEdit, FaTrash } from 'react-icons/fa';
-import Swal from 'sweetalert2'; // Import SweetAlert2
 
 const Projects = () => {
   const [projects, setProjects] = useState([]);
   const [filteredProjects, setFilteredProjects] = useState([]);
   const [error, setError] = useState(null);
+  const [successMessage, setSuccessMessage] = useState(null);
   const [projectToEdit, setProjectToEdit] = useState(null);
   const [projectToDelete, setProjectToDelete] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
@@ -18,21 +18,24 @@ const Projects = () => {
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false); // Loading state
   const itemsPerPage = 5;
 
   const fetchProjects = async () => {
-    setIsLoading(true);
+    setIsLoading(true); // Start loading
     try {
       const response = await apiService.getAllProjects();
       if (Array.isArray(response.data)) {
         setProjects(response.data);
         setFilteredProjects(response.data);
+      } else {
+        console.error("Data fetched is not an array:", response);
       }
-    } catch {
-      Swal.fire('Error', 'Failed to fetch projects.', 'error'); // SweetAlert2 error message
+    } catch (error) {
+      console.error("Error fetching projects:", error);
+      setError("Failed to fetch projects.");
     } finally {
-      setIsLoading(false);
+      setIsLoading(false); // Stop loading
     }
   };
 
@@ -53,52 +56,69 @@ const Projects = () => {
     try {
       await apiService.addProject(newProject);
       setShowAddModal(false);
-      Swal.fire('Success', 'Project added successfully!', 'success'); // SweetAlert2 success message
+      setSuccessMessage("Project added successfully!");
       fetchProjects();
-    } catch {
-      Swal.fire('Error', 'Failed to add project. Please try again.', 'error'); // SweetAlert2 error message
+    } catch (error) {
+      setError("Failed to add project. Please try again.");
     }
   };
 
   const handleEditProject = async (updatedProject) => {
     if (!updatedProject || updatedProject.name === "") {
-      Swal.fire('Error', 'Name is required.', 'error'); // SweetAlert2 error message
+      setError("Name is required.");
       return;
     }
 
     try {
       await apiService.updateProject(updatedProject.guid, updatedProject);
       setShowEditModal(false);
-      Swal.fire('Success', 'Project updated successfully!', 'success'); // SweetAlert2 success message
+      setSuccessMessage("Project updated successfully!");
       fetchProjects();
-    } catch {
-      Swal.fire('Error', 'Failed to update project. Please try again.', 'error'); // SweetAlert2 error message
+    } catch (error) {
+      console.error("Failed to update project:", error);
+      setError("Failed to update project. Please try again.");
     }
   };
 
   const handleDeleteProject = async () => {
     if (!projectToDelete || !projectToDelete.guid) {
-      Swal.fire('Error', 'No project selected for deletion.', 'error'); // SweetAlert2 error message
+      setError("No project selected for deletion.");
       return;
     }
-
+  
     try {
       await apiService.deleteProject(projectToDelete.guid);
       setShowDeleteModal(false);
-      Swal.fire('Success', 'Project deleted successfully!', 'success'); // SweetAlert2 success message
+      setSuccessMessage("Project deleted successfully!");
+  
+      // Refresh the project list
       fetchProjects();
-
+  
+      // Handle edge case: If deleting the last item on the page, go to the previous page
       if (filteredProjects.length % itemsPerPage === 1 && currentPage > 1) {
         setCurrentPage((prev) => prev - 1);
       }
-    } catch {
-      Swal.fire('Error', 'Failed to delete project. Please try again.', 'error'); // SweetAlert2 error message
+    } catch (error) {
+      console.error("Failed to delete project:", error);
+      setError("Failed to delete project. Please try again.");
     }
-  };
+  };  
+
+  useEffect(() => {
+    if (successMessage || error) {
+      const timer = setTimeout(() => {
+        setSuccessMessage(null);
+        setError(null);
+      }, 2000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [successMessage, error]);
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = filteredProjects.slice(indexOfFirstItem, indexOfLastItem);
+
   const totalPages = Math.ceil(filteredProjects.length / itemsPerPage);
 
   const handleSearchChange = (e) => {
@@ -114,8 +134,8 @@ const Projects = () => {
           <button
             onClick={() => setShowAddModal(true)}
             className="flex items-center bg-blue-600 text-white px-4 py-2 rounded-md shadow-sm hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
-          >
-            <FaPlus className="mr-2" />Add Project
+            >
+                <FaPlus className="mr-2" />Add Project
           </button>
         </div>
         <div className="mb-4">
@@ -141,7 +161,7 @@ const Projects = () => {
                   <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">#</th>
                   <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">Project Name</th>
                   <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">GUID</th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">Secret Key</th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">Secret Key</th> 
                   <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">Actions</th>
                 </tr>
               </thead>
@@ -151,29 +171,30 @@ const Projects = () => {
                     <td className="px-6 py-4 whitespace-nowrap">{index + 1}</td>
                     <td className="px-6 py-4 whitespace-nowrap">{project.name}</td>
                     <td className="px-6 py-4 whitespace-nowrap">{project.guid}</td>
-                    <td className="px-6 py-4 whitespace-nowrap">{project.secretKey}</td>
+                     <td className="px-6 py-4 whitespace-nowrap">{project.secretKey}</td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex space-x-2">
-                        <button
-                          onClick={() => {
-                            setProjectToEdit(project);
-                            setShowEditModal(true);
-                          }}
-                          className="flex items-center bg-blue-600 text-white px-3 py-2 rounded-md shadow-sm hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
-                        >
-                          <FaEdit className="mr-2" /> Edit
-                        </button>
-                        <button
-                          onClick={() => {
-                            setProjectToDelete(project);
-                            setShowDeleteModal(true);
-                          }}
-                          className="flex items-center bg-red-600 text-white px-3 py-2 rounded-md shadow-sm hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600"
-                        >
-                          <FaTrash className="mr-2" /> Delete
-                        </button>
-                      </div>
-                    </td>
+  <div className="flex space-x-2">
+    <button
+      onClick={() => {
+        setProjectToEdit(project);
+        setShowEditModal(true);
+      }}
+      className="flex items-center bg-blue-600 text-white px-3 py-2 rounded-md shadow-sm hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
+    >
+      <FaEdit className="mr-2" /> Edit
+    </button>
+    <button
+      onClick={() => {
+        setProjectToDelete(project);
+        setShowDeleteModal(true);
+      }}
+      className="flex items-center bg-red-600 text-white px-3 py-2 rounded-md shadow-sm hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600"
+    >
+      <FaTrash className="mr-2" /> Delete
+    </button>
+  </div>
+</td>
+
                   </tr>
                 ))}
               </tbody>
@@ -187,16 +208,18 @@ const Projects = () => {
         )}
         <div className="flex justify-between items-center mt-6">
           <button
-            className="bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 px-4 py-2 rounded-md disabled:opacity-50"
-            onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+            className="bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-gray-100 px-4 py-2 rounded-lg shadow-md disabled:opacity-50"
+            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
             disabled={currentPage === 1}
           >
             Previous
           </button>
-          <span>{`Page ${currentPage} of ${totalPages}`}</span>
+          <span className="text-gray-700 dark:text-gray-300">
+            Page {currentPage} of {totalPages}
+          </span>
           <button
-            className="bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 px-4 py-2 rounded-md disabled:opacity-50"
-            onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+            className="bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-gray-100 px-4 py-2 rounded-lg shadow-md disabled:opacity-50"
+            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
             disabled={currentPage === totalPages}
           >
             Next
@@ -204,28 +227,38 @@ const Projects = () => {
         </div>
       </div>
 
-      {showAddModal && (
-        <AddProjectModal
-          isOpen={showAddModal}
-          onClose={() => setShowAddModal(false)}
-          onAdd={handleAddProject}
-        />
+      <AddProjectModal
+        show={showAddModal}
+        onClose={() => setShowAddModal(false)}
+        onAdd={handleAddProject}
+      />
+      <EditProjectModal
+        show={showEditModal}
+        onClose={() => {
+          setShowEditModal(false);
+          setProjectToEdit(null);
+        }}
+        project={projectToEdit}
+        onUpdate={handleEditProject}
+      />
+      <DeleteProjectModal
+        show={showDeleteModal}
+        onClose={() => {
+          setShowDeleteModal(false);
+          setProjectToDelete(null);
+        }}
+        onDelete={handleDeleteProject}
+      />
+
+      {successMessage && (
+        <div className="fixed bottom-4 right-4 bg-green-500 text-white px-4 py-2 rounded-md shadow-md">
+          {successMessage}
+        </div>
       )}
-      {showEditModal && projectToEdit && (
-        <EditProjectModal
-          isOpen={showEditModal}
-          onClose={() => setShowEditModal(false)}
-          project={projectToEdit}
-          onEdit={handleEditProject}
-        />
-      )}
-      {showDeleteModal && projectToDelete && (
-        <DeleteProjectModal
-          isOpen={showDeleteModal}
-          onClose={() => setShowDeleteModal(false)}
-          project={projectToDelete}
-          onDelete={handleDeleteProject}
-        />
+      {error && (
+        <div className="fixed bottom-4 right-4 bg-red-500 text-white px-4 py-2 rounded-md shadow-md">
+          {error}
+        </div>
       )}
     </div>
   );
