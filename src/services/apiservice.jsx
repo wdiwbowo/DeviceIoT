@@ -284,39 +284,30 @@ const apiService = {
     }
   },
   
- updateProject: async (guid, projectData) => {
+updateProject: async (guid, projectData) => {
   if (!guid) {
     Swal.fire('Error', 'GUID is required.', 'error');
     throw new Error('GUID is required.');
   }
 
   try {
-    console.log("Updating project with GUID:", guid, "and data:", projectData); // Debug
     const response = await apiClient.put(`/projects/update/${guid}`, projectData);
-
-    console.log("Server response:", response); // Debug
-    if (response.status === 200) {
-      Swal.fire('Success', 'Project updated successfully!', 'success');
-      return response.data;
-    } else {
-      Swal.fire('Error', 'Unexpected response status: ' + response.status, 'error');
-      throw new Error('Unexpected response status: ' + response.status);
+    
+    // Cek apakah server mengembalikan status sukses
+    if (!response.data.success) {
+      Swal.fire('Error', response.data.message || 'Failed to update project', 'error');
+      throw new Error(response.data.message || 'Failed to update project');
     }
+    
+    Swal.fire('Success', 'Project updated successfully!', 'success');
+    return response.data;
   } catch (error) {
-    console.error("Error in updateProject:", error); // Debug
-    if (error.response) {
-      // Error from server
-      if (error.response.status === 401) {
-        Swal.fire('Error', 'Unauthorized access. Please log in again.', 'error');
-      } else {
-        Swal.fire('Error', error.response.data?.message || 'Failed to update project', 'error');
-      }
-      throw new Error(error.response.data?.message || 'Failed to update project');
+    if (error.response?.status === 401) {
+      Swal.fire('Error', 'Unauthorized access. Please log in again.', 'error');
     } else {
-      // Network or other error
-      Swal.fire('Error', 'Network error. Please try again later.', 'error');
-      throw new Error('Network error. Please try again later.');
+      Swal.fire('Error', error.message || 'Failed to update project', 'error');
     }
+    throw new Error(error.message || 'Failed to update project');
   }
 },
   
