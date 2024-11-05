@@ -8,14 +8,18 @@ const EditProjectModal = ({ show, onClose, project, onUpdate }) => {
     setUpdatedProject({ ...project });
   }, [project]);
 
-  const handleUpdateProject = () => {
+  const handleUpdateProject = async () => {
   if (!updatedProject.name) {
     setFormError("Name is required.");
     return;
   }
-  
-  onUpdate(updatedProject);
-  onClose(); // Close modal only after successful update
+
+  try {
+    await onUpdate(updatedProject);
+    onClose(); // Close only if the update was successful
+  } catch (error) {
+    setFormError("Failed to update project. Please try again.");
+  }
 };
 
 // Optionally, consider resetting form error on input change
