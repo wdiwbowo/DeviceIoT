@@ -1,4 +1,4 @@
-Fimport axios from 'axios';
+import axios from 'axios';
 import Swal from 'sweetalert2';
 import { jwtDecode } from 'jwt-decode';
 
