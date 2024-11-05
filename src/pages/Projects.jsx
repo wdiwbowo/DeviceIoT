@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
+import Swal from "sweetalert2"; // Import SweetAlert2
 import Navbar from "../components/Navbar";
 import apiService from "../services/apiservice";
 import AddProjectModal from "../components/projects/AddProjectModal";
 import EditProjectModal from "../components/projects/EditProjectModal";
 import DeleteProjectModal from "../components/projects/DeleteProjectModal";
-import { FaPlus, FaEdit, FaTrash, FaCopy  } from 'react-icons/fa';
+import { FaPlus, FaEdit, FaTrash, FaCopy } from 'react-icons/fa';
 
 const Projects = () => {
   const [projects, setProjects] = useState([]);
@@ -29,11 +30,10 @@ const Projects = () => {
         setProjects(response.data);
         setFilteredProjects(response.data);
       } else {
-        console.error("Data fetched is not an array:", response);
+        Swal.fire("Error", "Data fetched is not an array.", "error"); // SweetAlert for error
       }
     } catch (error) {
-      console.error("Error fetching projects:", error);
-      setError("Failed to fetch projects.");
+      Swal.fire("Error", "Failed to fetch projects.", "error"); // SweetAlert for error
     } finally {
       setIsLoading(false); // Stop loading
     }
@@ -57,14 +57,15 @@ const Projects = () => {
       await apiService.addProject(newProject);
       setShowAddModal(false);
       fetchProjects();
+      Swal.fire("Success", "Project added successfully!", "success"); // SweetAlert for success
     } catch (error) {
-      setError("Failed to add project. Please try again.");
+      Swal.fire("Error", "Failed to add project. Please try again.", "error"); // SweetAlert for error
     }
   };
 
   const handleEditProject = async (updatedProject) => {
     if (!updatedProject || updatedProject.name === "") {
-      setError("Name is required.");
+      Swal.fire("Error", "Name is required.", "error"); // SweetAlert for error
       return;
     }
 
@@ -72,42 +73,40 @@ const Projects = () => {
       await apiService.updateProject(updatedProject.guid, updatedProject);
       setShowEditModal(false);
       fetchProjects();
+      Swal.fire("Success", "Project updated successfully!", "success"); // SweetAlert for success
     } catch (error) {
-      console.error("Failed to update project:", error);
-      setError("Failed to update project. Please try again.");
+      Swal.fire("Error", "Failed to update project. Please try again.", "error"); // SweetAlert for error
     }
   };
 
   const handleDeleteProject = async () => {
     if (!projectToDelete || !projectToDelete.guid) {
-      setError("No project selected for deletion.");
+      Swal.fire("Error", "No project selected for deletion.", "error"); // SweetAlert for error
       return;
     }
-  
+
     try {
       await apiService.deleteProject(projectToDelete.guid);
       setShowDeleteModal(false);
-      // Refresh the project list
       fetchProjects();
-  
       // Handle edge case: If deleting the last item on the page, go to the previous page
       if (filteredProjects.length % itemsPerPage === 1 && currentPage > 1) {
         setCurrentPage((prev) => prev - 1);
       }
+      Swal.fire("Success", "Project deleted successfully!", "success"); // SweetAlert for success
     } catch (error) {
-      console.error("Failed to delete project:", error);
-      setError("Failed to delete project. Please try again.");
+      Swal.fire("Error", "Failed to delete project. Please try again.", "error"); // SweetAlert for error
     }
-  };  
+  };
 
   const copyToClipboard = (text) => {
     navigator.clipboard.writeText(text)
       .then(() => {
         setSuccessMessage("GUID copied to clipboard!");
+        Swal.fire("Success", "GUID copied to clipboard!", "success"); // SweetAlert for success
       })
       .catch(err => {
-        console.error("Failed to copy: ", err);
-        setError("Failed to copy GUID.");
+        Swal.fire("Error", "Failed to copy GUID.", "error"); // SweetAlert for error
       });
   };
 
@@ -141,8 +140,8 @@ const Projects = () => {
           <button
             onClick={() => setShowAddModal(true)}
             className="flex items-center bg-blue-600 text-white px-4 py-2 rounded-md shadow-sm hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
-            >
-                <FaPlus className="mr-2" />Add Project
+          >
+            <FaPlus className="mr-2" />Add Project
           </button>
         </div>
         <div className="mb-4">
@@ -168,7 +167,7 @@ const Projects = () => {
                   <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">#</th>
                   <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">Project Name</th>
                   <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">GUID</th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">Secret Key</th> 
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">Secret Key</th>
                   <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">Actions</th>
                 </tr>
               </thead>
@@ -186,95 +185,63 @@ const Projects = () => {
                         <FaCopy />
                       </button>
                     </td>
-                     <td className="px-6 py-4 whitespace-nowrap">{project.secretKey}</td>
+                    <td className="px-6 py-4 whitespace-nowrap">{project.secretKey}</td>
                     <td className="px-6 py-4 whitespace-nowrap">
-  <div className="flex space-x-2">
-    <button
-      onClick={() => {
-        setProjectToEdit(project);
-        setShowEditModal(true);
-      }}
-      className="flex items-center bg-blue-600 text-white px-3 py-2 rounded-md shadow-sm hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
-    >
-      <FaEdit className="mr-2" /> Edit
-    </button>
-    <button
-      onClick={() => {
-        setProjectToDelete(project);
-        setShowDeleteModal(true);
-      }}
-      className="flex items-center bg-red-600 text-white px-3 py-2 rounded-md shadow-sm hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600"
-    >
-      <FaTrash className="mr-2" /> Delete
-    </button>
-  </div>
-</td>
-
+                      <div className="flex space-x-2">
+                        <button
+                          onClick={() => {
+                            setProjectToEdit(project);
+                            setShowEditModal(true);
+                          }}
+                          className="flex items-center bg-blue-600 text-white px-3 py-2 rounded-md shadow-sm hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
+                        >
+                          <FaEdit className="mr-1" /> Edit
+                        </button>
+                        <button
+                          onClick={() => {
+                            setProjectToDelete(project);
+                            setShowDeleteModal(true);
+                          }}
+                          className="flex items-center bg-red-600 text-white px-3 py-2 rounded-md shadow-sm hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600"
+                        >
+                          <FaTrash className="mr-1" /> Delete
+                        </button>
+                      </div>
+                    </td>
                   </tr>
                 ))}
               </tbody>
             </table>
-            {currentItems.length === 0 && (
-              <div className="text-center py-8">
-                <p className="text-gray-600 dark:text-gray-300">No projects found.</p>
-              </div>
-            )}
           </div>
         )}
-        <div className="flex justify-between items-center mt-6">
-          <button
-            className="bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-gray-100 px-4 py-2 rounded-lg shadow-md disabled:opacity-50"
-            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-            disabled={currentPage === 1}
-          >
-            Previous
-          </button>
-          <span className="text-gray-700 dark:text-gray-300">
-            Page {currentPage} of {totalPages}
-          </span>
-          <button
-            className="bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-gray-100 px-4 py-2 rounded-lg shadow-md disabled:opacity-50"
-            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-            disabled={currentPage === totalPages}
-          >
-            Next
-          </button>
+        <div className="flex justify-between items-center mt-4">
+          <div>
+            <span className="text-sm text-gray-500 dark:text-gray-400">Showing {indexOfFirstItem + 1} to {Math.min(indexOfLastItem, filteredProjects.length)} of {filteredProjects.length} projects</span>
+          </div>
+          <div>
+            <button
+              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+              disabled={currentPage === 1}
+              className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:opacity-50"
+            >
+              Previous
+            </button>
+            <span className="mx-2 text-sm text-gray-500 dark:text-gray-400">{currentPage} of {totalPages}</span>
+            <button
+              onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+              disabled={currentPage === totalPages}
+              className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:opacity-50"
+            >
+              Next
+            </button>
+          </div>
         </div>
       </div>
 
-      <AddProjectModal
-        show={showAddModal}
-        onClose={() => setShowAddModal(false)}
-        onAdd={handleAddProject}
-      />
-      <EditProjectModal
-        show={showEditModal}
-        onClose={() => {
-          setShowEditModal(false);
-          setProjectToEdit(null);
-        }}
-        project={projectToEdit}
-        onUpdate={handleEditProject}
-      />
-      <DeleteProjectModal
-        show={showDeleteModal}
-        onClose={() => {
-          setShowDeleteModal(false);
-          setProjectToDelete(null);
-        }}
-        onDelete={handleDeleteProject}
-      />
-
-      {successMessage && (
-        <div className="fixed bottom-4 right-4 bg-green-500 text-white px-4 py-2 rounded-md shadow-md">
-          {successMessage}
-        </div>
-      )}
-      {error && (
-        <div className="fixed bottom-4 right-4 bg-red-500 text-white px-4 py-2 rounded-md shadow-md">
-          {error}
-        </div>
-      )}
+      {/* Modals */}
+      <AddProjectModal show={showAddModal} onClose={() => setShowAddModal(false)} onAddProject={handleAddProject} />
+      <EditProjectModal show={showEditModal} onClose={() => setShowEditModal(false)} project={projectToEdit} onEditProject={handleEditProject} />
+      <DeleteProjectModal show={showDeleteModal} onClose={() => setShowDeleteModal(false)} project={projectToDelete} onDeleteProject={handleDeleteProject} />
     </div>
   );
 };
