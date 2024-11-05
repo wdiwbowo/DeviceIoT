@@ -4,14 +4,16 @@ const EditProjectModal = ({ show, onClose, project, onUpdate }) => {
   const [updatedProject, setUpdatedProject] = useState({ ...project });
   const [formError, setFormError] = useState("");
 
-  // Ini memastikan updatedProject akan diperbarui setiap kali project berubah
   useEffect(() => {
     if (project) {
+      console.log("Project data on modal open:", project); // Debug: Lihat data proyek yang diterima saat modal dibuka
       setUpdatedProject({ ...project });
     }
   }, [project]);
 
   const handleUpdateProject = async () => {
+    console.log("Updated project data before update:", updatedProject); // Debug: Lihat data proyek yang akan dikirim untuk update
+
     if (!updatedProject.name) {
       setFormError("Name is required.");
       return;
@@ -19,8 +21,10 @@ const EditProjectModal = ({ show, onClose, project, onUpdate }) => {
 
     try {
       await onUpdate(updatedProject);
-      onClose(); // Tutup modal jika pembaruan berhasil
+      console.log("Project updated successfully"); // Debug: Konfirmasi jika update berhasil
+      onClose(); // Tutup modal jika update berhasil
     } catch (error) {
+      console.error("Error updating project:", error); // Debug: Menampilkan error jika terjadi masalah saat update
       setFormError("Failed to update project. Please try again.");
     }
   };
@@ -31,7 +35,7 @@ const EditProjectModal = ({ show, onClose, project, onUpdate }) => {
       ...prevState,
       [name]: value,
     }));
-    setFormError(""); // Reset error saat ada perubahan input
+    setFormError(""); // Reset error on change
   };
 
   if (!show) return null;
