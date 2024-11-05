@@ -62,20 +62,30 @@ const Projects = () => {
     }
   };
 
-  const handleEditProject = async (updatedProject) => {
-    if (!updatedProject || updatedProject.name === "") {
+    const handleEditProject = async (updatedProject) => {
+    // Validate that updatedProject is provided and has a name
+    if (!updatedProject || !updatedProject.name) {
       setError("Name is required.");
       return;
     }
-
+  
     try {
+      // Call the updateProject API service with the project GUID and updated data
       await apiService.updateProject(updatedProject.guid, updatedProject);
+      
+      // Close the edit modal and show success message
       setShowEditModal(false);
+      setSuccessMessage("Project updated successfully!");
+      
+      // Fetch the updated list of projects
       fetchProjects();
     } catch (error) {
+      console.error("Failed to update project:", error);
+      
+      // Set the error message to display to the user
       setError("Failed to update project. Please try again.");
     }
-  };
+  };  
 
   const handleDeleteProject = async () => {
     if (!projectToDelete || !projectToDelete.guid) {
