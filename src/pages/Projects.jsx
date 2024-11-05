@@ -223,26 +223,29 @@ const Projects = () => {
         </div>
       </div>
 
-      {/* Add Project Modal */}
-      {showAddModal && <AddProjectModal onClose={() => setShowAddModal(false)} onAddProject={handleAddProject} />}
       
-      {/* Edit Project Modal */}
-      {showEditModal && (
-        <EditProjectModal
-          project={projectToEdit}
-          onClose={() => setShowEditModal(false)}
-          onEditProject={handleEditProject}
-        />
-      )}
-
-      {/* Delete Project Modal */}
-      {showDeleteModal && (
-        <DeleteProjectModal
-          project={projectToDelete}
-          onClose={() => setShowDeleteModal(false)}
-          onDeleteProject={handleDeleteProject}
-        />
-      )}
+      <AddProjectModal
+        show={showAddModal}
+        onClose={() => setShowAddModal(false)}
+        onAdd={handleAddProject}
+      />
+      <EditProjectModal
+        show={showEditModal}
+        onClose={() => {
+          setShowEditModal(false);
+          setProjectToEdit(null);
+        }}
+        project={projectToEdit}
+        onUpdate={handleEditProject}
+      />
+      <DeleteProjectModal
+        show={showDeleteModal}
+        onClose={() => {
+          setShowDeleteModal(false);
+          setProjectToDelete(null);
+        }}
+        onDelete={handleDeleteProject}
+      />
     </div>
   );
 };
