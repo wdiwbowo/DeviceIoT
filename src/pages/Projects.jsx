@@ -5,12 +5,10 @@ import AddProjectModal from "../components/projects/AddProjectModal";
 import EditProjectModal from "../components/projects/EditProjectModal";
 import DeleteProjectModal from "../components/projects/DeleteProjectModal";
 import { FaPlus, FaEdit, FaTrash } from 'react-icons/fa';
-import Swal from 'sweetalert2'; // Import SweetAlert2
 
 const Projects = () => {
   const [projects, setProjects] = useState([]);
   const [filteredProjects, setFilteredProjects] = useState([]);
-  const [error, setError] = useState(null);
   const [projectToEdit, setProjectToEdit] = useState(null);
   const [projectToDelete, setProjectToDelete] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
@@ -18,21 +16,23 @@ const Projects = () => {
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false); // Loading state
   const itemsPerPage = 5;
 
   const fetchProjects = async () => {
-    setIsLoading(true);
+    setIsLoading(true); // Start loading
     try {
       const response = await apiService.getAllProjects();
       if (Array.isArray(response.data)) {
         setProjects(response.data);
         setFilteredProjects(response.data);
+      } else {
+        console.error("Data fetched is not an array:", response);
       }
-    } catch {
-      Swal.fire('Error', 'Failed to fetch projects.', 'error'); // SweetAlert2 error message
+    } catch (error) {
+      console.error("Error fetching projects:", error);
     } finally {
-      setIsLoading(false);
+      setIsLoading(false); // Stop loading
     }
   };
 
@@ -53,52 +53,53 @@ const Projects = () => {
     try {
       await apiService.addProject(newProject);
       setShowAddModal(false);
-      Swal.fire('Success', 'Project added successfully!', 'success'); // SweetAlert2 success message
       fetchProjects();
-    } catch {
-      Swal.fire('Error', 'Failed to add project. Please try again.', 'error'); // SweetAlert2 error message
+    } catch (error) {
+      console.error("Failed to add project:", error);
     }
   };
 
   const handleEditProject = async (updatedProject) => {
     if (!updatedProject || updatedProject.name === "") {
-      Swal.fire('Error', 'Name is required.', 'error'); // SweetAlert2 error message
+      console.error("Name is required.");
       return;
     }
 
     try {
       await apiService.updateProject(updatedProject.guid, updatedProject);
       setShowEditModal(false);
-      Swal.fire('Success', 'Project updated successfully!', 'success'); // SweetAlert2 success message
       fetchProjects();
-    } catch {
-      Swal.fire('Error', 'Failed to update project. Please try again.', 'error'); // SweetAlert2 error message
+    } catch (error) {
+      console.error("Failed to update project:", error);
     }
   };
 
   const handleDeleteProject = async () => {
     if (!projectToDelete || !projectToDelete.guid) {
-      Swal.fire('Error', 'No project selected for deletion.', 'error'); // SweetAlert2 error message
+      console.error("No project selected for deletion.");
       return;
     }
-
+  
     try {
       await apiService.deleteProject(projectToDelete.guid);
       setShowDeleteModal(false);
-      Swal.fire('Success', 'Project deleted successfully!', 'success'); // SweetAlert2 success message
+  
+      // Refresh the project list
       fetchProjects();
-
+  
+      // Handle edge case: If deleting the last item on the page, go to the previous page
       if (filteredProjects.length % itemsPerPage === 1 && currentPage > 1) {
         setCurrentPage((prev) => prev - 1);
       }
-    } catch {
-      Swal.fire('Error', 'Failed to delete project. Please try again.', 'error'); // SweetAlert2 error message
+    } catch (error) {
+      console.error("Failed to delete project:", error);
     }
-  };
+  };  
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = filteredProjects.slice(indexOfFirstItem, indexOfLastItem);
+
   const totalPages = Math.ceil(filteredProjects.length / itemsPerPage);
 
   const handleSearchChange = (e) => {
@@ -115,7 +116,7 @@ const Projects = () => {
             onClick={() => setShowAddModal(true)}
             className="flex items-center bg-blue-600 text-white px-4 py-2 rounded-md shadow-sm hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
           >
-            <FaPlus className="mr-2" />Add Project
+            <FaPlus className="mr-2" /> Add Project
           </button>
         </div>
         <div className="mb-4">
@@ -141,7 +142,7 @@ const Projects = () => {
                   <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">#</th>
                   <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">Project Name</th>
                   <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">GUID</th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">Secret Key</th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">Secret Key</th> 
                   <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">Actions</th>
                 </tr>
               </thead>
@@ -187,16 +188,18 @@ const Projects = () => {
         )}
         <div className="flex justify-between items-center mt-6">
           <button
-            className="bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 px-4 py-2 rounded-md disabled:opacity-50"
-            onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+            className="bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-gray-100 px-4 py-2 rounded-lg shadow-md disabled:opacity-50"
+            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
             disabled={currentPage === 1}
           >
             Previous
           </button>
-          <span>{`Page ${currentPage} of ${totalPages}`}</span>
+          <span className="text-gray-700 dark:text-gray-300">
+            Page {currentPage} of {totalPages}
+          </span>
           <button
-            className="bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 px-4 py-2 rounded-md disabled:opacity-50"
-            onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+            className="bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-gray-100 px-4 py-2 rounded-lg shadow-md disabled:opacity-50"
+            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
             disabled={currentPage === totalPages}
           >
             Next
@@ -204,29 +207,23 @@ const Projects = () => {
         </div>
       </div>
 
-      {showAddModal && (
-        <AddProjectModal
-          isOpen={showAddModal}
-          onClose={() => setShowAddModal(false)}
-          onAdd={handleAddProject}
-        />
-      )}
-      {showEditModal && projectToEdit && (
-        <EditProjectModal
-          isOpen={showEditModal}
-          onClose={() => setShowEditModal(false)}
-          project={projectToEdit}
-          onEdit={handleEditProject}
-        />
-      )}
-      {showDeleteModal && projectToDelete && (
-        <DeleteProjectModal
-          isOpen={showDeleteModal}
-          onClose={() => setShowDeleteModal(false)}
-          project={projectToDelete}
-          onDelete={handleDeleteProject}
-        />
-      )}
+      <AddProjectModal
+        show={showAddModal}
+        onClose={() => setShowAddModal(false)}
+        onAdd={handleAddProject}
+      />
+      <EditProjectModal
+        show={showEditModal}
+        onClose={() => setShowEditModal(false)}
+        project={projectToEdit}
+        onEdit={handleEditProject}
+      />
+      <DeleteProjectModal
+        show={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        project={projectToDelete}
+        onDelete={handleDeleteProject}
+      />
     </div>
   );
 };
