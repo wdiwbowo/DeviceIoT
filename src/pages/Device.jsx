@@ -216,9 +216,27 @@ export default function Device() {
                 </div>
             </div>
 
-            {showAddModal && <AddDeviceModal onClose={() => setShowAddModal(false)} onAdd={handleAddDevice} />}
-            {showEditModal && <EditDeviceModal device={deviceToEdit} onClose={() => setShowEditModal(false)} onEdit={handleEditDevice} />}
-            {showDeleteModal && <DeleteDeviceModal device={deviceToDelete} onClose={() => setShowDeleteModal(false)} onDelete={handleDeleteDevice} />}
+            <AddDeviceModal
+                    showModal={showAddModal}
+                    onClose={() => setShowAddModal(false)}
+                    onSave={handleAddDevice}
+                />
+                {deviceToEdit && (
+                    <EditDeviceModal
+                        showModal={showEditModal}
+                        onClose={() => setShowEditModal(false)}
+                        device={deviceToEdit}
+                        onSave={handleEditDevice}
+                    />
+                )}
+                  {deviceToDelete && (
+                    <DeleteDeviceModal
+                        isOpen={showDeleteModal}
+                        onClose={() => setShowDeleteModal(false)}
+                        device={deviceToDelete}
+                        onDelete={handleDeleteDevice}
+                    />
+                )}
         </div>
     );
 }
