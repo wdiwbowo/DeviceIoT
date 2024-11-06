@@ -47,8 +47,8 @@ export default function Device() {
     useEffect(() => {
         const filtered = devices.filter(device =>
             (device.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            device.deviceGuid.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            device.mac.toLowerCase().includes(searchQuery.toLowerCase())) &&
+                device.deviceGuid.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                device.mac.toLowerCase().includes(searchQuery.toLowerCase())) &&
             (selectedType === "All" || device.type === selectedType) // Filter by type
         );
         setFilteredDevices(filtered);
@@ -178,11 +178,11 @@ export default function Device() {
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">{device.type}</td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">{device.latitude}</td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">{device.longitude}</td>
-                         <td className="px-6 py-4 whitespace-nowrap text-sm">
-                    <span className={`font-semibold ${device.active ? 'text-green-500' : 'text-red-500'}`}>
-                        {device.active ? 'On' : 'Off'}
-                    </span>
-                </td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm">
+                                            <span className={`font-semibold ${device.active ? 'text-green-500' : 'text-red-500'}`}>
+                                                {device.active ? 'On' : 'Off'}
+                                            </span>
+                                        </td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
                                             <button onClick={() => { setDeviceToEdit(device); setShowEditModal(true); }} className="text-blue-500 hover:text-blue-700 mr-2">
                                                 <FaEdit />
@@ -217,26 +217,26 @@ export default function Device() {
             </div>
 
             <AddDeviceModal
-                    showModal={showAddModal}
-                    onClose={() => setShowAddModal(false)}
-                    onSave={handleAddDevice}
+                showModal={showAddModal}
+                onClose={() => setShowAddModal(false)}
+                onSave={handleAddDevice}
+            />
+            {deviceToEdit && (
+                <EditDeviceModal
+                    showModal={showEditModal}
+                    onClose={() => setShowEditModal(false)}
+                    device={deviceToEdit}
+                    onSave={handleEditDevice}
                 />
-                {deviceToEdit && (
-                    <EditDeviceModal
-                        showModal={showEditModal}
-                        onClose={() => setShowEditModal(false)}
-                        device={deviceToEdit}
-                        onSave={handleEditDevice}
-                    />
-                )}
-                  {deviceToDelete && (
-                    <DeleteDeviceModal
-                        isOpen={showDeleteModal}
-                        onClose={() => setShowDeleteModal(false)}
-                        device={deviceToDelete}
-                        onDelete={handleDeleteDevice}
-                    />
-                )}
+            )}
+            {deviceToDelete && (
+                <DeleteDeviceModal
+                    isOpen={showDeleteModal}
+                    onClose={() => setShowDeleteModal(false)}
+                    device={deviceToDelete}
+                    onDelete={handleDeleteDevice}
+                />
+            )}
         </div>
     );
 }

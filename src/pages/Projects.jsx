@@ -223,7 +223,7 @@ const Projects = () => {
         </div>
       </div>
 
-      
+
       <AddProjectModal
         show={showAddModal}
         onClose={() => setShowAddModal(false)}

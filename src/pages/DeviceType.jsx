@@ -183,14 +183,13 @@ const DeviceTypes = () => {
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{type.name || 'N/A'}</td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm">
-                    <span
-                        className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                            type.active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                        }`}
-                    >
-                        {type.active ? 'On' : 'Off'}
-                    </span>
-                </td>
+                                            <span
+                                                className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${type.active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                                                    }`}
+                                            >
+                                                {type.active ? 'On' : 'Off'}
+                                            </span>
+                                        </td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{type.guid || 'N/A'}</td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium flex space-x-2">
                                             <button

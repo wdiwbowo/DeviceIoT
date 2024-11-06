@@ -218,15 +218,15 @@ export default function AddDeviceModal({ showModal, onClose, onSave }) {
                                 <label className="ml-2 block text-sm font-medium text-gray-700 dark:text-gray-300">Active</label>
                             </div>
                             <div className="col-span-2">
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Image URL</label>
-                            <input
-                                type="text"
-                                name="image"
-                                value={deviceData.image}
-                                onChange={handleChange}
-                                className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                            />
-                        </div>
+                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Image URL</label>
+                                <input
+                                    type="text"
+                                    name="image"
+                                    value={deviceData.image}
+                                    onChange={handleChange}
+                                    className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                                />
+                            </div>
                         </div>
 
                         <div className="flex justify-end space-x-4">

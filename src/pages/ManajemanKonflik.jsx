@@ -18,7 +18,7 @@ const ProjectsTable = () => {
     const fetchReports = async () => {
       try {
         const response = await apiService.getAllReportsByCompany(queryParams);
-        
+
         // Akses struktur data yang benar
         const reportsData = response.data.data || [];
         setReports(reportsData);

@@ -17,7 +17,7 @@ export default function UserProfile() {
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
-  
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -49,8 +49,8 @@ export default function UserProfile() {
         Swal.close();
         setLoading(false);
       }
-    };    
-    
+    };
+
     fetchUserProfile();
   }, [navigate]);
 
@@ -93,7 +93,7 @@ export default function UserProfile() {
   };
 
   if (loading) {
-    return null; 
+    return null;
   }
 
   return (

@@ -123,24 +123,24 @@ export default function Device() {
                         <FaPlus className="mr-2" /> Add Device
                     </button>
                 </div>
-<div className="flex mb-4 space-x-4">
-                <input
-                    type="text"
-                    placeholder="Search devices..."
-                    value={searchQuery}
-                    onChange={handleSearchChange}
-                    className="flex-grow px-4 py-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                />
-                <select
-                    value={selectedType}
-                    onChange={handleTypeChange}
-                    className="px-4 py-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                >
-                    {deviceTypes.map((type, index) => (
-                        <option key={index} value={type}>{type}</option>
-                    ))}
-                </select>
-            </div>
+                <div className="flex mb-4 space-x-4">
+                    <input
+                        type="text"
+                        placeholder="Search devices..."
+                        value={searchQuery}
+                        onChange={handleSearchChange}
+                        className="flex-grow px-4 py-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                    />
+                    <select
+                        value={selectedType}
+                        onChange={handleTypeChange}
+                        className="px-4 py-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                    >
+                        {deviceTypes.map((type, index) => (
+                            <option key={index} value={type}>{type}</option>
+                        ))}
+                    </select>
+                </div>
                 <div className="overflow-x-auto bg-white dark:bg-gray-800 rounded-lg shadow-md">
                     <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                         <thead className="bg-gray-50 dark:bg-gray-700">
