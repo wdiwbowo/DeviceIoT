@@ -21,8 +21,9 @@ const AddProjectModal = ({ show, onClose, onAdd }) => {
       return;
     }
 
-    onAdd(newProject);
-    onClose();
+    onAdd(newProject); // Menambahkan proyek
+    setNewProject({ name: "", icon: "" }); // Reset form setelah menambahkan proyek
+    onClose(); // Menutup modal
   };
 
   if (!show) return null;
