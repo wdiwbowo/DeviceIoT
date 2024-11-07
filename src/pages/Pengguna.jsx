@@ -64,6 +64,7 @@ export default function Pengguna() {
                     setPenggunas([...penggunas, response.data.user]);
                     setFilteredPenggunas([...penggunas, response.data.user]);
                     Swal.fire('Success', 'User berhasil ditambahkan!', 'success');
+                    window.location.reload(); // Reload the page
                     setModalOpen(false);
                 } else {
                     Swal.fire('Error', 'Failed to add user.', 'error');
@@ -112,6 +113,7 @@ export default function Pengguna() {
                 setFilteredPenggunas(updatedPenggunas);
                 Swal.fire('Success', 'User updated successfully!', 'success');
                 setUpdateModalOpen(false);
+                window.location.reload(); // Reload the page
             } else {
                 Swal.fire('Error', 'Failed to update user.', 'error');
             }

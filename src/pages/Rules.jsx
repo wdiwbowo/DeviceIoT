@@ -6,6 +6,7 @@ import AddModal from "../components/Rules/AddModal";
 import EditModal from "../components/Rules/EditModal";
 import DeleteModal from "../components/Rules/DeleteModal";
 import { FaPlus, FaEdit, FaTrash } from 'react-icons/fa';
+import Swal from "sweetalert2";
 
 const Rules = () => {
     const [showAddModal, setShowAddModal] = useState(false);
@@ -23,24 +24,25 @@ const Rules = () => {
     const [successMessage, setSuccessMessage] = useState("");
     const [searchTerm, setSearchTerm] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
-    const itemsPerPage = 5; // Define how many items per page
+    const itemsPerPage = 5;
 
-    // Fetch data from API on component mount
+    // Function to fetch data from API
+    const fetchData = async () => {
+        setLoading(true);
+        try {
+            const response = await apiService.getAllRules();
+            setData(response.data);
+            setFilteredData(response.data);
+        } catch (error) {
+            setErrorMessage(error.message || "Failed to fetch rules data.");
+            console.error("Error fetching rules data:", error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Fetch data on component mount
     useEffect(() => {
-        const fetchData = async () => {
-            setLoading(true);
-            try {
-                const response = await apiService.getAllRules();
-                setData(response.data);
-                setFilteredData(response.data);
-            } catch (error) {
-                setErrorMessage(error.message || "Failed to fetch rules data.");
-                console.error("Error fetching rules data:", error);
-            } finally {
-                setLoading(false);
-            }
-        };
-
         fetchData();
     }, []);
 
@@ -55,7 +57,7 @@ const Rules = () => {
             );
             setFilteredData(results);
             setCurrentPage(1); // Reset to the first page when searching
-        }, 300), // Adjust debounce delay as needed
+        }, 300),
         [data]
     );
 
@@ -71,11 +73,20 @@ const Rules = () => {
         setSuccessMessage("");
         try {
             const response = await apiService.addRule(guidInput, valueInput, guidOutput, valueOutput);
-            // console.log('Rule added successfully:', response);
             const newRule = { guidInput, valueInput, guidOutput, valueOutput };
             setData((prevData) => [...prevData, newRule]);
             setFilteredData((prevData) => [...prevData, newRule]);
             setShowAddModal(false);
+    
+            // Show success SweetAlert and reload the page after confirmation
+            Swal.fire({
+                title: 'Success!',
+                text: 'Rule added successfully!',
+                icon: 'success',
+                confirmButtonText: 'OK'
+            }).then(() => {
+                window.location.reload(); // Reload the page
+            });
         } catch (error) {
             setErrorMessage(error.message || "Failed to add rule.");
             console.error('Failed to add rule:', error);
@@ -83,52 +94,70 @@ const Rules = () => {
             setLoading(false);
         }
     };
+    
 
-    // Handle edit rule
     // Handle edit rule
     const handleEdit = async () => {
         if (!selectedRule) return;
-
+    
         setLoading(true);
         setErrorMessage("");
         setSuccessMessage("");
-
+    
         try {
-            // Kirim request untuk memperbarui aturan
             const response = await apiService.updateRule(selectedRule.guid, guidInput, valueInput, guidOutput, valueOutput);
-            // console.log('Rule updated successfully:', response);
-
-            // Perbarui data di state
+            
             const updatedData = data.map((rule) =>
                 rule.guid === selectedRule.guid
                     ? { ...rule, guidInput, valueInput, guidOutput, valueOutput }
                     : rule
             );
-
+    
             setData(updatedData);
             setFilteredData(updatedData);
             setShowEditModal(false);
+    
+            // Show success SweetAlert and reload the page after confirmation
+            Swal.fire({
+                title: 'Success!',
+                text: 'Rule updated successfully!',
+                icon: 'success',
+                confirmButtonText: 'OK'
+            }).then(() => {
+                window.location.reload(); // Reload the page
+            });
         } catch (error) {
             setErrorMessage(error.message || "Failed to update rule.");
             console.error('Failed to update rule:', error);
         } finally {
             setLoading(false);
         }
-    };
+    };    
 
     // Handle delete rule
     const handleDelete = async () => {
         if (!selectedRule) return;
+    
         setLoading(true);
         setErrorMessage("");
         setSuccessMessage("");
-
+    
         try {
             await apiService.deleteRule(selectedRule.guid);
+            
             const updatedData = data.filter((rule) => rule.guid !== selectedRule.guid);
             setData(updatedData);
             setFilteredData(updatedData);
             setShowDeleteModal(false);
+    
+            // Show success SweetAlert and reload the page after confirmation
+            Swal.fire({
+                title: 'Deleted!',
+                text: 'Rule has been deleted successfully!',
+                icon: 'success',
+                confirmButtonText: 'OK'
+            }).then(() => {
+            });
         } catch (error) {
             setErrorMessage("Failed to delete rule.");
             console.error('Failed to delete rule:', error);
@@ -136,6 +165,7 @@ const Rules = () => {
             setLoading(false);
         }
     };
+    
 
     // Pagination calculations
     const totalPages = Math.ceil(filteredData.length / itemsPerPage);
@@ -198,62 +228,57 @@ const Rules = () => {
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{item.guidOutput}</td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{item.valueOutput}</td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                            <div className="flex space-x-2">
-                                                <button
-                                                    onClick={() => {
-                                                        setSelectedRule(item);
-                                                        setGuidInput(item.guidInput);
-                                                        setValueInput(item.valueInput);
-                                                        setGuidOutput(item.guidOutput);
-                                                        setValueOutput(item.valueOutput);
-                                                        setShowEditModal(true);
-                                                    }}
-                                                    className="flex items-center bg-blue-600 text-white px-3 py-2 rounded-md shadow-sm hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
-                                                >
-                                                    <FaEdit className="mr-2" /> Edit
-                                                </button>
-                                                <button
-                                                    onClick={() => {
-                                                        setSelectedRule(item);
-                                                        setShowDeleteModal(true);
-                                                    }}
-                                                    className="flex items-center bg-red-600 text-white px-3 py-2 rounded-md shadow-sm hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600"
-                                                >
-                                                    <FaTrash className="mr-2" /> Delete
-                                                </button>
-                                            </div>
+                                            <button
+                                                onClick={() => {
+                                                    setSelectedRule(item);
+                                                    setGuidInput(item.guidInput);
+                                                    setValueInput(item.valueInput);
+                                                    setGuidOutput(item.guidOutput);
+                                                    setValueOutput(item.valueOutput);
+                                                    setShowEditModal(true);
+                                                }}
+                                                className="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300"
+                                            >
+                                                <FaEdit />
+                                            </button>
+                                            <button
+                                                onClick={() => {
+                                                    setSelectedRule(item);
+                                                    setShowDeleteModal(true);
+                                                }}
+                                                className="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300 ml-4"
+                                            >
+                                                <FaTrash />
+                                            </button>
                                         </td>
-
                                     </tr>
                                 ))}
                             </tbody>
                         </table>
 
+                        {/* Pagination */}
+                        <div className="mt-4 flex justify-between">
+                            <button
+                                onClick={() => setCurrentPage((prevPage) => Math.max(prevPage - 1, 1))}
+                                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
+                            >
+                                Prev
+                            </button>
+                            <span className="px-4 py-2 text-sm font-medium text-gray-900 dark:text-white">
+                                Page {currentPage} of {totalPages}
+                            </span>
+                            <button
+                                onClick={() => setCurrentPage((prevPage) => Math.min(prevPage + 1, totalPages))}
+                                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
+                            >
+                                Next
+                            </button>
+                        </div>
                     </div>
                 )}
-                {/* Pagination */}
-                <div className="flex justify-between items-center mt-6">
-                    <button
-                        className="bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-gray-100 px-4 py-2 rounded-lg shadow-md disabled:opacity-50"
-                        onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-                        disabled={currentPage === 1}
-                    >
-                        Previous
-                    </button>
-                    <span className="text-gray-700 dark:text-gray-300">
-                        Page {currentPage} of {totalPages}
-                    </span>
-                    <button
-                        className="bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-gray-100 px-4 py-2 rounded-lg shadow-md disabled:opacity-50"
-                        onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-                        disabled={currentPage === totalPages}
-                    >
-                        Next
-                    </button>
-                </div>
+            </div>
 
-                {/* Add Modal */}
-                <AddModal
+            <AddModal
                     isOpen={showAddModal}
                     onClose={() => setShowAddModal(false)}
                     onSave={() => handleSave()}
@@ -288,7 +313,6 @@ const Rules = () => {
                     onClose={() => setShowDeleteModal(false)}
                     onDelete={() => handleDelete()}
                 />
-            </div>
         </div>
     );
 };

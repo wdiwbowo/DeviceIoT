@@ -7,8 +7,10 @@ import Swal from 'sweetalert2';
 const ProjectsTable = () => {
   const [reports, setReports] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
   const [error, setError] = useState(null);
 
+  const itemsPerPage = 5; // Define how many items per page
   const queryParams = {
     companyGuid: 'COMPANY-9a01d431-dfe6-48c2-ae5a-6d0177fd2e19-2024',
     type: 'AIProcessing',
@@ -25,19 +27,9 @@ const ProjectsTable = () => {
 
         // Show SweetAlert based on the data length
         if (reportsData.length === 0) {
-          Swal.fire({
-            icon: 'info',
-            title: 'Data Kosong',
-            text: 'Tidak ada laporan yang ditemukan.',
-            confirmButtonText: 'Ok'
-          });
+          // Handle empty data case
         } else {
-          Swal.fire({
-            icon: 'success',
-            title: 'Data Ditemukan',
-            text: `${reportsData.length} laporan ditemukan.`,
-            confirmButtonText: 'Ok'
-          });
+          // Handle data found case
         }
       } catch (err) {
         // Ganti dengan notifikasi SweetAlert
@@ -55,6 +47,13 @@ const ProjectsTable = () => {
 
     fetchReports();
   }, []);
+
+  // Pagination logic
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = reports.slice(indexOfFirstItem, indexOfLastItem);
+
+  const totalPages = Math.ceil(reports.length / itemsPerPage);
 
   if (error) return <p>{error}</p>;
 
@@ -81,7 +80,7 @@ const ProjectsTable = () => {
               </tr>
             </thead>
             <tbody>
-              {reports.length > 0 ? reports.map((item, index) => (
+              {currentItems.length > 0 ? currentItems.map((item, index) => (
                 <tr key={item._id}>
                   <td className="px-6 py-4 whitespace-nowrap">{index + 1}</td>
                   <td className="px-6 py-4 whitespace-nowrap">{item.reporterName || 'Unknown'}</td>
@@ -107,6 +106,25 @@ const ProjectsTable = () => {
             </tbody>
           </table>
         </div>
+          <div className="flex justify-between items-center mt-6">
+            <button
+              className="bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-gray-100 px-4 py-2 rounded-lg shadow-md disabled:opacity-50"
+              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+              disabled={currentPage === 1}
+            >
+              Previous
+            </button>
+            <span className="text-gray-700 dark:text-gray-300">
+              Page {currentPage} of {totalPages}
+            </span>
+            <button
+              className="bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-gray-100 px-4 py-2 rounded-lg shadow-md disabled:opacity-50"
+              onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+              disabled={currentPage === totalPages}
+            >
+              Next
+            </button>
+          </div>
       </div>
     </div>
   );

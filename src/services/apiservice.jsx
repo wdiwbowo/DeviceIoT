@@ -109,83 +109,85 @@ const apiService = {
   getAllDevices: async () => {
     try {
       const response = await apiClient.get('/devices/admin/get');
+      // Swal.fire('Success', 'Devices have been fetched successfully.', 'success');
       return response.data;
     } catch (error) {
       if (error.response?.status === 401) {
-        Swal.fire('Unauthorized', 'Please log in again.', 'error');
+        Swal.fire('Unauthorized', 'Your session has expired. Please log in again.', 'error');
       } else {
-        Swal.fire('Error', 'Failed to fetch devices', 'error');
+        Swal.fire('Error', 'Failed to fetch devices. Please try again later.', 'error');
       }
       throw error;
     }
   },
-
+  
   addDevice: async (deviceData) => {
     try {
       const response = await apiClient.post('/devices/admin/add', deviceData);
-      Swal.fire('Success', 'Device added successfully!', 'success');
+      Swal.fire('Success', 'Device has been added successfully!', 'success');
       return response.data;
     } catch (error) {
       if (error.response?.status === 401) {
-        Swal.fire('Unauthorized', 'Please log in again.', 'error');
+        Swal.fire('Unauthorized', 'Your session has expired. Please log in again.', 'error');
         throw new Error('Unauthorized access. Please log in again.');
       }
-      Swal.fire('Error', error.response?.data?.message || 'Failed to add device', 'error');
-      throw new Error(error.response?.data?.message || 'Failed to add device');
+      Swal.fire('Error', error.response?.data?.message || 'Failed to add the device. Please try again.', 'error');
+      throw new Error(error.response?.data?.message || 'Failed to add the device.');
     }
   },
-
+  
   updateDevice: async (guid, deviceData) => {
     if (!guid) {
-      Swal.fire('Error', 'GUID is required for updating device.', 'error');
+      Swal.fire('Error', 'GUID is required to update the device.', 'error');
       throw new Error('GUID is required.');
     }
-
+  
     try {
       const response = await apiClient.put(`/devices/update/${guid}`, deviceData);
-      Swal.fire('Success', 'Device updated successfully!', 'success');
+      Swal.fire('Success', 'Device has been updated successfully!', 'success');
       return response.data;
     } catch (error) {
       if (error.response?.status === 401) {
-        Swal.fire('Unauthorized', 'Please log in again.', 'error');
+        Swal.fire('Unauthorized', 'Your session has expired. Please log in again.', 'error');
         throw new Error('Unauthorized access. Please log in again.');
       }
-      Swal.fire('Error', error.response?.data?.message || 'Failed to update device', 'error');
-      throw new Error(error.response?.data?.message || 'Failed to update device');
+      Swal.fire('Error', error.response?.data?.message || 'Failed to update the device. Please try again.', 'error');
+      throw new Error(error.response?.data?.message || 'Failed to update the device.');
     }
   },
-
+  
   deleteDevice: async (guid) => {
     if (!guid) {
-      Swal.fire('Error', 'GUID is required for deleting device.', 'error');
+      Swal.fire('Error', 'GUID is required to delete the device.', 'error');
       throw new Error('GUID is required.');
     }
-
+  
     try {
       const response = await apiClient.delete(`/devices/delete/${guid}`);
-      Swal.fire('Success', 'Device deleted successfully!', 'success');
+      Swal.fire('Success', 'Device has been deleted successfully!', 'success');
       return response.data;
     } catch (error) {
       if (error.response?.status === 401) {
-        Swal.fire('Unauthorized', 'Please log in again.', 'error');
+        Swal.fire('Unauthorized', 'Your session has expired. Please log in again.', 'error');
         throw new Error('Unauthorized access. Please log in again.');
       }
-      Swal.fire('Error', error.response?.data?.message || 'Failed to delete device', 'error');
-      throw new Error(error.response?.data?.message || 'Failed to delete device');
+      Swal.fire('Error', error.response?.data?.message || 'Failed to delete the device. Please try again.', 'error');
+      throw new Error(error.response?.data?.message || 'Failed to delete the device.');
     }
   },
+  
 
   getAllRules: async () => {
     try {
       const response = await apiClient.get('/rules/all');
-      Swal.fire('Success', 'Rules fetched successfully.', 'success');
+      // Swal.fire('Success', 'Rules have been fetched successfully.', 'success');
       return response.data;
     } catch (error) {
-      Swal.fire('Error', error.response?.data?.message || 'Failed to fetch rules', 'error');
+      Swal.fire('Error', error.response?.data?.message || 'Failed to fetch rules. Please try again later.', 'error');
       throw new Error(error.response?.data?.message || 'Failed to fetch rules');
     }
   },
-
+  
   addRule: async (guidInput, valueInput, guidOutput, valueOutput) => {
     try {
       const response = await apiClient.post('/rules/add', {
@@ -194,14 +196,14 @@ const apiService = {
         guidOutput,
         valueOutput,
       });
-      Swal.fire('Success', 'Rule added successfully!', 'success');
+      Swal.fire('Success', 'Rule has been added successfully!', 'success');
       return response.data;
     } catch (error) {
-      Swal.fire('Error', error.response?.data?.message || 'Failed to add rule', 'error');
+      Swal.fire('Error', error.response?.data?.message || 'Failed to add rule. Please try again later.', 'error');
       throw new Error(error.response?.data?.message || 'Failed to add rule');
     }
   },
-
+  
   updateRule: async (guid, newGuidInput, newValueInput, newGuidOutput, newValueOutput) => {
     try {
       const requestData = {
@@ -217,51 +219,51 @@ const apiService = {
         },
       });
   
-      Swal.fire('Success', 'Rule updated successfully!', 'success');
+      Swal.fire('Success', 'Rule has been updated successfully!', 'success');
       return response.data;
     } catch (error) {
       if (error.response?.status === 401) {
         Swal.fire('Error', 'Unauthorized access. Please log in again.', 'error');
       } else {
-        Swal.fire('Error', error.response?.data?.message || 'Failed to update rule', 'error');
+        Swal.fire('Error', error.response?.data?.message || 'Failed to update rule. Please try again later.', 'error');
       }
       throw new Error(error.response?.data?.message || 'Failed to update rule');
     }
   },
   
   deleteRule: async (guid) => {
-  if (!guid) {
-    Swal.fire('Error', 'GUID is required.', 'error');
-    console.error('Error: GUID is required.');
-    throw new Error('GUID is required.');
-  }
-
-  try {
-    console.log(`Attempting to delete rule with GUID: ${guid}`);
-    const response = await apiClient.delete(`/rules/delete/${guid}`);
-    console.log('Delete Rule Response:', response.data);
-    Swal.fire('Success', 'Rule deleted successfully!', 'success');
-    return response.data;
-  } catch (error) {
-    console.error('Error deleting rule:', error);
-
-    if (error.response?.status === 401) {
-      Swal.fire('Error', 'Unauthorized access. Please log in again.', 'error');
-      console.error('Unauthorized access. Redirecting to login.');
-      throw new Error('Unauthorized access. Please log in again.');
-    } else {
-      const errorMessage = error.response?.data?.message || 'Failed to delete rule';
-      Swal.fire('Error', errorMessage, 'error');
-      console.error('Failed to delete rule:', errorMessage);
-      throw new Error(errorMessage);
+    if (!guid) {
+      Swal.fire('Error', 'GUID is required to delete the rule.', 'error');
+      console.error('Error: GUID is required.');
+      throw new Error('GUID is required.');
     }
-  }
-},
+  
+    try {
+      console.log(`Attempting to delete rule with GUID: ${guid}`);
+      const response = await apiClient.delete(`/rules/delete/${guid}`);
+      console.log('Delete Rule Response:', response.data);
+      Swal.fire('Success', 'Rule has been deleted successfully!', 'success');
+      return response.data;
+    } catch (error) {
+      console.error('Error deleting rule:', error);
+  
+      if (error.response?.status === 401) {
+        Swal.fire('Error', 'Unauthorized access. Please log in again.', 'error');
+        console.error('Unauthorized access. Redirecting to login.');
+        throw new Error('Unauthorized access. Please log in again.');
+      } else {
+        const errorMessage = error.response?.data?.message || 'Failed to delete rule. Please try again later.';
+        Swal.fire('Error', errorMessage, 'error');
+        console.error('Failed to delete rule:', errorMessage);
+        throw new Error(errorMessage);
+      }
+    }
+  },  
   
   getAllProjects: async () => {
     try {
       const response = await apiClient.get('/projects/get');
-      Swal.fire('Success', 'Project fetched successfully.', 'success');
+      // Swal.fire('Success', 'Project fetched successfully.', 'success');
       return response.data;
     } catch (error) {
       if (error.response?.status === 401) {
@@ -331,7 +333,7 @@ updateProject: async (guid, projectData) => {
   getDeviceTypes: async () => {
     try {
       const response = await apiClient.get('/device-types/get');
-      Swal.fire('Success', 'Device Type fetched successfully.', 'success');
+      // Swal.fire('Success', 'Device Type fetched successfully.', 'success');
       return response.data;
     } catch (error) {
       Swal.fire('Error', 'Error fetching device types', 'error');
@@ -393,7 +395,7 @@ updateProject: async (guid, projectData) => {
   getAllCompanies: async () => {
     try {
       const response = await apiUser.get('/companies');
-      Swal.fire('Success', 'Company fetched successfully.', 'success');
+      // Swal.fire('Success', 'Company fetched successfully.', 'success');
       return response.data?.data || [];
     } catch (error) {
       Swal.fire('Error', error.response?.data?.message || 'Failed to fetch companies', 'error');
@@ -418,6 +420,7 @@ updateProject: async (guid, projectData) => {
   getAllDevicesCompany: async () => {
     try {
       const response = await apiClient.get('/devices/company/get');
+      // Swal.fire('Success', 'Device fetched successfully.', 'success');
       return response.data;
     } catch (error) {
       if (error.response?.status === 401) {
@@ -487,7 +490,7 @@ updateProject: async (guid, projectData) => {
   getAllUser: async () => {
       try {
           const response = await apiUser.get('/users/by-module');
-          Swal.fire('Success', 'Users fetched successfully.', 'success');
+          // Swal.fire('Success', 'Users fetched successfully.', 'success');
           return response.data;
       } catch (error) {
           if (error.response?.status === 401) {
@@ -534,7 +537,7 @@ updateProject: async (guid, projectData) => {
                   type: queryParams.type,
               }
           });
-          Swal.fire('Success', 'Reports fetched successfully.', 'success');
+          // Swal.fire('Success', 'Reports fetched successfully.', 'success');
           return response.data;
       } catch (error) {
           if (error.response?.status === 401) {
