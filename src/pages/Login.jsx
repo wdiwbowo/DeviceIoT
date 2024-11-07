@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { jwtDecode } from 'jwt-decode';
+import {jwtDecode} from 'jwt-decode';
 import apiService from '../services/apiservice';
-import { FaEye, FaEyeSlash } from 'react-icons/fa'; // Importing icons
+import { FaEye, FaEyeSlash, FaUser, FaLock } from 'react-icons/fa'; // Importing icons
 import Swal from 'sweetalert2'; // Import SweetAlert
 
 const Login = () => {
@@ -44,39 +44,49 @@ const Login = () => {
       <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
         <h2 className="text-2xl font-bold mb-6 text-center">Login</h2>
         <form onSubmit={handleLogin}>
-          <div className="mb-4">
+          <div className="mb-4 relative">
             <label htmlFor="username" className="block text-gray-700 mb-2">
               Username
             </label>
-            <input
-              type="text"
-              id="username"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded"
-              required
-            />
+            <div className="flex items-center border border-gray-300 rounded">
+              <span className="px-3 text-gray-600">
+                <FaUser />
+              </span>
+              <input
+                type="text"
+                id="username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                className="w-full p-2 focus:outline-none"
+                required
+              />
+            </div>
           </div>
           <div className="mb-6 relative">
             <label htmlFor="password" className="block text-gray-700 mb-2">
               Password
             </label>
-            <input
-              type={showPassword ? 'text' : 'password'}
-              id="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded pr-10"
-              required
-            />
-            <button
-              type="button"
-              onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-2 top-2"
-              aria-label="Toggle password visibility"
-            >
-              {showPassword ? <FaEyeSlash className="text-gray-600" /> : <FaEye className="text-gray-600" />}
-            </button>
+            <div className="flex items-center border border-gray-300 rounded">
+              <span className="px-3 text-gray-600">
+                <FaLock />
+              </span>
+              <input
+                type={showPassword ? 'text' : 'password'}
+                id="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full p-2 pr-10 focus:outline-none"
+                required
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-2 top-2"
+                aria-label="Toggle password visibility"
+              >
+                {showPassword ? <FaEyeSlash className="text-gray-600" /> : <FaEye className="text-gray-600" />}
+              </button>
+            </div>
           </div>
           <button
             type="submit"
