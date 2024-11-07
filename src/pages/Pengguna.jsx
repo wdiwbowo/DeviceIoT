@@ -3,16 +3,20 @@ import Navbar from "../components/Navbar";
 import apiService from '../services/apiservice';
 import { FaPlus, FaEdit, FaTrash } from 'react-icons/fa';
 import AddUserModal from "../components/pengguna/AddUserModal";
-import Swal from 'sweetalert2'; // Import SweetAlert2
+import DeleteUserModal from "../components/pengguna/DeleteUserModal";
+import UpdateUserModal from "../components/pengguna/UpdateUserModal"; // New import
+import Swal from 'sweetalert2';
 
 export default function Pengguna() {
     const [penggunas, setPenggunas] = useState([]);
     const [filteredPenggunas, setFilteredPenggunas] = useState([]);
-    const [error, setError] = useState(null);
-    const [successMessage, setSuccessMessage] = useState(null);
     const [searchQuery, setSearchQuery] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
+    const [isUpdateModalOpen, setUpdateModalOpen] = useState(false); // New state for Update Modal
+    const [userToUpdate, setUserToUpdate] = useState(null); // New state for the user to update
     const [isModalOpen, setModalOpen] = useState(false);
+    const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
+    const [userToDelete, setUserToDelete] = useState(null);
     const itemsPerPage = 5;
 
     const fetchPenggunas = async () => {
@@ -22,10 +26,10 @@ export default function Pengguna() {
                 setPenggunas(response.data.users);
                 setFilteredPenggunas(response.data.users);
             } else {
-                Swal.fire('Error', 'Data fetched is not an array', 'error'); // Show error alert
+                Swal.fire('Error', 'Data fetched is not an array', 'error');
             }
         } catch (error) {
-            Swal.fire('Error', 'Failed to fetch pengguna.', 'error'); // Show error alert
+            Swal.fire('Error', 'Failed to fetch pengguna.', 'error');
         }
     };
 
@@ -59,14 +63,60 @@ export default function Pengguna() {
                 if (response.success) {
                     setPenggunas([...penggunas, response.data.user]);
                     setFilteredPenggunas([...penggunas, response.data.user]);
-                    Swal.fire('Success', 'User berhasil ditambahkan!', 'success'); // Show success alert
+                    Swal.fire('Success', 'User berhasil ditambahkan!', 'success');
                     setModalOpen(false);
                 } else {
-                    Swal.fire('Error', 'Failed to add user.', 'error'); // Show error alert
+                    Swal.fire('Error', 'Failed to add user.', 'error');
                 }
             } catch (error) {
-                Swal.fire('Error', 'Failed to add user.', 'error'); // Show error alert
+                Swal.fire('Error', 'Failed to add user.', 'error');
             }
+        }
+    };
+
+    const openDeleteModal = (user) => {
+        setUserToDelete(user);
+        setDeleteModalOpen(true);
+    };
+
+    const handleDeleteUser = async () => {
+        if (userToDelete) {
+            try {
+                await apiService.deleteUser(userToDelete.guid);
+                const updatedPenggunas = penggunas.filter(user => user.guid !== userToDelete.guid);
+                setPenggunas(updatedPenggunas);
+                setFilteredPenggunas(updatedPenggunas);
+                Swal.fire('Success', 'User berhasil dihapus!', 'success');
+            } catch (error) {
+                Swal.fire('Error', 'Gagal menghapus user.', 'error');
+            } finally {
+                setDeleteModalOpen(false);
+                setUserToDelete(null);
+            }
+        }
+    };
+
+    const openUpdateModal = (user) => {
+        setUserToUpdate(user);
+        setUpdateModalOpen(true);
+    };
+
+    const handleUpdateUser = async (updatedData) => {
+        try {
+            const response = await apiService.updateUser(updatedData.guid, updatedData);
+            if (response.success) {
+                const updatedPenggunas = penggunas.map((user) =>
+                    user.guid === updatedData.guid ? { ...user, ...updatedData } : user
+                );
+                setPenggunas(updatedPenggunas);
+                setFilteredPenggunas(updatedPenggunas);
+                Swal.fire('Success', 'User updated successfully!', 'success');
+                setUpdateModalOpen(false);
+            } else {
+                Swal.fire('Error', 'Failed to update user.', 'error');
+            }
+        } catch (error) {
+            Swal.fire('Error', 'Failed to update user.', 'error');
         }
     };
 
@@ -127,11 +177,16 @@ export default function Pengguna() {
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                             <div className="flex space-x-2">
-                                                <button className="flex items-center bg-blue-600 text-white px-3 py-2 rounded-md shadow-sm hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600">
-                                                    <FaEdit className="mr-2" /> Edit
+                                                <button
+                                                    onClick={() => openUpdateModal} 
+                                                    className="flex items-center bg-blue-500 text-white px-2 py-1 rounded-md hover:bg-blue-600">
+                                                    <FaEdit className="mr-1" /> Edit
                                                 </button>
-                                                <button className="flex items-center bg-red-600 text-white px-3 py-2 rounded-md shadow-sm hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600">
-                                                    <FaTrash className="mr-2" /> Delete
+                                                <button
+                                                    onClick={() => openDeleteModal(item)}
+                                                    className="flex items-center bg-red-600 text-white px-2 py-1 rounded-md hover:bg-red-700"
+                                                >
+                                                    <FaTrash className="mr-1" /> Delete
                                                 </button>
                                             </div>
                                         </td>
@@ -142,17 +197,26 @@ export default function Pengguna() {
                     </table>
                 </div>
 
-                {error && (
-                    <div className="mb-4 p-4 bg-red-100 text-red-700 rounded">
-                        <p>{error}</p>
-                    </div>
-                )}
+                <DeleteUserModal
+                    isOpen={isDeleteModalOpen}
+                    onClose={() => setDeleteModalOpen(false)}
+                    onConfirm={handleDeleteUser}
+                    user={userToDelete}
+                />
 
-                {successMessage && (
-                    <div className="mb-4 p-4 bg-green-100 text-green-700 rounded">
-                        <p>{successMessage}</p>
-                    </div>
-                )}
+                {/* AddUserModal component */}
+                <AddUserModal
+                    isOpen={isModalOpen}
+                    onClose={() => setModalOpen(false)}
+                    onAddUser={handleAddUser}
+                />
+
+                <UpdateUserModal
+                    isOpen={isUpdateModalOpen}
+                    onClose={() => setUpdateModalOpen(false)}
+                    user={userToUpdate}
+                    onUpdateUser={handleUpdateUser}
+                />
 
                 <div className="flex justify-between items-center mt-6">
                     <button
@@ -174,13 +238,6 @@ export default function Pengguna() {
                     </button>
                 </div>
             </div>
-
-            {/* AddUserModal component */}
-            <AddUserModal
-                isOpen={isModalOpen}
-                onClose={() => setModalOpen(false)}
-                onAddUser={handleAddUser}
-            />
         </div>
     );
 }

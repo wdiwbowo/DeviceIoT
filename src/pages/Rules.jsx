@@ -75,7 +75,6 @@ const Rules = () => {
             const newRule = { guidInput, valueInput, guidOutput, valueOutput };
             setData((prevData) => [...prevData, newRule]);
             setFilteredData((prevData) => [...prevData, newRule]);
-            setSuccessMessage("Rule added successfully!");
             setShowAddModal(false);
         } catch (error) {
             setErrorMessage(error.message || "Failed to add rule.");
@@ -108,7 +107,6 @@ const Rules = () => {
 
             setData(updatedData);
             setFilteredData(updatedData);
-            setSuccessMessage("Rule updated successfully!");
             setShowEditModal(false);
         } catch (error) {
             setErrorMessage(error.message || "Failed to update rule.");
@@ -130,7 +128,6 @@ const Rules = () => {
             const updatedData = data.filter((rule) => rule.guid !== selectedRule.guid);
             setData(updatedData);
             setFilteredData(updatedData);
-            setSuccessMessage("Rule deleted successfully!");
             setShowDeleteModal(false);
         } catch (error) {
             setErrorMessage("Failed to delete rule.");

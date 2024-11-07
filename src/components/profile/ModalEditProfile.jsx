@@ -95,12 +95,13 @@ export default function ModalEditProfile({ isOpen, onClose, user, onUpdate }) {
           <div className="mb-4">
             <label className="block text-gray-700">Nomor Telepon</label>
             <InputMask
-              mask="(999) 999-9999"
+              mask="+62 999-9999-9999"
               value={phoneNumber}
               onChange={(e) => setPhoneNumber(e.target.value)} // Update state correctly
               className="border rounded w-full px-3 py-2"
               required
             />
+
           </div>
           <div className="mb-4">
             <label className="block text-gray-700">Alamat</label>
