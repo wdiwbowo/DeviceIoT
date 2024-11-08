@@ -17,7 +17,7 @@ export default function Device() {
     const [deviceToDelete, setDeviceToDelete] = useState(null);
     const [searchQuery, setSearchQuery] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
-    const itemsPerPage = 5;
+    const itemsPerPage = 10;
     const [selectedType, setSelectedType] = useState("All"); // State for selected device type
     const [deviceTypes, setDeviceTypes] = useState([]); // State for device types
 

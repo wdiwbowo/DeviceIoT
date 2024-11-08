@@ -11,7 +11,7 @@ const ProjectsTable = () => {
   const [error, setError] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const [reportsPerPage] = useState(5);
+  const [reportsPerPage] = useState(10);
   const [successMessage, setSuccessMessage] = useState(""); // State for success message
 
   const queryParams = {

@@ -24,7 +24,7 @@ const Rules = () => {
     const [successMessage, setSuccessMessage] = useState("");
     const [searchTerm, setSearchTerm] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
-    const itemsPerPage = 5;
+    const itemsPerPage = 10;
 
     // Function to fetch data from API
     const fetchData = async () => {

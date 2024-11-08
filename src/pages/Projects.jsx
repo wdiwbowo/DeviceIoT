@@ -18,7 +18,7 @@ const Projects = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const itemsPerPage = 5;
+  const itemsPerPage = 10;
 
   const fetchProjects = async () => {
     setIsLoading(true);

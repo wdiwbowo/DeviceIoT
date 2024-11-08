@@ -17,7 +17,7 @@ export default function Pengguna() {
     const [isModalOpen, setModalOpen] = useState(false);
     const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
     const [userToDelete, setUserToDelete] = useState(null);
-    const itemsPerPage = 5;
+    const itemsPerPage = 10;
 
     const fetchPenggunas = async () => {
         try {

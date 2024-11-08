@@ -10,7 +10,7 @@ const ProjectsTable = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [error, setError] = useState(null);
 
-  const itemsPerPage = 5; // Define how many items per page
+  const itemsPerPage = 10; // Define how many items per page
   const queryParams = {
     companyGuid: 'COMPANY-9a01d431-dfe6-48c2-ae5a-6d0177fd2e19-2024',
     type: 'AIProcessing',
