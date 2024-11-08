@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {jwtDecode} from 'jwt-decode';
+import {jwtDecode} from 'jwt-decode'; // Correct import for jwt-decode
 import apiService from '../services/apiservice';
 import { FaEye, FaEyeSlash, FaUser, FaLock } from 'react-icons/fa'; // Importing icons
 import Swal from 'sweetalert2'; // Import SweetAlert
@@ -42,6 +42,9 @@ const Login = () => {
   return (
     <div className="flex items-center justify-center h-screen bg-gray-100">
       <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
+        <div className="flex justify-center mb-4">
+          <FaUser className="text-blue-500 text-6xl hover:text-blue-600 transition duration-200" />
+        </div>
         <h2 className="text-2xl font-bold mb-6 text-center">Login</h2>
         <form onSubmit={handleLogin}>
           <div className="mb-4 relative">
@@ -49,7 +52,7 @@ const Login = () => {
               Username
             </label>
             <div className="flex items-center border border-gray-300 rounded">
-              <span className="px-3 text-gray-600">
+              <span className="px-3 text-blue-500">
                 <FaUser />
               </span>
               <input
@@ -67,7 +70,7 @@ const Login = () => {
               Password
             </label>
             <div className="flex items-center border border-gray-300 rounded">
-              <span className="px-3 text-gray-600">
+              <span className="px-3 text-blue-500">
                 <FaLock />
               </span>
               <input
@@ -84,7 +87,11 @@ const Login = () => {
                 className="absolute right-2 top-2"
                 aria-label="Toggle password visibility"
               >
-                {showPassword ? <FaEyeSlash className="text-gray-600" /> : <FaEye className="text-gray-600" />}
+                {showPassword ? (
+                  <FaEyeSlash className="text-blue-500 hover:text-blue-600 transition duration-200" />
+                ) : (
+                  <FaEye className="text-blue-500 hover:text-blue-600 transition duration-200" />
+                )}
               </button>
             </div>
           </div>
